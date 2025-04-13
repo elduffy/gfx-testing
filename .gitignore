@@ -34,3 +34,4 @@
 # Project specifics
 .idea
 cmake-build-debug
+!content/*

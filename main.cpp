@@ -1,5 +1,18 @@
+#include <filesystem>
 #include <iostream>
 #include <SDL3/SDL.h>
+#include <obj_loader.hpp>
+
+std::filesystem::path getProjectRoot() {
+    std::filesystem::path path = std::filesystem::current_path();
+    while (!is_empty(path)) {
+        if (path.filename() == "gfx-testing") {
+            return path;
+        }
+        path = path.parent_path();
+    }
+    throw std::runtime_error("Could not find project root directory.");
+}
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
@@ -17,6 +30,8 @@ int main() {
         SDL_Log("SDL_CreateWindow failed: %s", SDL_GetError());
         return -1;
     }
+
+    model::loadObjFile( getProjectRoot() / "content/basic-shapes.obj");
 
     bool quit = false;
     SDL_Event event;
