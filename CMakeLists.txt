@@ -13,6 +13,7 @@ add_executable(gfx_testing
         main.cpp
         src/obj_loader.cpp
         src/sdl.cpp
+        src/util.cpp
 )
 target_link_libraries(gfx_testing
         SDL3::SDL3
