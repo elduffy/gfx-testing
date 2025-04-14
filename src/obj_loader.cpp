@@ -4,7 +4,7 @@
 #include <tiny_obj_loader.h>
 #include <SDL3/SDL_log.h>
 
-namespace model {
+namespace gfx_testing::model {
     void loadObjFile(const std::filesystem::path& path) {
         SDL_Log("Loading obj file %s", path.c_str());
 
@@ -29,7 +29,7 @@ namespace model {
         SDL_Log("Successfully loaded obj file %s with %zu shapes, %zu materials", path.c_str(), shapes.size(), materials.size());
 
         for (auto const& shape : shapes) {
-            SDL_Log("Shape %s has %d indices", shape.name.c_str(), shape.mesh.indices.size());
+            SDL_Log("Shape %s has %zu indices", shape.name.c_str(), shape.mesh.indices.size());
         }
     }
 }

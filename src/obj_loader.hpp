@@ -1,5 +1,5 @@
 #pragma once
 
-namespace model {
+namespace gfx_testing::model {
     void loadObjFile(std::filesystem::path const & path);
 }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL3/SDL.h>
 #include <obj_loader.hpp>
+#include <sdl.hpp>
 
 std::filesystem::path getProjectRoot() {
     std::filesystem::path path = std::filesystem::current_path();
@@ -15,23 +16,8 @@ std::filesystem::path getProjectRoot() {
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
-    {
-        SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
-        return 1;
-    }
-	SDL_Log("SDL initialized.");
-
-    SDL_Window* window = SDL_CreateWindow("gfx-testing", 768, 512, SDL_WINDOW_RESIZABLE);
-    if (window == nullptr)
-    {
-        SDL_Log("SDL_CreateWindow failed: %s", SDL_GetError());
-        return -1;
-    }
-
-    model::loadObjFile( getProjectRoot() / "content/basic-shapes.obj");
+    gfx_testing::sdl::SdlContext context;
+    gfx_testing::model::loadObjFile(getProjectRoot() / "content/basic-shapes.obj");
 
     bool quit = false;
     SDL_Event event;
@@ -54,7 +40,5 @@ int main() {
         }
     }
 
-	SDL_DestroyWindow(window);
-    SDL_Quit();
     return 0;
 }
