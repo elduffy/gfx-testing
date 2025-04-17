@@ -34,4 +34,5 @@
 # Project specifics
 .idea
 cmake-build-debug
-!content/*
+!content/models/*
+content/shaders/compiled/*/*

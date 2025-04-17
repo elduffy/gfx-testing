@@ -10,7 +10,7 @@ void handleEvent(SDL_Event const &event) {
 
 int main() {
     gfx_testing::sdl::SdlContext context;
-    gfx_testing::model::loadObjFile(gfx_testing::util::getProjectRoot() / "content/basic-shapes.obj");
+    gfx_testing::model::loadObjFile(gfx_testing::util::getProjectRoot() / "content/models/basic-shapes.obj");
     gfx_testing::sdl::runEventLoop(handleEvent);
     return 0;
 }
