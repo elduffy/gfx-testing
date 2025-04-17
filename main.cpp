@@ -10,7 +10,11 @@ void handleEvent(SDL_Event const &event) {
 
 int main() {
     gfx_testing::sdl::SdlContext context;
-    gfx_testing::model::loadObjFile(gfx_testing::util::getProjectRoot() / "content/models/basic-shapes.obj");
+    auto projectRoot = gfx_testing::util::getProjectRoot();
+    gfx_testing::model::loadObjFile(projectRoot / "content/models/basic-shapes.obj");
+    auto shader = gfx_testing::util::loadShader(context,
+                                                projectRoot / "content/shaders/src/pos_color_transform.vert.hlsl", 0,
+                                                1, 0, 0);
     gfx_testing::sdl::runEventLoop(handleEvent);
     return 0;
 }

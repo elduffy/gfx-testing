@@ -42,3 +42,14 @@ namespace gfx_testing::sdl {
         SDL_Quit();
     }
 }
+
+namespace gfx_testing::sdl {
+    SdlShader::SdlShader(SdlContext const &context, SDL_GPUShader *shader): mContext(context), mShader(shader) {
+    }
+
+    SdlShader::~SdlShader() {
+        if (mShader) {
+            SDL_ReleaseGPUShader(mContext.mDevice, mShader);
+        }
+    }
+}

@@ -33,4 +33,14 @@ namespace gfx_testing::sdl {
             }
         }
     }
+
+    class SdlShader {
+    public:
+        SdlShader(SdlContext const &context, SDL_GPUShader *shader);
+
+        ~SdlShader();
+
+        SdlContext const &mContext;
+        SDL_GPUShader *mShader = nullptr;
+    };
 }
