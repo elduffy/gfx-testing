@@ -43,7 +43,33 @@ namespace gfx_testing::sdl {
 
         ~SdlShader();
 
+        SDL_GPUShader *operator*() const { return mShader; }
+
         SdlContext const &mContext;
         SDL_GPUShader *mShader = nullptr;
+    };
+
+    class SdlGfxPipeline {
+    public:
+        SdlGfxPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline);
+
+        ~SdlGfxPipeline();
+
+        SDL_GPUGraphicsPipeline *operator*() const { return mPipeline; }
+
+        SdlContext const &mContext;
+        SDL_GPUGraphicsPipeline *mPipeline = nullptr;
+    };
+
+    class SdlGpuBuffer {
+    public:
+        SdlGpuBuffer(SdlContext const &context, SDL_GPUBuffer *buffer);
+
+        ~SdlGpuBuffer();
+
+        SDL_GPUBuffer *operator*() const { return mBuffer; }
+
+        SdlContext const &mContext;
+        SDL_GPUBuffer *mBuffer = nullptr;
     };
 }

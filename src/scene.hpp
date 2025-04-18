@@ -15,5 +15,7 @@ namespace gfx_testing::scene {
         glm::mat4x4 mProjection;
         glm::mat4x4 mView;
         glm::mat4x4 mModel;
+        sdl::SdlGfxPipeline mPipeline;
+        sdl::SdlGpuBuffer mBuffer;
     };
 }

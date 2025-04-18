@@ -21,8 +21,7 @@ namespace gfx_testing::sdl {
         mDevice = SDL_CreateGPUDevice(
                 SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
                 gfxDebug,
-                nullptr
-                );
+                nullptr);
         if (mDevice == nullptr) {
             SDL_Log("Failed to create GPU device: %s", SDL_GetError());
             throw std::runtime_error("Failed to create GPU device");
@@ -52,5 +51,26 @@ namespace gfx_testing::sdl {
         if (mShader) {
             SDL_ReleaseGPUShader(mContext.mDevice, mShader);
         }
+    }
+}
+
+namespace gfx_testing::sdl {
+    SdlGfxPipeline::SdlGfxPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline):
+        mContext(context), mPipeline(pipeline) {
+    }
+
+    SdlGfxPipeline::~SdlGfxPipeline() {
+        SDL_ReleaseGPUGraphicsPipeline(mContext.mDevice, mPipeline);
+    }
+}
+
+
+namespace gfx_testing::sdl {
+    SdlGpuBuffer::SdlGpuBuffer(SdlContext const &context, SDL_GPUBuffer *buffer):
+        mContext(context), mBuffer(buffer) {
+    }
+
+    SdlGpuBuffer::~SdlGpuBuffer() {
+        SDL_ReleaseGPUBuffer(mContext.mDevice, mBuffer);
     }
 }
