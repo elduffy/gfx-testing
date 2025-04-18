@@ -4,6 +4,7 @@
 #include <util.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <SDL3/SDL_log.h>
+#include <boost/scope/scope_exit.hpp>
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot() {
@@ -46,6 +47,9 @@ namespace gfx_testing::util {
 
         size_t codeSize = 0;
         auto *code = static_cast<uint8_t *>(SDL_LoadFile(compiledFilePath.c_str(), &codeSize));
+        boost::scope::scope_exit freeCodeGuard([&code] {
+            SDL_free(code);
+        });
         SDL_Log("Loaded SPIRV shader from %s of size %zu", compiledFilePath.c_str(), codeSize);
 
         if (code == nullptr) {
@@ -65,10 +69,8 @@ namespace gfx_testing::util {
         };
         SDL_GPUShader *shader = SDL_CreateGPUShader(sdlContext.mDevice, &shaderCreateInfo);
         if (shader == nullptr) {
-            SDL_free(code);
             throw std::runtime_error("Could not create shader.");
         }
-        SDL_free(code);
         return {sdlContext, shader};
     }
 }
