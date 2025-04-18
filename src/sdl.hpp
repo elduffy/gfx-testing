@@ -15,13 +15,13 @@ namespace gfx_testing::sdl {
         SDL_GPUDevice *mDevice;
     };
 
-    template<typename Fn>
-    void runEventLoop(Fn &fn) {
+    template<typename EventFn, typename UpdateFn>
+    void runEventLoop(EventFn &eventFn, UpdateFn &updateFn) {
         SDL_Event event;
 
         while (true) {
             while (SDL_PollEvent(&event)) {
-                fn(event);
+                eventFn(event);
                 switch (event.type) {
                     case SDL_EVENT_QUIT: {
                         SDL_Log("Quitting.");
@@ -33,6 +33,7 @@ namespace gfx_testing::sdl {
                     }
                 }
             }
+            updateFn();
         }
     }
 
