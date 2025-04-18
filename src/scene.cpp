@@ -15,7 +15,7 @@ namespace {
                 0.1f,
                 100.0f
                 );
-        auto const view = glm::lookAt(
+        auto const view = lookAt(
                 glm::vec3(5, 5, 5),
                 glm::vec3(0, 0, 0),
                 glm::vec3(0, 1, 0)
@@ -33,25 +33,25 @@ namespace gfx_testing::scene {
                 static_cast<float>(context.mWidth) / static_cast<float>(context.mHeight),
                 0.1f,
                 100.0f)),
-        mView(glm::lookAt(glm::vec3(5, 5, 5),
-                          glm::vec3(0, 0, 0),
-                          glm::vec3(0, 1, 0)
+        mView(lookAt(glm::vec3(5, 5, 5),
+                     glm::vec3(0, 0, 0),
+                     glm::vec3(0, 1, 0)
                 )),
         mModel(glm::mat4(1.0f)) {
 
-        gfx_testing::model::loadObjFile(projectRoot / "content/models/basic-shapes.obj");
+        model::loadObjFile(projectRoot / "content/models/basic-shapes.obj");
 
-        auto vertexShader = gfx_testing::util::loadShader(context,
-                                                          projectRoot /
-                                                          "content/shaders/src/pos_color_transform.vert.hlsl",
-                                                          0,
-                                                          1, 0, 0);
-        auto fragmentShader = gfx_testing::util::loadShader(context,
-                                                            projectRoot /
-                                                            "content/shaders/src/solid_color.frag.hlsl",
-                                                            0,
-                                                            0, 0, 0);
-
+        auto vertexShader = util::loadShader(context,
+                                             projectRoot /
+                                             "content/shaders/src/pos_color_transform.vert.hlsl",
+                                             0,
+                                             1, 0, 0);
+        auto fragmentShader = util::loadShader(context,
+                                               projectRoot /
+                                               "content/shaders/src/solid_color.frag.hlsl",
+                                               0,
+                                               0, 0, 0);
+        SDL_GPUGraphicsPipelineCreateInfo graphicsPipelineInfo = {};
     }
 
     void Scene::Update(sdl::SdlContext const &context) {
