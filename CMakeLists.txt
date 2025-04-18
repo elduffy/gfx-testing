@@ -8,6 +8,7 @@ include(cmake/fetch-tinyobjloader.cmake)
 set(BOOST_INCLUDE_LIBRARIES algorithm scope)
 set(BOOST_ENABLE_CMAKE ON)
 include(cmake/fetch-boost.cmake)
+include(cmake/fetch-glm.cmake)
 
 find_package(SDL3 REQUIRED)
 
@@ -22,6 +23,7 @@ target_link_libraries(gfx_testing
         SDL3::SDL3
         Boost::algorithm
         Boost::scope
+        glm::glm
 )
 target_include_directories(gfx_testing SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
 target_include_directories(gfx_testing PRIVATE src/)

@@ -9,6 +9,8 @@ namespace gfx_testing::sdl {
 
         ~SdlContext();
 
+        int32_t mWidth;
+        int32_t mHeight;
         SDL_Window *mWindow;
         SDL_GPUDevice *mDevice;
     };

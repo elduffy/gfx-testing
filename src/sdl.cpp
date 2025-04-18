@@ -4,14 +4,14 @@
 
 namespace gfx_testing::sdl {
     SdlContext::SdlContext(const bool gfxDebug)
-        : mWindow(nullptr), mDevice(nullptr) {
+        : mWidth(768), mHeight(512), mWindow(nullptr), mDevice(nullptr) {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
             SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
             throw std::runtime_error("Failed to initialize SDL");
         }
         SDL_Log("SDL initialized.");
 
-        mWindow = SDL_CreateWindow("gfx-testing", 768, 512, SDL_WINDOW_RESIZABLE);
+        mWindow = SDL_CreateWindow("gfx-testing", mWidth, mHeight, SDL_WINDOW_RESIZABLE);
         if (mWindow == nullptr) {
             SDL_Log("SDL_CreateWindow failed: %s", SDL_GetError());
             throw std::runtime_error("Failed to create SDL window");
