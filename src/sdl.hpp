@@ -72,4 +72,43 @@ namespace gfx_testing::sdl {
         SdlContext const &mContext;
         SDL_GPUBuffer *mBuffer = nullptr;
     };
+
+    class SdlMappedTransferBuffer {
+    public:
+        SdlMappedTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer, void *mappedMemory);
+
+        ~SdlMappedTransferBuffer();
+
+        template<typename T>
+        T *get() const { return static_cast<T *>(mMappedMemory); }
+
+        SdlContext const &mContext;
+        SDL_GPUTransferBuffer *mBuffer = nullptr;
+        void *mMappedMemory = nullptr;
+    };
+
+    class SdlTransferBuffer {
+    public:
+        SdlTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer);
+
+        ~SdlTransferBuffer();
+
+        SDL_GPUTransferBuffer *operator*() const { return mBuffer; }
+
+        [[nodiscard]] SdlMappedTransferBuffer map(bool cycle) const;
+
+        SdlContext const &mContext;
+        SDL_GPUTransferBuffer *mBuffer = nullptr;
+    };
+
+    class SdlCommandBuffer {
+    public:
+        explicit SdlCommandBuffer(SDL_GPUCommandBuffer *buffer);
+
+        ~SdlCommandBuffer();
+
+        SDL_GPUCommandBuffer *operator*() const { return mBuffer; }
+
+        SDL_GPUCommandBuffer *mBuffer = nullptr;
+    };
 }

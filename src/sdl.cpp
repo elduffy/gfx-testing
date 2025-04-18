@@ -74,3 +74,37 @@ namespace gfx_testing::sdl {
         SDL_ReleaseGPUBuffer(mContext.mDevice, mBuffer);
     }
 }
+
+namespace gfx_testing::sdl {
+    SdlMappedTransferBuffer::SdlMappedTransferBuffer(SdlContext const &context,
+                                                     SDL_GPUTransferBuffer *buffer,
+                                                     void *mappedMemory) :
+        mContext(context), mBuffer(buffer), mMappedMemory(mappedMemory) {
+    }
+
+    SdlMappedTransferBuffer::~SdlMappedTransferBuffer() {
+        SDL_UnmapGPUTransferBuffer(mContext.mDevice, mBuffer);
+    }
+
+    SdlTransferBuffer::SdlTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer):
+        mContext(context), mBuffer(buffer) {
+    }
+
+    SdlTransferBuffer::~SdlTransferBuffer() {
+        SDL_ReleaseGPUTransferBuffer(mContext.mDevice, mBuffer);
+    }
+
+    SdlMappedTransferBuffer SdlTransferBuffer::map(bool cycle) const {
+        return {mContext, mBuffer, SDL_MapGPUTransferBuffer(mContext.mDevice, mBuffer, cycle)};
+    }
+}
+
+namespace gfx_testing::sdl {
+    SdlCommandBuffer::SdlCommandBuffer(SDL_GPUCommandBuffer *buffer):
+        mBuffer(buffer) {
+    }
+
+    SdlCommandBuffer::~SdlCommandBuffer() {
+        SDL_SubmitGPUCommandBuffer(mBuffer);
+    }
+}
