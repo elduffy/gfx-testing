@@ -98,13 +98,3 @@ namespace gfx_testing::sdl {
         return {mContext, mBuffer, SDL_MapGPUTransferBuffer(mContext.mDevice, mBuffer, cycle)};
     }
 }
-
-namespace gfx_testing::sdl {
-    SdlCommandBuffer::SdlCommandBuffer(SDL_GPUCommandBuffer *buffer):
-        mBuffer(buffer) {
-    }
-
-    SdlCommandBuffer::~SdlCommandBuffer() {
-        SDL_SubmitGPUCommandBuffer(mBuffer);
-    }
-}

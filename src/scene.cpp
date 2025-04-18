@@ -117,9 +117,13 @@ namespace gfx_testing::scene {
         data[1].mColor = glm::vec4(0, 255, 0, 255);
         data[2].mColor = glm::vec4(0, 0, 255, 255);
 
-        const sdl::SdlCommandBuffer commandBuffer{SDL_AcquireGPUCommandBuffer(context.mDevice)};
+        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
+        if (commandBuffer == nullptr) {
+            throw std::runtime_error("Failed to acquire GPU command buffer");
+        }
+        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
-        auto *copyPass = SDL_BeginGPUCopyPass(*commandBuffer);
+        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
         const SDL_GPUTransferBufferLocation source = {
                 .transfer_buffer = *transferBuffer,
                 .offset = 0,
@@ -158,9 +162,7 @@ namespace gfx_testing::scene {
         if (commandBuffer == nullptr) {
             throw std::runtime_error("Failed to acquire command buffer");
         }
-        boost::scope::scope_exit submitCommandBufferGuard([commandBuffer] {
-            SDL_SubmitGPUCommandBuffer(commandBuffer);
-        });
+        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         SDL_GPUTexture *swapchainTexture = nullptr;
         if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, context.mWindow, &swapchainTexture, nullptr,

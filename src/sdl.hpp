@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <boost/scope/scope_exit.hpp>
 #include <SDL3/SDL.h>
 
 namespace gfx_testing::sdl {
@@ -35,6 +37,13 @@ namespace gfx_testing::sdl {
             }
             updateFn();
         }
+    }
+
+    [[nodiscard]] inline auto scopedSubmitCommandBuffer(SDL_GPUCommandBuffer *commandBuffer) {
+        boost::scope::scope_exit guard([commandBuffer] {
+            SDL_SubmitGPUCommandBuffer(commandBuffer);
+        });
+        return std::move(guard);
     }
 
     class SdlShader {
@@ -99,16 +108,5 @@ namespace gfx_testing::sdl {
 
         SdlContext const &mContext;
         SDL_GPUTransferBuffer *mBuffer = nullptr;
-    };
-
-    class SdlCommandBuffer {
-    public:
-        explicit SdlCommandBuffer(SDL_GPUCommandBuffer *buffer);
-
-        ~SdlCommandBuffer();
-
-        SDL_GPUCommandBuffer *operator*() const { return mBuffer; }
-
-        SDL_GPUCommandBuffer *mBuffer = nullptr;
     };
 }
