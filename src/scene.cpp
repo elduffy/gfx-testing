@@ -62,8 +62,7 @@ namespace gfx_testing::scene {
                 SDL_GPUVertexAttribute{
                         .location = 1,
                         .buffer_slot = 0,
-                        // Can use SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4?
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM,
+                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
                         .offset = sizeof(shader::PositionColorVertex::mPosition),
                 }
         };
@@ -113,9 +112,9 @@ namespace gfx_testing::scene {
         data[0].mPosition = glm::vec3(-1, -1, 0);
         data[1].mPosition = glm::vec3(1, -1, 0);
         data[2].mPosition = glm::vec3(0, 1, 0);
-        data[0].mColor = glm::vec4(255, 0, 0, 255);
-        data[1].mColor = glm::vec4(0, 255, 0, 255);
-        data[2].mColor = glm::vec4(0, 0, 255, 255);
+        data[0].mColor = glm::vec4(1, 0, 0, 1);
+        data[1].mColor = glm::vec4(0, 1, 0, 1);
+        data[2].mColor = glm::vec4(0, 0, 1, 1);
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
         if (commandBuffer == nullptr) {
@@ -157,7 +156,7 @@ namespace gfx_testing::scene {
         transferVertexData(context, *mBuffer, 3);
     }
 
-    void Scene::Update(sdl::SdlContext const &context) {
+    void Scene::Draw(sdl::SdlContext const &context) {
         SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
         if (commandBuffer == nullptr) {
             throw std::runtime_error("Failed to acquire command buffer");
@@ -177,11 +176,19 @@ namespace gfx_testing::scene {
 
         const SDL_GPUColorTargetInfo colorTargetInfo{
                 .texture = swapchainTexture,
-                .clear_color = {1.0, 0, 0, 1},
+                .clear_color = {0, 0, 0, 1},
                 .load_op = SDL_GPU_LOADOP_CLEAR,
                 .store_op = SDL_GPU_STOREOP_STORE,
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, nullptr);
+        SDL_BindGPUGraphicsPipeline(renderPass, *mPipeline);
+
+        SDL_GPUBufferBinding bufferBinding = {
+                .buffer = *mBuffer,
+                .offset = 0,
+        };
+        SDL_BindGPUVertexBuffers(renderPass, 0, &bufferBinding, 1);
+        SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
         SDL_EndGPURenderPass(renderPass);
 
         auto mvpMatrix = createMVPMatrix(context);

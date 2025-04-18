@@ -9,7 +9,7 @@ namespace gfx_testing::scene {
     public:
         Scene(sdl::SdlContext const &context, std::filesystem::path const &projectRoot);
 
-        void Update(sdl::SdlContext const &context);
+        void Draw(sdl::SdlContext const &context);
 
     private:
         glm::mat4x4 mProjection;

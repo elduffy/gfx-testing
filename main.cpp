@@ -9,7 +9,7 @@ void handleEvent(SDL_Event const &event) {
 }
 
 void handleUpdate(gfx_testing::sdl::SdlContext const &context, gfx_testing::scene::Scene &scene) {
-    scene.Update(context);
+    scene.Draw(context);
 }
 
 int main() {
