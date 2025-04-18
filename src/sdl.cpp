@@ -3,8 +3,8 @@
 #include <stdexcept>
 
 namespace gfx_testing::sdl {
-    SdlContext::SdlContext(const bool gfxDebug)
-        : mWidth(768), mHeight(512), mWindow(nullptr), mDevice(nullptr) {
+    SdlContext::SdlContext(const bool gfxDebug) :
+        mWidth(768), mHeight(512), mWindow(nullptr), mDevice(nullptr) {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
             SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
             throw std::runtime_error("Failed to initialize SDL");
@@ -19,10 +19,10 @@ namespace gfx_testing::sdl {
         SDL_Log("Window created.");
 
         mDevice = SDL_CreateGPUDevice(
-            SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
-            gfxDebug,
-            nullptr
-        );
+                SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
+                gfxDebug,
+                nullptr
+                );
         if (mDevice == nullptr) {
             SDL_Log("Failed to create GPU device: %s", SDL_GetError());
             throw std::runtime_error("Failed to create GPU device");
@@ -44,7 +44,8 @@ namespace gfx_testing::sdl {
 }
 
 namespace gfx_testing::sdl {
-    SdlShader::SdlShader(SdlContext const &context, SDL_GPUShader *shader): mContext(context), mShader(shader) {
+    SdlShader::SdlShader(SdlContext const &context, SDL_GPUShader *shader):
+        mContext(context), mShader(shader) {
     }
 
     SdlShader::~SdlShader() {

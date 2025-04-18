@@ -15,4 +15,3 @@ namespace gfx_testing::util {
         uint32_t storageTextures
     );
 }
-

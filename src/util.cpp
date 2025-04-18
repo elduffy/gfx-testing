@@ -19,13 +19,13 @@ namespace gfx_testing::util {
     }
 
     sdl::SdlShader loadShader(
-        sdl::SdlContext const &sdlContext,
-        const std::filesystem::path &shaderSourcePath,
-        uint32_t samplers,
-        uint32_t uniformBuffers,
-        uint32_t storageBuffers,
-        uint32_t storageTextures
-    ) {
+            sdl::SdlContext const &sdlContext,
+            const std::filesystem::path &shaderSourcePath,
+            uint32_t samplers,
+            uint32_t uniformBuffers,
+            uint32_t storageBuffers,
+            uint32_t storageTextures
+            ) {
         SDL_GPUShaderStage stage;
         if (SDL_strstr(shaderSourcePath.filename().c_str(), ".vert")) {
             stage = SDL_GPU_SHADERSTAGE_VERTEX;
@@ -57,15 +57,15 @@ namespace gfx_testing::util {
         }
 
         const SDL_GPUShaderCreateInfo shaderCreateInfo{
-            .code_size = codeSize,
-            .code = code,
-            .entrypoint = "main",
-            .format = SDL_GPU_SHADERFORMAT_SPIRV,
-            .stage = stage,
-            .num_samplers = samplers,
-            .num_storage_textures = storageTextures,
-            .num_storage_buffers = storageBuffers,
-            .num_uniform_buffers = uniformBuffers,
+                .code_size = codeSize,
+                .code = code,
+                .entrypoint = "main",
+                .format = SDL_GPU_SHADERFORMAT_SPIRV,
+                .stage = stage,
+                .num_samplers = samplers,
+                .num_storage_textures = storageTextures,
+                .num_storage_buffers = storageBuffers,
+                .num_uniform_buffers = uniformBuffers,
         };
         SDL_GPUShader *shader = SDL_CreateGPUShader(sdlContext.mDevice, &shaderCreateInfo);
         if (shader == nullptr) {
