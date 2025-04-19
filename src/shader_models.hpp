@@ -7,7 +7,9 @@
 
 namespace gfx_testing::shader {
     struct PositionColorVertex {
+        // TODO alignment?
         glm::vec3 mPosition;
+        glm::vec3 mNormal;
         glm::vec4 mColor;
     };
 

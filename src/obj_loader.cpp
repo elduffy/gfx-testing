@@ -1,5 +1,6 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <filesystem>
+#include <format>
 #include <iostream>
 #include <shader_models.hpp>
 #include <tiny_obj_loader.h>
@@ -40,18 +41,28 @@ namespace gfx_testing::model {
             throw std::runtime_error("Vertex count is greater than 16 bit limit. Need to refactor now :(");
         }
         if (attrib.vertices.size() != attrib.colors.size()) {
-            throw std::runtime_error("Vertex count is not the same as color component.");
+            throw std::runtime_error(std::format("Vertex count {} is not the same as color count {}.",
+                                                 attrib.vertices.size(), attrib.colors.size()));
         }
+        // if (attrib.vertices.size() != attrib.normals.size()) {
+        //     throw std::runtime_error(std::format("Vertex count {} is not the same as normal count {}.",
+        //                                          attrib.vertices.size(), attrib.normals.size()));
+        // }
 
         const auto numVertices = attrib.vertices.size() / 3;
         shader::MeshData meshData;
 
         meshData.vertices.resize(numVertices);
         for (auto i = 0; i < numVertices; i++) {
-            auto &[position, color] = meshData.vertices[i];
+            auto &[position, normal, color] = meshData.vertices[i];
             position.x = attrib.vertices.at(3 * i);
             position.y = attrib.vertices.at(3 * i + 1);
             position.z = attrib.vertices.at(3 * i + 2);
+
+            // TODO: load the normals
+            normal.x = 0;
+            normal.y = 0;
+            normal.z = 1;
 
             color.r = attrib.colors.at(3 * i);
             color.g = attrib.colors.at(3 * i + 1);

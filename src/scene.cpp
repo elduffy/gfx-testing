@@ -15,12 +15,12 @@ namespace gfx_testing::scene {
                                             std::filesystem::path const &projectRoot) {
         const auto vertexShader = sdl::SdlShader::loadShader(context,
                                                              projectRoot /
-                                                             "content/shaders/src/pos_color_transform.vert.hlsl",
+                                                             "content/shaders/src/pos_norm_color_transform.vert.hlsl",
                                                              0,
                                                              1, 0, 0);
         const auto fragmentShader = sdl::SdlShader::loadShader(context,
                                                                projectRoot /
-                                                               "content/shaders/src/solid_color.frag.hlsl",
+                                                               "content/shaders/src/norm_color.frag.hlsl",
                                                                0,
                                                                0, 0, 0);
 
@@ -43,8 +43,15 @@ namespace gfx_testing::scene {
                 SDL_GPUVertexAttribute{
                         .location = 1,
                         .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
+                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
                         .offset = sizeof(shader::PositionColorVertex::mPosition),
+                },
+                SDL_GPUVertexAttribute{
+                        .location = 2,
+                        .buffer_slot = 0,
+                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
+                        .offset = sizeof(shader::PositionColorVertex::mPosition) + sizeof(
+                                      shader::PositionColorVertex::mNormal),
                 }
         };
 
