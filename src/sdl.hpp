@@ -1,18 +1,19 @@
 #pragma once
 
 #include <algorithm>
+#include <util.hpp>
 #include <boost/scope/scope_exit.hpp>
 #include <SDL3/SDL.h>
 
 namespace gfx_testing::sdl {
     class SdlContext {
     public:
+        static constexpr util::Extent2D INITIAL_EXTENT = {768, 512};
+
         explicit SdlContext(bool gfxDebug = true);
 
         ~SdlContext();
 
-        int32_t mWidth;
-        int32_t mHeight;
         SDL_Window *mWindow;
         SDL_GPUDevice *mDevice;
     };
@@ -24,6 +25,7 @@ namespace gfx_testing::sdl {
         return std::move(guard);
     }
 
+
     class SdlShader {
     public:
         SdlShader(SdlContext const &context, SDL_GPUShader *shader);
@@ -31,6 +33,15 @@ namespace gfx_testing::sdl {
         ~SdlShader();
 
         SDL_GPUShader *operator*() const { return mShader; }
+
+        static SdlShader loadShader(
+            SdlContext const &context,
+            const std::filesystem::path &shaderSourcePath,
+            uint32_t samplers,
+            uint32_t uniformBuffers,
+            uint32_t storageBuffers,
+            uint32_t storageTextures
+        );
 
         SdlContext const &mContext;
         SDL_GPUShader *mShader = nullptr;

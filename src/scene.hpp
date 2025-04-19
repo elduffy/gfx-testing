@@ -13,6 +13,8 @@ namespace gfx_testing::scene {
 
         void update();
 
+        void onResize(util::Extent2D extent);
+
         void draw() const;
 
     private:

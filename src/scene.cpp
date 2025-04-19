@@ -10,38 +10,19 @@
 #include <glm/ext/matrix_transform.hpp>
 
 
-namespace {
-    // gfx_testing::shader::MVPMatrix createMVPMatrix(gfx_testing::sdl::SdlContext const &context) {
-    //     auto const proj = glm::perspective(
-    //             glm::radians(45.0f),
-    //             static_cast<float>(context.mWidth) / static_cast<float>(context.mHeight),
-    //             0.1f,
-    //             100.0f
-    //             );
-    //     auto const view = lookAt(
-    //             glm::vec3(5, 5, 5),
-    //             glm::vec3(0, 0, 0),
-    //             glm::vec3(0, 1, 0)
-    //             );
-    //     constexpr auto model = glm::mat4(1.0f);
-    //     return {proj * view * model};
-    // }
-}
-
 namespace gfx_testing::scene {
     SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context,
                                             std::filesystem::path const &projectRoot) {
-
-        const auto vertexShader = util::loadShader(context,
-                                                   projectRoot /
-                                                   "content/shaders/src/pos_color_transform.vert.hlsl",
-                                                   0,
-                                                   1, 0, 0);
-        const auto fragmentShader = util::loadShader(context,
-                                                     projectRoot /
-                                                     "content/shaders/src/solid_color.frag.hlsl",
-                                                     0,
-                                                     0, 0, 0);
+        const auto vertexShader = sdl::SdlShader::loadShader(context,
+                                                             projectRoot /
+                                                             "content/shaders/src/pos_color_transform.vert.hlsl",
+                                                             0,
+                                                             1, 0, 0);
+        const auto fragmentShader = sdl::SdlShader::loadShader(context,
+                                                               projectRoot /
+                                                               "content/shaders/src/solid_color.frag.hlsl",
+                                                               0,
+                                                               0, 0, 0);
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
                 .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
@@ -163,14 +144,14 @@ namespace gfx_testing::scene {
         SDL_EndGPUCopyPass(copyPass);
     }
 
+    glm::mat4x4 getProjection(const util::Extent2D extent) {
+        auto const aspect = static_cast<float>(extent.mWidth) / static_cast<float>(extent.mHeight);
+        return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
+    }
+
     Scene::Scene(game::GameContext const &gameContext, std::filesystem::path const &projectRoot) :
         mGameContext(gameContext),
-        mProjection(glm::perspective(
-                glm::radians(45.0f),
-                static_cast<float>(gameContext.mSdlContext.mWidth) / static_cast<float>(gameContext.mSdlContext.
-                    mHeight),
-                0.1f,
-                100.0f)),
+        mProjection(getProjection(sdl::SdlContext::INITIAL_EXTENT)),
         mView(lookAt(glm::vec3(5, 5, 5),
                      glm::vec3(0, 0, 0),
                      glm::vec3(0, 0, 1)
@@ -183,6 +164,11 @@ namespace gfx_testing::scene {
 
         transferVertexIndexData(gameContext.mSdlContext, mMeshData, *mVertexBuffer, *mIndexBuffer);
     }
+
+    void Scene::onResize(const util::Extent2D extent) {
+        mProjection = getProjection(extent);
+    }
+
 
     void Scene::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 4.f;

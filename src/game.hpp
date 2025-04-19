@@ -18,11 +18,14 @@ namespace gfx_testing::game {
                 mDeltaTime = static_cast<float>(mFrameStart - previousFrameStart) / 1000.f;
 
                 while (SDL_PollEvent(&event)) {
-                    eventFn(*this, event);
+                    eventFn(event);
                     switch (event.type) {
                         case SDL_EVENT_QUIT: {
                             SDL_Log("Quitting.");
                             return;
+                        }
+                        case SDL_EVENT_WINDOW_RESIZED: {
+                            break;
                         }
                         default: {
                             // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
@@ -30,7 +33,7 @@ namespace gfx_testing::game {
                         }
                     }
                 }
-                updateFn(*this);
+                updateFn();
             }
         }
 

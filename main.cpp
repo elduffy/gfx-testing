@@ -5,11 +5,20 @@
 #include <scene.hpp>
 #include <game.hpp>
 
-void handleEvent(gfx_testing::game::GameContext const &gameContext, SDL_Event const &event) {
-    // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
+void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
+    switch (event.type) {
+        case SDL_EVENT_WINDOW_RESIZED: {
+            scene.onResize({event.window.data1, event.window.data2});
+            break;
+        }
+        default: {
+            // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
+            break;
+        }
+    }
 }
 
-void handleUpdate(gfx_testing::game::GameContext const &, gfx_testing::scene::Scene &scene) {
+void handleUpdate(gfx_testing::scene::Scene &scene) {
     scene.update();
     scene.draw();
 }
@@ -21,8 +30,9 @@ int main() {
 
     gfx_testing::scene::Scene scene(gameContext, projectRoot);
 
-    auto updateFunction = [&scene](auto const &gameCtx) { handleUpdate(gameCtx, scene); };
+    auto eventFunction = [&scene](auto const &event) { handleEvent(scene, event); };
+    auto updateFunction = [&scene] { handleUpdate(scene); };
     SDL_Log("Begin main loop");
-    gameContext.runMainLoop(handleEvent, updateFunction);
+    gameContext.runMainLoop(eventFunction, updateFunction);
     return 0;
 }
