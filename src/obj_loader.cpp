@@ -59,7 +59,6 @@ namespace gfx_testing::model {
             position.y = attrib.vertices.at(3 * i + 1);
             position.z = attrib.vertices.at(3 * i + 2);
 
-            // TODO: load the normals
             normal.x = 0;
             normal.y = 0;
             normal.z = 1;
@@ -76,6 +75,12 @@ namespace gfx_testing::model {
 
             for (auto const &index: shape.mesh.indices) {
                 meshData.indices.push_back(index.vertex_index);
+                auto &vertex = meshData.vertices.at(index.vertex_index);
+
+                vertex.mNormal.x = attrib.normals.at(3 * index.normal_index);
+                vertex.mNormal.y = attrib.normals.at(3 * index.normal_index + 1);
+                vertex.mNormal.z = attrib.normals.at(3 * index.normal_index + 2);
+                vertex.mNormal = normalize(vertex.mNormal);
             }
         }
 
