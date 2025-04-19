@@ -19,6 +19,7 @@ int main() {
     gfx_testing::scene::Scene scene(context, projectRoot);
 
     auto updateFunction = [&context, &scene] { handleUpdate(context, scene); };
+    SDL_Log("Begin main loop");
     gfx_testing::sdl::runEventLoop(handleEvent, updateFunction);
     return 0;
 }
