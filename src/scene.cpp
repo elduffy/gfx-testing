@@ -28,6 +28,10 @@ namespace {
 }
 
 namespace gfx_testing::scene {
+    static constexpr size_t NUM_VERTICES = 3;
+    static constexpr size_t NUM_INDICES = 3;
+    static constexpr size_t VERTEX_BUFFER_SIZE = sizeof(shader::PositionColorVertex) * NUM_VERTICES;
+    static constexpr size_t INDEX_BUFFER_SIZE = sizeof(uint16_t) * NUM_INDICES;
 
     SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context,
                                             std::filesystem::path const &projectRoot) {
@@ -90,31 +94,49 @@ namespace gfx_testing::scene {
         return pipeline;
     }
 
-    SDL_GPUBuffer *createVertexBuffer(sdl::SdlContext const &context, size_t vertexCount) {
+    SDL_GPUBuffer *createVertexBuffer(sdl::SdlContext const &context) {
         const SDL_GPUBufferCreateInfo createInfo = {
                 .usage = SDL_GPU_BUFFERUSAGE_VERTEX,
-                .size = boost::safe_numerics::checked::cast<
-                    uint32_t>(sizeof(shader::PositionColorVertex) * vertexCount),
+                .size = boost::safe_numerics::checked::cast<uint32_t>(VERTEX_BUFFER_SIZE),
         };
         return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
     }
 
-    void transferVertexData(sdl::SdlContext const &context, SDL_GPUBuffer *buffer, size_t vertexCount) {
+    SDL_GPUBuffer *createIndexBuffer(sdl::SdlContext const &context) {
+        const SDL_GPUBufferCreateInfo createInfo = {
+                .usage = SDL_GPU_BUFFERUSAGE_INDEX,
+                .size = boost::safe_numerics::checked::cast<uint32_t>(INDEX_BUFFER_SIZE),
+        };
+        return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
+    }
+
+    void transferVertexIndexData(sdl::SdlContext const &context, SDL_GPUBuffer *vertexBuffer,
+                                 SDL_GPUBuffer *indexBuffer) {
         const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
                 .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                .size = boost::safe_numerics::checked::cast<
-                    uint32_t>(sizeof(shader::PositionColorVertex) * vertexCount),
+                .size = boost::safe_numerics::checked::cast<uint32_t>(VERTEX_BUFFER_SIZE + INDEX_BUFFER_SIZE),
         };
         const sdl::SdlTransferBuffer transferBuffer{
                 context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
-        const auto mappedBuffer = transferBuffer.map(false);
-        auto *data = mappedBuffer.get<shader::PositionColorVertex>();
-        data[0].mPosition = glm::vec3(-1, -1, 0);
-        data[1].mPosition = glm::vec3(1, -1, 0);
-        data[2].mPosition = glm::vec3(0, 1, 0);
-        data[0].mColor = glm::vec4(1, 0, 0, 1);
-        data[1].mColor = glm::vec4(0, 1, 0, 1);
-        data[2].mColor = glm::vec4(0, 0, 1, 1);
+
+        // Set the index data
+        {
+            const auto mappedBuffer = transferBuffer.map(false);
+            auto *vertexData = mappedBuffer.get<shader::PositionColorVertex>();
+            static_assert(NUM_VERTICES == 3, "Code expects exactly 3 vertices");
+            vertexData[0].mPosition = glm::vec3(-1, -1, 0);
+            vertexData[1].mPosition = glm::vec3(1, -1, 0);
+            vertexData[2].mPosition = glm::vec3(0, 1, 0);
+            vertexData[0].mColor = glm::vec4(1, 0, 0, 1);
+            vertexData[1].mColor = glm::vec4(0, 1, 0, 1);
+            vertexData[2].mColor = glm::vec4(0, 0, 1, 1);
+
+            auto *indexData = mappedBuffer.get<uint16_t>(VERTEX_BUFFER_SIZE);
+            static_assert(NUM_INDICES == 3, "Code expects exactly 3 indices");
+            indexData[0] = 0;
+            indexData[1] = 1;
+            indexData[2] = 2;
+        }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
         if (commandBuffer == nullptr) {
@@ -123,17 +145,32 @@ namespace gfx_testing::scene {
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-        const SDL_GPUTransferBufferLocation source = {
-                .transfer_buffer = *transferBuffer,
-                .offset = 0,
-        };
-        const SDL_GPUBufferRegion destination = {
-                .buffer = buffer,
-                .offset = 0,
-                .size = boost::safe_numerics::checked::cast<
-                    uint32_t>(sizeof(shader::PositionColorVertex) * vertexCount),
-        };
-        SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
+        // Vertex upload
+        {
+            const SDL_GPUTransferBufferLocation source = {
+                    .transfer_buffer = *transferBuffer,
+                    .offset = 0,
+            };
+            const SDL_GPUBufferRegion destination = {
+                    .buffer = vertexBuffer,
+                    .offset = 0,
+                    .size = boost::safe_numerics::checked::cast<uint32_t>(VERTEX_BUFFER_SIZE),
+            };
+            SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
+        }
+        // Index upload
+        {
+            const SDL_GPUTransferBufferLocation source = {
+                    .transfer_buffer = *transferBuffer,
+                    .offset = VERTEX_BUFFER_SIZE,
+            };
+            const SDL_GPUBufferRegion destination = {
+                    .buffer = indexBuffer,
+                    .offset = 0,
+                    .size = boost::safe_numerics::checked::cast<uint32_t>(INDEX_BUFFER_SIZE),
+            };
+            SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
+        }
         SDL_EndGPUCopyPass(copyPass);
     }
 
@@ -149,11 +186,12 @@ namespace gfx_testing::scene {
                 )),
         mModel(glm::mat4(1.0f)),
         mPipeline(context, createPipeline(context, projectRoot)),
-        mBuffer(context, createVertexBuffer(context, 3)) {
+        mVertexBuffer(context, createVertexBuffer(context)),
+        mIndexBuffer(context, createIndexBuffer(context)) {
 
         // TODO: use the vertex info from the obj file
         model::loadObjFile(projectRoot / "content/models/basic-shapes.obj");
-        transferVertexData(context, *mBuffer, 3);
+        transferVertexIndexData(context, *mVertexBuffer, *mIndexBuffer);
     }
 
     void Scene::Draw(sdl::SdlContext const &context) {
@@ -183,12 +221,18 @@ namespace gfx_testing::scene {
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, nullptr);
         SDL_BindGPUGraphicsPipeline(renderPass, *mPipeline);
 
-        SDL_GPUBufferBinding bufferBinding = {
-                .buffer = *mBuffer,
+        SDL_GPUBufferBinding vertexBufferBinding = {
+                .buffer = *mVertexBuffer,
                 .offset = 0,
         };
-        SDL_BindGPUVertexBuffers(renderPass, 0, &bufferBinding, 1);
-        SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
+        SDL_GPUBufferBinding indexBufferBinding = {
+                .buffer = *mIndexBuffer,
+                .offset = 0,
+        };
+        SDL_BindGPUVertexBuffers(renderPass, 0, &vertexBufferBinding, 1);
+        // SDL_DrawGPUPrimitives(renderPass, NUM_VERTICES, 1, 0, 0);
+        SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+        SDL_DrawGPUIndexedPrimitives(renderPass, NUM_INDICES, 1, 0, 0, 0);
         SDL_EndGPURenderPass(renderPass);
 
         auto mvpMatrix = createMVPMatrix(context);

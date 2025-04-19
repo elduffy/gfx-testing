@@ -78,7 +78,7 @@ namespace gfx_testing::sdl {
 namespace gfx_testing::sdl {
     SdlMappedTransferBuffer::SdlMappedTransferBuffer(SdlContext const &context,
                                                      SDL_GPUTransferBuffer *buffer,
-                                                     void *mappedMemory) :
+                                                     uint8_t *mappedMemory) :
         mContext(context), mBuffer(buffer), mMappedMemory(mappedMemory) {
     }
 
@@ -95,6 +95,7 @@ namespace gfx_testing::sdl {
     }
 
     SdlMappedTransferBuffer SdlTransferBuffer::map(bool cycle) const {
-        return {mContext, mBuffer, SDL_MapGPUTransferBuffer(mContext.mDevice, mBuffer, cycle)};
+        return {mContext, mBuffer,
+                static_cast<uint8_t *>(SDL_MapGPUTransferBuffer(mContext.mDevice, mBuffer, cycle))};
     }
 }

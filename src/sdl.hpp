@@ -84,16 +84,16 @@ namespace gfx_testing::sdl {
 
     class SdlMappedTransferBuffer {
     public:
-        SdlMappedTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer, void *mappedMemory);
+        SdlMappedTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer, uint8_t *mappedMemory);
 
         ~SdlMappedTransferBuffer();
 
         template<typename T>
-        T *get() const { return static_cast<T *>(mMappedMemory); }
+        T *get(const size_t offset = 0) const { return reinterpret_cast<T *>(mMappedMemory + offset); }
 
         SdlContext const &mContext;
         SDL_GPUTransferBuffer *mBuffer = nullptr;
-        void *mMappedMemory = nullptr;
+        uint8_t *mMappedMemory = nullptr;
     };
 
     class SdlTransferBuffer {
