@@ -20,6 +20,7 @@ add_executable(gfx_testing
         src/sdl.cpp
         src/util.cpp
         src/scene.cpp
+        src/game.cpp
 )
 target_link_libraries(gfx_testing
         SDL3::SDL3

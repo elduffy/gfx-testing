@@ -9,22 +9,23 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+
 namespace {
-    gfx_testing::shader::MVPMatrix createMVPMatrix(gfx_testing::sdl::SdlContext const &context) {
-        auto const proj = glm::perspective(
-                glm::radians(45.0f),
-                static_cast<float>(context.mWidth) / static_cast<float>(context.mHeight),
-                0.1f,
-                100.0f
-                );
-        auto const view = lookAt(
-                glm::vec3(5, 5, 5),
-                glm::vec3(0, 0, 0),
-                glm::vec3(0, 1, 0)
-                );
-        constexpr auto model = glm::mat4(1.0f);
-        return {proj * view * model};
-    }
+    // gfx_testing::shader::MVPMatrix createMVPMatrix(gfx_testing::sdl::SdlContext const &context) {
+    //     auto const proj = glm::perspective(
+    //             glm::radians(45.0f),
+    //             static_cast<float>(context.mWidth) / static_cast<float>(context.mHeight),
+    //             0.1f,
+    //             100.0f
+    //             );
+    //     auto const view = lookAt(
+    //             glm::vec3(5, 5, 5),
+    //             glm::vec3(0, 0, 0),
+    //             glm::vec3(0, 1, 0)
+    //             );
+    //     constexpr auto model = glm::mat4(1.0f);
+    //     return {proj * view * model};
+    // }
 }
 
 namespace gfx_testing::scene {
@@ -162,34 +163,42 @@ namespace gfx_testing::scene {
         SDL_EndGPUCopyPass(copyPass);
     }
 
-    Scene::Scene(sdl::SdlContext const &context, std::filesystem::path const &projectRoot) :
+    Scene::Scene(game::GameContext const &gameContext, std::filesystem::path const &projectRoot) :
+        mGameContext(gameContext),
         mProjection(glm::perspective(
                 glm::radians(45.0f),
-                static_cast<float>(context.mWidth) / static_cast<float>(context.mHeight),
+                static_cast<float>(gameContext.mSdlContext.mWidth) / static_cast<float>(gameContext.mSdlContext.
+                    mHeight),
                 0.1f,
                 100.0f)),
         mView(lookAt(glm::vec3(5, 5, 5),
                      glm::vec3(0, 0, 0),
-                     glm::vec3(0, 1, 0)
+                     glm::vec3(0, 0, 1)
                 )),
         mModel(glm::mat4(1.0f)),
         mMeshData(model::loadObjFile(projectRoot / "content/models/basic-shapes.obj")),
-        mPipeline(context, createPipeline(context, projectRoot)),
-        mVertexBuffer(context, createVertexBuffer(context, mMeshData)),
-        mIndexBuffer(context, createIndexBuffer(context, mMeshData)) {
+        mPipeline(gameContext.mSdlContext, createPipeline(gameContext.mSdlContext, projectRoot)),
+        mVertexBuffer(gameContext.mSdlContext, createVertexBuffer(gameContext.mSdlContext, mMeshData)),
+        mIndexBuffer(gameContext.mSdlContext, createIndexBuffer(gameContext.mSdlContext, mMeshData)) {
 
-        transferVertexIndexData(context, mMeshData, *mVertexBuffer, *mIndexBuffer);
+        transferVertexIndexData(gameContext.mSdlContext, mMeshData, *mVertexBuffer, *mIndexBuffer);
     }
 
-    void Scene::draw(sdl::SdlContext const &context) const {
-        SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
+    void Scene::update() {
+        constexpr auto RADS_PER_SECOND = glm::pi<float>() / 4.f;
+        mModel = rotate(mModel, mGameContext.mDeltaTime * RADS_PER_SECOND, glm::vec3(0, 0, 1));
+    }
+
+    void Scene::draw() const {
+        SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(mGameContext.mSdlContext.mDevice);
         if (commandBuffer == nullptr) {
             throw std::runtime_error("Failed to acquire command buffer");
         }
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         SDL_GPUTexture *swapchainTexture = nullptr;
-        if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, context.mWindow, &swapchainTexture, nullptr,
+        if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow, &swapchainTexture,
+                                                   nullptr,
                                                    nullptr)) {
             throw std::runtime_error("Failed to acquire swapchain texture");
         }
@@ -199,7 +208,7 @@ namespace gfx_testing::scene {
             return;
         }
 
-        const auto mvpMatrix = createMVPMatrix(context);
+        const auto mvpMatrix = mProjection * mView * mModel;
         SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpMatrix, sizeof(mvpMatrix));
 
         const SDL_GPUColorTargetInfo colorTargetInfo{

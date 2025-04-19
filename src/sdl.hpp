@@ -17,28 +17,6 @@ namespace gfx_testing::sdl {
         SDL_GPUDevice *mDevice;
     };
 
-    template<typename EventFn, typename UpdateFn>
-    void runEventLoop(EventFn &eventFn, UpdateFn &updateFn) {
-        SDL_Event event;
-
-        while (true) {
-            while (SDL_PollEvent(&event)) {
-                eventFn(event);
-                switch (event.type) {
-                    case SDL_EVENT_QUIT: {
-                        SDL_Log("Quitting.");
-                        return;
-                    }
-                    default: {
-                        // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
-                        break;
-                    }
-                }
-            }
-            updateFn();
-        }
-    }
-
     [[nodiscard]] inline auto scopedSubmitCommandBuffer(SDL_GPUCommandBuffer *commandBuffer) {
         boost::scope::scope_exit guard([commandBuffer] {
             SDL_SubmitGPUCommandBuffer(commandBuffer);
