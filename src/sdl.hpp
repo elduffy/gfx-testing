@@ -71,6 +71,18 @@ namespace gfx_testing::sdl {
         SDL_GPUBuffer *mBuffer = nullptr;
     };
 
+    class SdlGpuTexture {
+    public:
+        SdlGpuTexture(SdlContext const &context, SDL_GPUTexture *texture);
+
+        ~SdlGpuTexture();
+
+        SDL_GPUTexture *operator*() const { return mTexture; }
+
+        SdlContext const &mContext;
+        SDL_GPUTexture *mTexture = nullptr;
+    };
+
     class SdlMappedTransferBuffer {
     public:
         SdlMappedTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer, uint8_t *mappedMemory);

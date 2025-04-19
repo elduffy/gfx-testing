@@ -58,9 +58,16 @@ namespace gfx_testing::scene {
                         .num_vertex_attributes = vertexAttributes.size(),
                 },
                 .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+                .depth_stencil_state = {
+                        .compare_op = SDL_GPU_COMPAREOP_LESS,
+                        .enable_depth_test = true,
+                        .enable_depth_write = true,
+                },
                 .target_info = {
                         .color_target_descriptions = &colorTargetDescription,
                         .num_color_targets = 1,
+                        .depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM,
+                        .has_depth_stencil_target = true,
                 },
         };
         auto *pipeline = SDL_CreateGPUGraphicsPipeline(context.mDevice, &graphicsPipelineInfo);
@@ -85,6 +92,20 @@ namespace gfx_testing::scene {
                 .size = meshData.getIndexBufferSize(),
         };
         return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
+    }
+
+    SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
+        const SDL_GPUTextureCreateInfo createInfo = {
+                .type = SDL_GPU_TEXTURETYPE_2D,
+                .format = SDL_GPU_TEXTUREFORMAT_D16_UNORM,
+                .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET,
+                .width = extent.mWidth,
+                .height = extent.mHeight,
+                .layer_count_or_depth = 1,
+                .num_levels = 1,
+                .sample_count = SDL_GPU_SAMPLECOUNT_1,
+        };
+        return SDL_CreateGPUTexture(context.mDevice, &createInfo);
     }
 
     void transferVertexIndexData(sdl::SdlContext const &context, shader::MeshData const &meshData,
@@ -160,8 +181,9 @@ namespace gfx_testing::scene {
         mMeshData(model::loadObjFile(projectRoot / "content/models/basic-shapes.obj")),
         mPipeline(gameContext.mSdlContext, createPipeline(gameContext.mSdlContext, projectRoot)),
         mVertexBuffer(gameContext.mSdlContext, createVertexBuffer(gameContext.mSdlContext, mMeshData)),
-        mIndexBuffer(gameContext.mSdlContext, createIndexBuffer(gameContext.mSdlContext, mMeshData)) {
-
+        mIndexBuffer(gameContext.mSdlContext, createIndexBuffer(gameContext.mSdlContext, mMeshData)),
+        mDepthTexture(gameContext.mSdlContext,
+                      createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {
         transferVertexIndexData(gameContext.mSdlContext, mMeshData, *mVertexBuffer, *mIndexBuffer);
     }
 
@@ -203,7 +225,17 @@ namespace gfx_testing::scene {
                 .load_op = SDL_GPU_LOADOP_CLEAR,
                 .store_op = SDL_GPU_STOREOP_STORE,
         };
-        SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, nullptr);
+        const SDL_GPUDepthStencilTargetInfo depthStencilTargetInfo{
+                .texture = *mDepthTexture,
+                .clear_depth = 1.f,
+                .load_op = SDL_GPU_LOADOP_CLEAR,
+                .store_op = SDL_GPU_STOREOP_STORE,
+                .stencil_load_op = SDL_GPU_LOADOP_DONT_CARE,
+                .stencil_store_op = SDL_GPU_STOREOP_DONT_CARE,
+                .cycle = true,
+        };
+        SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
+                                                               &depthStencilTargetInfo);
         SDL_BindGPUGraphicsPipeline(renderPass, *mPipeline);
 
         SDL_GPUBufferBinding vertexBufferBinding = {

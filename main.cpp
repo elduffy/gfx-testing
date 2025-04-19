@@ -8,7 +8,10 @@
 void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
     switch (event.type) {
         case SDL_EVENT_WINDOW_RESIZED: {
-            scene.onResize({event.window.data1, event.window.data2});
+            scene.onResize({
+                    boost::safe_numerics::checked::cast<uint32_t>(event.window.data1),
+                    boost::safe_numerics::checked::cast<uint32_t>(event.window.data2),
+            });
             break;
         }
         default: {

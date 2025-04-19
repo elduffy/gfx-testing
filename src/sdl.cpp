@@ -128,6 +128,16 @@ namespace gfx_testing::sdl {
 }
 
 namespace gfx_testing::sdl {
+    SdlGpuTexture::SdlGpuTexture(SdlContext const &context, SDL_GPUTexture *texture):
+        mContext(context), mTexture(texture) {
+    }
+
+    SdlGpuTexture::~SdlGpuTexture() {
+        SDL_ReleaseGPUTexture(mContext.mDevice, mTexture);
+    }
+}
+
+namespace gfx_testing::sdl {
     SdlMappedTransferBuffer::SdlMappedTransferBuffer(SdlContext const &context,
                                                      SDL_GPUTransferBuffer *buffer,
                                                      uint8_t *mappedMemory) :

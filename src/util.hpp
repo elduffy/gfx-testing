@@ -7,7 +7,7 @@ namespace gfx_testing::util {
 
 
     struct Extent2D {
-        int32_t mWidth;
-        int32_t mHeight;
+        uint32_t mWidth;
+        uint32_t mHeight;
     };
 }

@@ -26,5 +26,6 @@ namespace gfx_testing::scene {
         sdl::SdlGfxPipeline mPipeline;
         sdl::SdlGpuBuffer mVertexBuffer;
         sdl::SdlGpuBuffer mIndexBuffer;
+        sdl::SdlGpuTexture mDepthTexture;
     };
 }
