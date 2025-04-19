@@ -6,8 +6,8 @@
 #include <boost/scope/scope_exit.hpp>
 #include <boost/safe_numerics/checked_default.hpp>
 
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 namespace {
     gfx_testing::shader::MVPMatrix createMVPMatrix(gfx_testing::sdl::SdlContext const &context) {
@@ -194,7 +194,7 @@ namespace gfx_testing::scene {
         transferVertexIndexData(context, *mVertexBuffer, *mIndexBuffer);
     }
 
-    void Scene::Draw(sdl::SdlContext const &context) {
+    void Scene::draw(sdl::SdlContext const &context) const {
         SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
         if (commandBuffer == nullptr) {
             throw std::runtime_error("Failed to acquire command buffer");

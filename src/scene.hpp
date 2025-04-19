@@ -2,14 +2,14 @@
 
 #include <sdl.hpp>
 #include <filesystem>
-#include "glm/mat4x4.hpp"
+#include <glm/mat4x4.hpp>
 
 namespace gfx_testing::scene {
     class Scene {
     public:
         Scene(sdl::SdlContext const &context, std::filesystem::path const &projectRoot);
 
-        void Draw(sdl::SdlContext const &context);
+        void draw(sdl::SdlContext const &context) const;
 
     private:
         glm::mat4x4 mProjection;

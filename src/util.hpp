@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <SDL3/SDL_gpu.h>
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot();
