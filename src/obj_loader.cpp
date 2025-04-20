@@ -52,9 +52,9 @@ namespace gfx_testing::model {
         const auto numVertices = attrib.vertices.size() / 3;
         shader::MeshData meshData;
 
-        meshData.vertices.resize(numVertices);
+        meshData.mVertices.resize(numVertices);
         for (auto i = 0; i < numVertices; i++) {
-            auto &[position, normal, color] = meshData.vertices[i];
+            auto &[position, normal, color] = meshData.mVertices[i];
             position.x = attrib.vertices.at(3 * i);
             position.y = attrib.vertices.at(3 * i + 1);
             position.z = attrib.vertices.at(3 * i + 2);
@@ -71,11 +71,11 @@ namespace gfx_testing::model {
 
         for (auto const &shape: shapes) {
             SDL_Log("Shape %s has %zu indices", shape.name.c_str(), shape.mesh.indices.size());
-            meshData.indices.reserve(meshData.indices.size() + shape.mesh.indices.size());
+            meshData.mIndices.reserve(meshData.mIndices.size() + shape.mesh.indices.size());
 
             for (auto const &index: shape.mesh.indices) {
-                meshData.indices.push_back(index.vertex_index);
-                auto &vertex = meshData.vertices.at(index.vertex_index);
+                meshData.mIndices.push_back(index.vertex_index);
+                auto &vertex = meshData.mVertices.at(index.vertex_index);
 
                 vertex.mNormal.x = attrib.normals.at(3 * index.normal_index);
                 vertex.mNormal.y = attrib.normals.at(3 * index.normal_index + 1);

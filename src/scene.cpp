@@ -9,8 +9,17 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "glm/gtc/random.hpp"
+
 
 namespace gfx_testing::scene {
+
+    static constexpr glm::vec3 CAMERA_POSITION(5, 5, 5);
+    static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
+    static constexpr glm::vec3 LIGHT_DIRECTION(1, -1, 1);
+    static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
+    static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
+
     SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context,
                                             std::filesystem::path const &projectRoot) {
         const auto vertexShader = sdl::SdlShader::loadShader(context,
@@ -20,9 +29,9 @@ namespace gfx_testing::scene {
                                                              1, 0, 0);
         const auto fragmentShader = sdl::SdlShader::loadShader(context,
                                                                projectRoot /
-                                                               "content/shaders/src/norm_color.frag.hlsl",
+                                                               "content/shaders/src/gooch.frag.hlsl",
                                                                0,
-                                                               0, 0, 0);
+                                                               1, 0, 0);
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
                 .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
@@ -130,10 +139,10 @@ namespace gfx_testing::scene {
         {
             const auto mappedBuffer = transferBuffer.map(false);
             auto *vertexData = mappedBuffer.get<shader::PositionColorVertex>();
-            std::ranges::copy(meshData.vertices, vertexData);
+            std::ranges::copy(meshData.mVertices, vertexData);
 
             auto *indexData = mappedBuffer.get<uint16_t>(meshData.getVertexBufferSize());
-            std::ranges::copy(meshData.indices, indexData);
+            std::ranges::copy(meshData.mIndices, indexData);
         }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
@@ -180,11 +189,11 @@ namespace gfx_testing::scene {
     Scene::Scene(game::GameContext const &gameContext, std::filesystem::path const &projectRoot) :
         mGameContext(gameContext),
         mProjection(getProjection(sdl::SdlContext::INITIAL_EXTENT)),
-        mView(lookAt(glm::vec3(5, 5, 5),
+        mView(lookAt(CAMERA_POSITION,
                      glm::vec3(0, 0, 0),
                      glm::vec3(0, 0, 1)
                 )),
-        mModel(glm::mat4(1.0f)),
+        mModel(translate(glm::mat4(1.0f), OBJECT_POSITION)),
         mMeshData(model::loadObjFile(projectRoot / "content/models/basic-shapes.obj")),
         mPipeline(gameContext.mSdlContext, createPipeline(gameContext.mSdlContext, projectRoot)),
         mVertexBuffer(gameContext.mSdlContext, createVertexBuffer(gameContext.mSdlContext, mMeshData)),
@@ -224,7 +233,17 @@ namespace gfx_testing::scene {
         }
 
         const auto mvpMatrix = mProjection * mView * mModel;
+        static_assert(sizeof(mvpMatrix) % 16 == 0);
         SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpMatrix, sizeof(mvpMatrix));
+
+        constexpr shader::GoochParams params{
+                .mViewDir = OBJECT_POSITION - CAMERA_POSITION, // TODO fix this
+                .mLightDir = LIGHT_DIRECTION,
+                .mCoolColor = COOL_COLOR,
+                .mWarmColor = WARM_COLOR,
+        };
+        static_assert(sizeof(params) % 16 == 0);
+        SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
 
         const SDL_GPUColorTargetInfo colorTargetInfo{
                 .texture = swapchainTexture,
@@ -256,7 +275,7 @@ namespace gfx_testing::scene {
         SDL_BindGPUVertexBuffers(renderPass, 0, &vertexBufferBinding, 1);
         // SDL_DrawGPUPrimitives(renderPass, NUM_VERTICES, 1, 0, 0);
         SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
-        SDL_DrawGPUIndexedPrimitives(renderPass, mMeshData.indices.size(), 1, 0, 0, 0);
+        SDL_DrawGPUIndexedPrimitives(renderPass, mMeshData.mIndices.size(), 1, 0, 0, 0);
         SDL_EndGPURenderPass(renderPass);
     }
 }
