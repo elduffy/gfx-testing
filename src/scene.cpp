@@ -242,9 +242,9 @@ namespace gfx_testing::scene {
         static_assert(sizeof(mvpTransform) % 16 == 0);
         SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
 
-        constexpr shader::GoochParams params{
-                .mCameraDir = CAMERA_POSITION,
-                .mLightPos = LIGHT_POSITION,
+        const shader::GoochParams params{
+                .mCameraPos = glm::vec3(mProjection * mView * mModel * glm::vec4(CAMERA_POSITION, 1)),
+                .mLightPos = glm::vec3(mProjection * mView * mModel * glm::vec4(LIGHT_POSITION, 1)),
                 .mCoolColor = COOL_COLOR,
                 .mWarmColor = WARM_COLOR,
         };

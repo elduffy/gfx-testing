@@ -24,7 +24,8 @@ float4 main(Input input) : SV_Target0
     float3 r = 2.0 * diff * input.Normal - lightDir;
 
     float3 viewDir = normalize(input.Position.xyz - CameraPos);
-    float s = saturate(100.0 * dot(r, viewDir) - 97.0);
+    // TOOD: re-enable highlights
+    float s = 0;//saturate(100.0 * dot(r, viewDir) - 97.0);
 
     float3 highlight = float3(1.0, 1.0, 1.0);
     float3 result = s * highlight + (1.0-s)*(t*warm + (1.0-t)*cool);

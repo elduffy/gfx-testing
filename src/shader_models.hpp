@@ -33,7 +33,7 @@ namespace gfx_testing::shader {
     };
 
     struct GoochParams {
-        SHADER_ALIGN glm::vec3 mCameraDir;
+        SHADER_ALIGN glm::vec3 mCameraPos;
         SHADER_ALIGN glm::vec3 mLightPos;
         SHADER_ALIGN glm::vec3 mCoolColor;
         SHADER_ALIGN glm::vec3 mWarmColor;
