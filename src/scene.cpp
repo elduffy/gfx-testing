@@ -16,7 +16,7 @@ namespace gfx_testing::scene {
 
     static constexpr glm::vec3 CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
-    static constexpr glm::vec3 LIGHT_DIRECTION(1, -1, 1);
+    static constexpr glm::vec3 LIGHT_POSITION(1, -1, 1);
     static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
     static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
 
@@ -232,13 +232,18 @@ namespace gfx_testing::scene {
             return;
         }
 
-        const auto mvpMatrix = mProjection * mView * mModel;
-        static_assert(sizeof(mvpMatrix) % 16 == 0);
-        SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpMatrix, sizeof(mvpMatrix));
+
+        shader::MvpTransform mvpTransform{
+                .mModelView = mView * mModel,
+                .mProjection = mProjection,
+        };
+        // auto const mvpTransform = mProjection * mView * mModel;
+        static_assert(sizeof(mvpTransform) % 16 == 0);
+        SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
 
         constexpr shader::GoochParams params{
-                .mViewDir = OBJECT_POSITION - CAMERA_POSITION, // TODO fix this
-                .mLightDir = LIGHT_DIRECTION,
+                .mCameraDir = CAMERA_POSITION,
+                .mLightPos = LIGHT_POSITION,
                 .mCoolColor = COOL_COLOR,
                 .mWarmColor = WARM_COLOR,
         };

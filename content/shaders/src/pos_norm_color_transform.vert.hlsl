@@ -1,6 +1,7 @@
-cbuffer UBO : register(b0, space1)
+cbuffer MvpTransform : register(b0, space1)
 {
-    float4x4 transform : packoffset(c0);
+    float4x4 modelView;
+    float4x4 projection;
 };
 
 struct Input
@@ -21,7 +22,7 @@ Output main(Input input)
 {
     Output output;
     output.Color = input.Color;
-    output.Normal = input.Normal;
-    output.Position = mul(transform, float4(input.Position, 1.0f));
+    output.Normal = mul(modelView, float4(input.Normal, 0)).xyz;
+    output.Position = mul(mul(projection, modelView), float4(input.Position, 1.0f));
     return output;
 }

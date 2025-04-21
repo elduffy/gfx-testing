@@ -14,8 +14,9 @@ namespace gfx_testing::shader {
         glm::vec4 mColor;
     };
 
-    struct MVPMatrix {
-        glm::mat4 mTransform;
+    struct MvpTransform {
+        glm::mat4 mModelView;
+        glm::mat4 mProjection;
     };
 
     struct MeshData {
@@ -32,8 +33,8 @@ namespace gfx_testing::shader {
     };
 
     struct GoochParams {
-        SHADER_ALIGN glm::vec3 mViewDir;
-        SHADER_ALIGN glm::vec3 mLightDir;
+        SHADER_ALIGN glm::vec3 mCameraDir;
+        SHADER_ALIGN glm::vec3 mLightPos;
         SHADER_ALIGN glm::vec3 mCoolColor;
         SHADER_ALIGN glm::vec3 mWarmColor;
     };
