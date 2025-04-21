@@ -135,6 +135,12 @@ namespace gfx_testing::sdl {
     SdlGpuTexture::~SdlGpuTexture() {
         SDL_ReleaseGPUTexture(mContext.mDevice, mTexture);
     }
+
+    void SdlGpuTexture::reset(SDL_GPUTexture *newTexture) {
+        SDL_ReleaseGPUTexture(mContext.mDevice, mTexture);
+        mTexture = newTexture;
+    }
+
 }
 
 namespace gfx_testing::sdl {

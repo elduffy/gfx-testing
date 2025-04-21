@@ -205,6 +205,7 @@ namespace gfx_testing::scene {
 
     void Scene::onResize(const util::Extent2D extent) {
         mProjection = getProjection(extent);
+        mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
     }
 
 

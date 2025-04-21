@@ -79,6 +79,8 @@ namespace gfx_testing::sdl {
 
         SDL_GPUTexture *operator*() const { return mTexture; }
 
+        void reset(SDL_GPUTexture *newTexture);
+
         SdlContext const &mContext;
         SDL_GPUTexture *mTexture = nullptr;
     };
