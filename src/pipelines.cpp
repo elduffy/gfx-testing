@@ -68,38 +68,28 @@ namespace gfx_testing::pipeline {
         return pipeline;
     }
 
-    SDL_GPUGraphicsPipeline *createDiffusePipeline(sdl::SdlContext const &context,
-                                                   std::filesystem::path const &projectRoot) {
-        const auto vertexShader = sdl::SdlShader::loadShader(context,
-                                                             projectRoot /
-                                                             "content/shaders/src/pos_norm_color_transform.vert.hlsl",
-                                                             0,
-                                                             1, 0, 0);
-        const auto fragmentShader = sdl::SdlShader::loadShader(context,
-                                                               projectRoot /
-                                                               "content/shaders/src/norm_color.frag.hlsl",
-                                                               0,
-                                                               1, 0, 0);
-        return createPipeline(context, *vertexShader, *fragmentShader);
-    }
-
-    SDL_GPUGraphicsPipeline *createGoochPipeline(sdl::SdlContext const &context,
-                                                 std::filesystem::path const &projectRoot) {
-        const auto vertexShader = sdl::SdlShader::loadShader(context,
-                                                             projectRoot /
-                                                             "content/shaders/src/pos_norm_color_transform.vert.hlsl",
-                                                             0,
-                                                             1, 0, 0);
-        const auto fragmentShader = sdl::SdlShader::loadShader(context,
-                                                               projectRoot /
-                                                               "content/shaders/src/gooch.frag.hlsl",
-                                                               0,
-                                                               1, 0, 0);
-        return createPipeline(context, *vertexShader, *fragmentShader);
-    }
-
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext, std::filesystem::path const &projectRoot):
-        mDiffuse{sdlContext, createDiffusePipeline(sdlContext, projectRoot)},
-        mGooch{sdlContext, createGoochPipeline(sdlContext, projectRoot)} {
+        Pipelines(sdlContext,
+                  *sdl::SdlShader::loadShader(sdlContext,
+                                              projectRoot /
+                                              "content/shaders/src/pos_norm_color_transform.vert.hlsl",
+                                              0,
+                                              1, 0, 0),
+                  *sdl::SdlShader::loadShader(sdlContext,
+                                              projectRoot /
+                                              "content/shaders/src/norm_color.frag.hlsl",
+                                              0,
+                                              1, 0, 0),
+                  *sdl::SdlShader::loadShader(sdlContext,
+                                              projectRoot /
+                                              "content/shaders/src/gooch.frag.hlsl",
+                                              0,
+                                              1, 0, 0)) {
+    }
+
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, SDL_GPUShader *defaultVertexShader,
+                         SDL_GPUShader *normColorFragShader, SDL_GPUShader *goochFragShader):
+        mDiffuse(sdlContext, createPipeline(sdlContext, defaultVertexShader, normColorFragShader)),
+        mGooch(sdlContext, createPipeline(sdlContext, defaultVertexShader, goochFragShader)) {
     }
 }
