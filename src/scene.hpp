@@ -23,6 +23,7 @@ namespace gfx_testing::scene {
         glm::mat4x4 mView;
         render::RenderObject mRenderObject;
         render::RenderObject mDebugAxes;
+        render::RenderObject mPointLight;
         sdl::SdlGpuTexture mDepthTexture;
     };
 }

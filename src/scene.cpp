@@ -17,7 +17,7 @@ namespace gfx_testing::scene {
 
     static constexpr glm::vec3 CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
-    static constexpr glm::vec3 LIGHT_POSITION(1, -1, 1);
+    static constexpr glm::vec3 LIGHT_POSITION(2, -3, 1);
     static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
     static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
 
@@ -51,6 +51,8 @@ namespace gfx_testing::scene {
                       translate(glm::mat4(1.0f), OBJECT_POSITION)),
         mDebugAxes(gameContext, model::loadObjFile(projectRoot / "content/models/debug-axes.obj"),
                    glm::mat4(1.0f)),
+        mPointLight(gameContext, model::loadObjFile(projectRoot / "content/models/uv-sphere.obj"),
+                    glm::translate(glm::mat4(1.0f), LIGHT_POSITION)),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)) {
@@ -118,6 +120,19 @@ namespace gfx_testing::scene {
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
 
             mDebugAxes.render(renderPass);
+        }
+
+        // Point light
+        {
+            shader::MvpTransform mvpTransform{
+                    .mModelView = mView * mPointLight.mTransform,
+                    .mProjection = mProjection,
+            };
+            static_assert(sizeof(mvpTransform) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
+
+            mPointLight.render(renderPass);
         }
 
         // Render object
