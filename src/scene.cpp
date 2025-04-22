@@ -11,7 +11,6 @@
 
 #include "glm/gtc/random.hpp"
 #include <pipelines.hpp>
-#include <buffer.hpp>
 
 
 namespace gfx_testing::scene {
@@ -36,63 +35,6 @@ namespace gfx_testing::scene {
         return SDL_CreateGPUTexture(context.mDevice, &createInfo);
     }
 
-    void transferVertexIndexData(sdl::SdlContext const &context, shader::MeshData const &meshData,
-                                 SDL_GPUBuffer *vertexBuffer,
-                                 SDL_GPUBuffer *indexBuffer) {
-        const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
-                .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                .size = boost::safe_numerics::checked::add(meshData.getVertexBufferSize(),
-                                                           meshData.getIndexBufferSize()),
-        };
-        const sdl::SdlTransferBuffer transferBuffer{
-                context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
-
-        // Set the vertex/index data
-        {
-            const auto mappedBuffer = transferBuffer.map(false);
-            auto *vertexData = mappedBuffer.get<shader::PositionColorVertex>();
-            std::ranges::copy(meshData.mVertices, vertexData);
-
-            auto *indexData = mappedBuffer.get<uint16_t>(meshData.getVertexBufferSize());
-            std::ranges::copy(meshData.mIndices, indexData);
-        }
-
-        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
-        if (commandBuffer == nullptr) {
-            throw std::runtime_error("Failed to acquire GPU command buffer");
-        }
-        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
-
-        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-        // Vertex upload
-        {
-            const SDL_GPUTransferBufferLocation source = {
-                    .transfer_buffer = *transferBuffer,
-                    .offset = 0,
-            };
-            const SDL_GPUBufferRegion destination = {
-                    .buffer = vertexBuffer,
-                    .offset = 0,
-                    .size = meshData.getVertexBufferSize(),
-            };
-            SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
-        }
-        // Index upload
-        {
-            const SDL_GPUTransferBufferLocation source = {
-                    .transfer_buffer = *transferBuffer,
-                    .offset = meshData.getVertexBufferSize(),
-            };
-            const SDL_GPUBufferRegion destination = {
-                    .buffer = indexBuffer,
-                    .offset = 0,
-                    .size = meshData.getIndexBufferSize(),
-            };
-            SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
-        }
-        SDL_EndGPUCopyPass(copyPass);
-    }
-
     glm::mat4x4 getProjection(const util::Extent2D extent) {
         auto const aspect = static_cast<float>(extent.mWidth) / static_cast<float>(extent.mHeight);
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
@@ -105,16 +47,11 @@ namespace gfx_testing::scene {
                      glm::vec3(0, 0, 0),
                      glm::vec3(0, 0, 1)
                 )),
-        mModel(translate(glm::mat4(1.0f), OBJECT_POSITION)),
-        mMeshData(model::loadObjFile(projectRoot / "content/models/basic-shapes.obj")),
-        mVertexBuffer(mGameContext.mBufferManager.allocate(
-                SDL_GPU_BUFFERUSAGE_VERTEX, mMeshData.getVertexBufferSize())),
-        mIndexBuffer(mGameContext.mBufferManager.allocate(
-                SDL_GPU_BUFFERUSAGE_INDEX, mMeshData.getIndexBufferSize())),
+        mRenderObject(gameContext, model::loadObjFile(projectRoot / "content/models/basic-shapes.obj"),
+                      translate(glm::mat4(1.0f), OBJECT_POSITION)),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)) {
-        transferVertexIndexData(gameContext.mSdlContext, mMeshData, mVertexBuffer, mIndexBuffer);
     }
 
     void Scene::onResize(const util::Extent2D extent) {
@@ -125,7 +62,9 @@ namespace gfx_testing::scene {
 
     void Scene::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 4.f;
-        mModel = rotate(mModel, mGameContext.mDeltaTime * RADS_PER_SECOND, glm::vec3(0, 0, 1));
+
+        mRenderObject.mTransform = rotate(mRenderObject.mTransform, mGameContext.mDeltaTime * RADS_PER_SECOND,
+                                          glm::vec3(0, 0, 1));
     }
 
     void Scene::draw() const {
@@ -149,7 +88,7 @@ namespace gfx_testing::scene {
 
 
         shader::MvpTransform mvpTransform{
-                .mModelView = mView * mModel,
+                .mModelView = mView * mRenderObject.mTransform,
                 .mProjection = mProjection,
         };
         // auto const mvpTransform = mProjection * mView * mModel;
@@ -157,8 +96,8 @@ namespace gfx_testing::scene {
         SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
 
         const shader::GoochParams params{
-                .mCameraPos = glm::vec3(mProjection * mView * mModel * glm::vec4(CAMERA_POSITION, 1)),
-                .mLightPos = glm::vec3(mProjection * mView * mModel * glm::vec4(LIGHT_POSITION, 1)),
+                .mCameraPos = glm::vec3(mProjection * mView * mRenderObject.mTransform * glm::vec4(CAMERA_POSITION, 1)),
+                .mLightPos = glm::vec3(mProjection * mView * mRenderObject.mTransform * glm::vec4(LIGHT_POSITION, 1)),
                 .mCoolColor = COOL_COLOR,
                 .mWarmColor = WARM_COLOR,
         };
@@ -184,18 +123,7 @@ namespace gfx_testing::scene {
                                                                &depthStencilTargetInfo);
         SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
 
-        SDL_GPUBufferBinding vertexBufferBinding = {
-                .buffer = mVertexBuffer,
-                .offset = 0,
-        };
-        SDL_GPUBufferBinding indexBufferBinding = {
-                .buffer = mIndexBuffer,
-                .offset = 0,
-        };
-        SDL_BindGPUVertexBuffers(renderPass, 0, &vertexBufferBinding, 1);
-        // SDL_DrawGPUPrimitives(renderPass, NUM_VERTICES, 1, 0, 0);
-        SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
-        SDL_DrawGPUIndexedPrimitives(renderPass, mMeshData.mIndices.size(), 1, 0, 0, 0);
+        mRenderObject.render(renderPass);
         SDL_EndGPURenderPass(renderPass);
     }
 }

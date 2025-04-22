@@ -1,6 +1,5 @@
 #pragma once
 
-#include <buffer.hpp>
 #include <sdl.hpp>
 #include <chrono>
 #include <pipelines.hpp>
@@ -48,7 +47,6 @@ namespace gfx_testing::game {
     public:
         sdl::SdlContext const &mSdlContext;
         pipeline::Pipelines mPipelines;
-        BufferManager mBufferManager;
         std::chrono::high_resolution_clock::time_point mStartTime = std::chrono::high_resolution_clock::now();
         uint64_t mFrameStart = 0;
         float mDeltaTime = 0.0f;

@@ -22,7 +22,7 @@ add_executable(gfx_testing
         src/scene.cpp
         src/game.cpp
         src/pipelines.cpp
-        src/buffer.cpp
+        src/render_object.cpp
 )
 target_link_libraries(gfx_testing
         SDL3::SDL3
