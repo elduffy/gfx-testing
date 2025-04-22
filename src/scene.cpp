@@ -17,7 +17,7 @@ namespace gfx_testing::scene {
 
     static constexpr glm::vec3 CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
-    static constexpr glm::vec3 LIGHT_POSITION(2, -3, 1);
+    static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 0);
     static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
     static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
 
@@ -52,7 +52,7 @@ namespace gfx_testing::scene {
         mDebugAxes(gameContext, model::loadObjFile(projectRoot / "content/models/debug-axes.obj"),
                    glm::mat4(1.0f)),
         mPointLight(gameContext, model::loadObjFile(projectRoot / "content/models/uv-sphere.obj"),
-                    glm::translate(glm::mat4(1.0f), LIGHT_POSITION)),
+                    translate(glm::mat4(1.0f), INITIAL_LIGHT_POSITION)),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)) {
@@ -63,12 +63,20 @@ namespace gfx_testing::scene {
         mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
     }
 
+    glm::vec3 Scene::getLightPosition() const {
+        // TODO: store the decomposed scale/rot/translation somewhere to avoid this
+        auto const totalFloatSecs = static_cast<float>(mGameContext.mFrameStart) / 1000.f;
+        auto const r = length(INITIAL_LIGHT_POSITION);
+        auto const theta = -1.5 * totalFloatSecs;
+        return {r * cos(theta), r * sin(theta), cos(2 * theta)};
+    }
 
     void Scene::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 4.f;
 
         mRenderObject.mTransform = rotate(mRenderObject.mTransform, mGameContext.mDeltaTime * RADS_PER_SECOND,
                                           glm::vec3(0, 0, 1));
+        mPointLight.mTransform = translate(glm::mat4(1.0f), getLightPosition());
     }
 
     void Scene::draw() const {
@@ -148,7 +156,7 @@ namespace gfx_testing::scene {
                     .mCameraPos = glm::vec3(
                             mProjection * mView * mRenderObject.mTransform * glm::vec4(CAMERA_POSITION, 1)),
                     .mLightPos = glm::vec3(
-                            mProjection * mView * mRenderObject.mTransform * glm::vec4(LIGHT_POSITION, 1)),
+                            mProjection * mView * mRenderObject.mTransform * glm::vec4(getLightPosition(), 1)),
                     .mCoolColor = COOL_COLOR,
                     .mWarmColor = WARM_COLOR,
             };

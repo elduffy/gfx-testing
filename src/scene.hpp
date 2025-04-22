@@ -18,6 +18,8 @@ namespace gfx_testing::scene {
         void draw() const;
 
     private:
+        [[nodiscard]] glm::vec3 getLightPosition() const;
+
         game::GameContext &mGameContext;
         glm::mat4x4 mProjection;
         glm::mat4x4 mView;
