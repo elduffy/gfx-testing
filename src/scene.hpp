@@ -4,7 +4,6 @@
 #include <filesystem>
 #include <game.hpp>
 #include <render_object.hpp>
-#include <shader_models.hpp>
 #include <glm/mat4x4.hpp>
 
 namespace gfx_testing::scene {
@@ -23,6 +22,7 @@ namespace gfx_testing::scene {
         glm::mat4x4 mProjection;
         glm::mat4x4 mView;
         render::RenderObject mRenderObject;
+        render::RenderObject mDebugAxes;
         sdl::SdlGpuTexture mDepthTexture;
     };
 }

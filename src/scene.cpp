@@ -49,6 +49,8 @@ namespace gfx_testing::scene {
                 )),
         mRenderObject(gameContext, model::loadObjFile(projectRoot / "content/models/basic-shapes.obj"),
                       translate(glm::mat4(1.0f), OBJECT_POSITION)),
+        mDebugAxes(gameContext, model::loadObjFile(projectRoot / "content/models/debug-axes.obj"),
+                   glm::mat4(1.0f)),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)) {
@@ -87,23 +89,6 @@ namespace gfx_testing::scene {
         }
 
 
-        shader::MvpTransform mvpTransform{
-                .mModelView = mView * mRenderObject.mTransform,
-                .mProjection = mProjection,
-        };
-        // auto const mvpTransform = mProjection * mView * mModel;
-        static_assert(sizeof(mvpTransform) % 16 == 0);
-        SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-
-        const shader::GoochParams params{
-                .mCameraPos = glm::vec3(mProjection * mView * mRenderObject.mTransform * glm::vec4(CAMERA_POSITION, 1)),
-                .mLightPos = glm::vec3(mProjection * mView * mRenderObject.mTransform * glm::vec4(LIGHT_POSITION, 1)),
-                .mCoolColor = COOL_COLOR,
-                .mWarmColor = WARM_COLOR,
-        };
-        static_assert(sizeof(params) % 16 == 0);
-        SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
-
         const SDL_GPUColorTargetInfo colorTargetInfo{
                 .texture = swapchainTexture,
                 .clear_color = {0, 0, 0, 1},
@@ -121,9 +106,43 @@ namespace gfx_testing::scene {
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
                                                                &depthStencilTargetInfo);
-        SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
 
-        mRenderObject.render(renderPass);
+        // Debug axes
+        {
+            shader::MvpTransform mvpTransform{
+                    .mModelView = mView * mDebugAxes.mTransform,
+                    .mProjection = mProjection,
+            };
+            static_assert(sizeof(mvpTransform) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
+
+            mDebugAxes.render(renderPass);
+        }
+
+        // Render object
+        {
+            shader::MvpTransform mvpTransform{
+                    .mModelView = mView * mRenderObject.mTransform,
+                    .mProjection = mProjection,
+            };
+            static_assert(sizeof(mvpTransform) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+
+            const shader::GoochParams params{
+                    .mCameraPos = glm::vec3(
+                            mProjection * mView * mRenderObject.mTransform * glm::vec4(CAMERA_POSITION, 1)),
+                    .mLightPos = glm::vec3(
+                            mProjection * mView * mRenderObject.mTransform * glm::vec4(LIGHT_POSITION, 1)),
+                    .mCoolColor = COOL_COLOR,
+                    .mWarmColor = WARM_COLOR,
+            };
+            static_assert(sizeof(params) % 16 == 0);
+            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
+
+            mRenderObject.render(renderPass);
+        }
         SDL_EndGPURenderPass(renderPass);
     }
 }

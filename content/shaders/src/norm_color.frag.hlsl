@@ -7,5 +7,5 @@ struct Input
 
 float4 main(Input input) : SV_Target0
 {
-    return float4(input.Normal, 1);
+    return input.Color;
 }
