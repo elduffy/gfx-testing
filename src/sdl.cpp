@@ -122,6 +122,11 @@ namespace gfx_testing::sdl {
         mContext(context), mBuffer(buffer) {
     }
 
+    SdlGpuBuffer::SdlGpuBuffer(SdlGpuBuffer &&other) noexcept:
+        mContext(other.mContext), mBuffer(other.mBuffer) {
+        other.mBuffer = nullptr;
+    }
+
     SdlGpuBuffer::~SdlGpuBuffer() {
         SDL_ReleaseGPUBuffer(mContext.mDevice, mBuffer);
     }

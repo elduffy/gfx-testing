@@ -9,7 +9,7 @@
 namespace gfx_testing::scene {
     class Scene {
     public:
-        Scene(game::GameContext const &gameContext, std::filesystem::path const &projectRoot);
+        Scene(game::GameContext &gameContext, std::filesystem::path const &projectRoot);
 
         void update();
 
@@ -18,14 +18,13 @@ namespace gfx_testing::scene {
         void draw() const;
 
     private:
-        game::GameContext const &mGameContext;
+        game::GameContext &mGameContext;
         glm::mat4x4 mProjection;
         glm::mat4x4 mView;
         glm::mat4x4 mModel;
         shader::MeshData mMeshData; // TODO we don't need this to match the lifetime of the Scene
-        sdl::SdlGfxPipeline mPipeline;
-        sdl::SdlGpuBuffer mVertexBuffer;
-        sdl::SdlGpuBuffer mIndexBuffer;
+        SDL_GPUBuffer *mVertexBuffer;
+        SDL_GPUBuffer *mIndexBuffer;
         sdl::SdlGpuTexture mDepthTexture;
     };
 }

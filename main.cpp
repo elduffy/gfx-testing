@@ -28,8 +28,8 @@ void handleUpdate(gfx_testing::scene::Scene &scene) {
 
 int main() {
     const gfx_testing::sdl::SdlContext sdlContext;
-    gfx_testing::game::GameContext gameContext(sdlContext);
     const auto projectRoot = gfx_testing::util::getProjectRoot();
+    gfx_testing::game::GameContext gameContext(sdlContext, projectRoot);
 
     gfx_testing::scene::Scene scene(gameContext, projectRoot);
 

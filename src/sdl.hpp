@@ -28,6 +28,8 @@ namespace gfx_testing::sdl {
 
     class SdlShader {
     public:
+        NO_COPY_NO_MOVE(SdlShader);
+
         SdlShader(SdlContext const &context, SDL_GPUShader *shader);
 
         ~SdlShader();
@@ -49,6 +51,8 @@ namespace gfx_testing::sdl {
 
     class SdlGfxPipeline {
     public:
+        NO_COPY_NO_MOVE(SdlGfxPipeline);
+
         SdlGfxPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline);
 
         ~SdlGfxPipeline();
@@ -61,7 +65,11 @@ namespace gfx_testing::sdl {
 
     class SdlGpuBuffer {
     public:
+        NO_COPY(SdlGpuBuffer);
+
         SdlGpuBuffer(SdlContext const &context, SDL_GPUBuffer *buffer);
+
+        SdlGpuBuffer(SdlGpuBuffer &&) noexcept;
 
         ~SdlGpuBuffer();
 
@@ -73,6 +81,8 @@ namespace gfx_testing::sdl {
 
     class SdlGpuTexture {
     public:
+        NO_COPY_NO_MOVE(SdlGpuTexture);
+
         SdlGpuTexture(SdlContext const &context, SDL_GPUTexture *texture);
 
         ~SdlGpuTexture();
@@ -87,6 +97,8 @@ namespace gfx_testing::sdl {
 
     class SdlMappedTransferBuffer {
     public:
+        NO_COPY_NO_MOVE(SdlMappedTransferBuffer);
+
         SdlMappedTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer, uint8_t *mappedMemory);
 
         ~SdlMappedTransferBuffer();
@@ -101,6 +113,8 @@ namespace gfx_testing::sdl {
 
     class SdlTransferBuffer {
     public:
+        NO_COPY_NO_MOVE(SdlTransferBuffer);
+
         SdlTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer);
 
         ~SdlTransferBuffer();

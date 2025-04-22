@@ -10,6 +10,8 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "glm/gtc/random.hpp"
+#include <pipelines.hpp>
+#include <buffer.hpp>
 
 
 namespace gfx_testing::scene {
@@ -19,96 +21,6 @@ namespace gfx_testing::scene {
     static constexpr glm::vec3 LIGHT_POSITION(1, -1, 1);
     static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
     static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
-
-    SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context,
-                                            std::filesystem::path const &projectRoot) {
-        const auto vertexShader = sdl::SdlShader::loadShader(context,
-                                                             projectRoot /
-                                                             "content/shaders/src/pos_norm_color_transform.vert.hlsl",
-                                                             0,
-                                                             1, 0, 0);
-        const auto fragmentShader = sdl::SdlShader::loadShader(context,
-                                                               projectRoot /
-                                                               "content/shaders/src/gooch.frag.hlsl",
-                                                               0,
-                                                               1, 0, 0);
-
-        SDL_GPUColorTargetDescription colorTargetDescription = {
-                .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
-        };
-        constexpr SDL_GPUVertexBufferDescription vertexBufferDescription = {
-                .slot = 0,
-                .pitch = sizeof(shader::PositionColorVertex),
-                .input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
-                .instance_step_rate = 0,
-        };
-        constexpr std::array vertexAttributes{
-                SDL_GPUVertexAttribute{
-                        .location = 0,
-                        .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-                        .offset = 0,
-                },
-                SDL_GPUVertexAttribute{
-                        .location = 1,
-                        .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-                        .offset = sizeof(shader::PositionColorVertex::mPosition),
-                },
-                SDL_GPUVertexAttribute{
-                        .location = 2,
-                        .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
-                        .offset = sizeof(shader::PositionColorVertex::mPosition) + sizeof(
-                                      shader::PositionColorVertex::mNormal),
-                }
-        };
-
-        const SDL_GPUGraphicsPipelineCreateInfo graphicsPipelineInfo = {
-                .vertex_shader = *vertexShader,
-                .fragment_shader = *fragmentShader,
-                .vertex_input_state = SDL_GPUVertexInputState{
-                        .vertex_buffer_descriptions = &vertexBufferDescription,
-                        .num_vertex_buffers = 1,
-                        .vertex_attributes = &vertexAttributes[0],
-                        .num_vertex_attributes = vertexAttributes.size(),
-                },
-                .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
-                .depth_stencil_state = {
-                        .compare_op = SDL_GPU_COMPAREOP_LESS,
-                        .enable_depth_test = true,
-                        .enable_depth_write = true,
-                },
-                .target_info = {
-                        .color_target_descriptions = &colorTargetDescription,
-                        .num_color_targets = 1,
-                        .depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM,
-                        .has_depth_stencil_target = true,
-                },
-        };
-        auto *pipeline = SDL_CreateGPUGraphicsPipeline(context.mDevice, &graphicsPipelineInfo);
-        if (pipeline == nullptr) {
-            throw std::runtime_error("Failed to create graphics pipeline");
-        }
-        SDL_Log("Created graphics pipeline");
-        return pipeline;
-    }
-
-    SDL_GPUBuffer *createVertexBuffer(sdl::SdlContext const &context, shader::MeshData const &meshData) {
-        const SDL_GPUBufferCreateInfo createInfo = {
-                .usage = SDL_GPU_BUFFERUSAGE_VERTEX,
-                .size = meshData.getVertexBufferSize(),
-        };
-        return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
-    }
-
-    SDL_GPUBuffer *createIndexBuffer(sdl::SdlContext const &context, shader::MeshData const &meshData) {
-        const SDL_GPUBufferCreateInfo createInfo = {
-                .usage = SDL_GPU_BUFFERUSAGE_INDEX,
-                .size = meshData.getIndexBufferSize(),
-        };
-        return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
-    }
 
     SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
         const SDL_GPUTextureCreateInfo createInfo = {
@@ -186,7 +98,7 @@ namespace gfx_testing::scene {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
     }
 
-    Scene::Scene(game::GameContext const &gameContext, std::filesystem::path const &projectRoot) :
+    Scene::Scene(game::GameContext &gameContext, std::filesystem::path const &projectRoot) :
         mGameContext(gameContext),
         mProjection(getProjection(sdl::SdlContext::INITIAL_EXTENT)),
         mView(lookAt(CAMERA_POSITION,
@@ -195,12 +107,14 @@ namespace gfx_testing::scene {
                 )),
         mModel(translate(glm::mat4(1.0f), OBJECT_POSITION)),
         mMeshData(model::loadObjFile(projectRoot / "content/models/basic-shapes.obj")),
-        mPipeline(gameContext.mSdlContext, createPipeline(gameContext.mSdlContext, projectRoot)),
-        mVertexBuffer(gameContext.mSdlContext, createVertexBuffer(gameContext.mSdlContext, mMeshData)),
-        mIndexBuffer(gameContext.mSdlContext, createIndexBuffer(gameContext.mSdlContext, mMeshData)),
+        mVertexBuffer(mGameContext.mBufferManager.allocate(
+                SDL_GPU_BUFFERUSAGE_VERTEX, mMeshData.getVertexBufferSize())),
+        mIndexBuffer(mGameContext.mBufferManager.allocate(
+                SDL_GPU_BUFFERUSAGE_INDEX, mMeshData.getIndexBufferSize())),
         mDepthTexture(gameContext.mSdlContext,
-                      createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {
-        transferVertexIndexData(gameContext.mSdlContext, mMeshData, *mVertexBuffer, *mIndexBuffer);
+                      createDepthTexture(gameContext.mSdlContext,
+                                         sdl::SdlContext::INITIAL_EXTENT)) {
+        transferVertexIndexData(gameContext.mSdlContext, mMeshData, mVertexBuffer, mIndexBuffer);
     }
 
     void Scene::onResize(const util::Extent2D extent) {
@@ -268,14 +182,14 @@ namespace gfx_testing::scene {
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
                                                                &depthStencilTargetInfo);
-        SDL_BindGPUGraphicsPipeline(renderPass, *mPipeline);
+        SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
 
         SDL_GPUBufferBinding vertexBufferBinding = {
-                .buffer = *mVertexBuffer,
+                .buffer = mVertexBuffer,
                 .offset = 0,
         };
         SDL_GPUBufferBinding indexBufferBinding = {
-                .buffer = *mIndexBuffer,
+                .buffer = mIndexBuffer,
                 .offset = 0,
         };
         SDL_BindGPUVertexBuffers(renderPass, 0, &vertexBufferBinding, 1);

@@ -1,9 +1,4 @@
-#include <algorithm>
-#include <format>
-#include <sdl.hpp>
 #include <util.hpp>
-#include <SDL3/SDL_log.h>
-#include <boost/scope/scope_exit.hpp>
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot() {
