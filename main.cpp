@@ -26,7 +26,7 @@ void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::scene
                 constexpr auto RADS_PER_VIEWPORT_DIMENSIONS = 4.f;
                 auto const extent = scene.getViewportExtent().asVec2() / RADS_PER_VIEWPORT_DIMENSIONS;
                 glm::vec2 const &radians = {-event.motion.yrel / extent.y, -event.motion.xrel / extent.x};
-                scene.pivotCamera(radians);
+                scene.getCamera().pivot(radians);
             }
             break;
         }
@@ -34,7 +34,7 @@ void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::scene
             constexpr auto UNITS_PER_MOUSE_CLICK = 0.5f;
             const float deltaRadius = (event.wheel.direction == SDL_MOUSEWHEEL_NORMAL ? -1.f : 1.f) *
                                       UNITS_PER_MOUSE_CLICK * event.wheel.y;
-            scene.approachCamera(deltaRadius);
+            scene.getCamera().approach(deltaRadius);
             break;
         }
         default: {

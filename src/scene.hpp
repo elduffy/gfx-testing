@@ -1,5 +1,6 @@
 #pragma once
 
+#include <camera.hpp>
 #include <sdl.hpp>
 #include <filesystem>
 #include <game.hpp>
@@ -15,24 +16,19 @@ namespace gfx_testing::scene {
 
         void onResize(util::Extent2D extent);
 
-        void pivotCamera(glm::vec2 const &radians);
-
-        void approachCamera(float deltaRadius);
-
         void draw() const;
 
-        [[nodiscard]] util::Extent2D getViewportExtent() const;
+        [[nodiscard]] util::Extent2D getViewportExtent() const { return mViewportExtent; };
+
+        render::Camera &getCamera() { return mCamera; }
 
     private:
         [[nodiscard]] glm::vec3 getLightPosition() const;
 
-        void updateViewMatrix();
-
         game::GameContext &mGameContext;
         util::Extent2D mViewportExtent;
-        glm::vec3 mCameraPosWs;
+        render::Camera mCamera;
         glm::mat4x4 mProjection;
-        glm::mat4x4 mView;
         render::RenderObject mRenderObject;
         render::RenderObject mDebugAxes;
         render::RenderObject mPointLight;

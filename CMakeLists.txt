@@ -24,6 +24,7 @@ add_executable(gfx_testing
         src/pipelines.cpp
         src/render_object.cpp
         src/stopwatch.cpp
+        src/camera.cpp
 )
 target_link_libraries(gfx_testing
         SDL3::SDL3

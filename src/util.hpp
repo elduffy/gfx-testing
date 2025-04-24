@@ -1,8 +1,10 @@
 #pragma once
 
 #include <filesystem>
-
+#include <cmath>
+#include "glm/geometric.hpp"
 #include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
 
 #define NO_COPY(T) T(const T &) = delete
 #define NO_MOVE(T) T(T &&) = delete
@@ -22,4 +24,8 @@ namespace gfx_testing::util {
             return {mWidth, mHeight};
         }
     };
+
+    glm::vec3 getSphericalCoords(glm::vec3 const &cartesian);
+
+    glm::vec3 getCartesianCoords(glm::vec3 const &spherical);
 }
