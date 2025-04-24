@@ -7,6 +7,8 @@
 #include <render_object.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "point_light.hpp"
+
 namespace gfx_testing::scene {
     class Scene {
     public:
@@ -23,15 +25,13 @@ namespace gfx_testing::scene {
         render::Camera &getCamera() { return mCamera; }
 
     private:
-        [[nodiscard]] glm::vec3 getLightPosition() const;
-
         game::GameContext &mGameContext;
         util::Extent2D mViewportExtent;
         render::Camera mCamera;
         glm::mat4x4 mProjection;
-        render::RenderObject mRenderObject;
+        render::RenderObject mPropObjects;
         render::RenderObject mDebugAxes;
-        render::RenderObject mPointLight;
+        render::PointLight mPointLight;
         sdl::SdlGpuTexture mDepthTexture;
     };
 }

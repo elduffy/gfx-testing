@@ -11,7 +11,6 @@
 
 #include <pipelines.hpp>
 
-
 namespace gfx_testing::scene {
 
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
@@ -44,12 +43,11 @@ namespace gfx_testing::scene {
         mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION),
         mProjection(getProjection(mViewportExtent)),
-        mRenderObject(gameContext, model::loadObjFile(projectRoot / "content/models/basic-shapes.obj"),
-                      translate(glm::mat4(1.0f), OBJECT_POSITION)),
+        mPropObjects(gameContext, model::loadObjFile(projectRoot / "content/models/basic-shapes.obj"),
+                     translate(glm::mat4(1.0f), OBJECT_POSITION)),
         mDebugAxes(gameContext, model::loadObjFile(projectRoot / "content/models/debug-axes.obj"),
                    glm::mat4(1.0f)),
-        mPointLight(gameContext, model::loadObjFile(projectRoot / "content/models/uv-sphere.obj"),
-                    translate(glm::mat4(1.0f), INITIAL_LIGHT_POSITION)),
+        mPointLight(gameContext, projectRoot, INITIAL_LIGHT_POSITION),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)) {
@@ -61,21 +59,13 @@ namespace gfx_testing::scene {
         mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
     }
 
-    glm::vec3 Scene::getLightPosition() const {
-        // TODO: store the decomposed scale/rot/translation somewhere to avoid this
-        auto const totalFloatSecs = static_cast<float>(mGameContext.getFrameSnapshot().mAccumulatedTime) / 1000.f;
-        auto const r = length(INITIAL_LIGHT_POSITION);
-        auto const theta = -0.5 * totalFloatSecs;
-        return {r * cos(theta), r * sin(theta), cos(2 * theta)};
-    }
-
     void Scene::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
-        mRenderObject.mTransform = rotate(mRenderObject.mTransform,
-                                          mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
-                                          glm::vec3(0, 0, 1));
-        mPointLight.mTransform = translate(glm::mat4(1.0f), getLightPosition());
+        mPropObjects.mTransform = rotate(mPropObjects.mTransform,
+                                         mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
+                                         glm::vec3(0, 0, 1));
+        mPointLight.update();
     }
 
     void Scene::draw() const {
@@ -116,7 +106,6 @@ namespace gfx_testing::scene {
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
                                                                &depthStencilTargetInfo);
 
-        auto const lightPos = getLightPosition();
         // Debug axes
         {
             shader::MvpTransform mvpTransform{
@@ -128,7 +117,7 @@ namespace gfx_testing::scene {
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             shader::CameraLight cameraLight{
                     .mCameraPosWs = mCamera.mPosWs,
-                    .mLightPosWs = lightPos,
+                    .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
@@ -139,8 +128,9 @@ namespace gfx_testing::scene {
 
         // Point light
         {
+            auto const &renderObject = mPointLight.mRenderObject;
             shader::MvpTransform mvpTransform{
-                    .mModel = mPointLight.mTransform,
+                    .mModel = renderObject.mTransform,
                     .mView = mCamera.mView,
                     .mProjection = mProjection,
             };
@@ -148,19 +138,19 @@ namespace gfx_testing::scene {
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             shader::CameraLight cameraLight{
                     .mCameraPosWs = mCamera.mPosWs,
-                    .mLightPosWs = lightPos,
+                    .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
 
-            mPointLight.render(renderPass);
+            renderObject.render(renderPass);
         }
 
-        // Render object
+        // Prop objects
         {
             shader::MvpTransform mvpTransform{
-                    .mModel = mRenderObject.mTransform,
+                    .mModel = mPropObjects.mTransform,
                     .mView = mCamera.mView,
                     .mProjection = mProjection,
             };
@@ -168,7 +158,7 @@ namespace gfx_testing::scene {
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             shader::CameraLight cameraLight{
                     .mCameraPosWs = mCamera.mPosWs,
-                    .mLightPosWs = lightPos,
+                    .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
@@ -181,7 +171,7 @@ namespace gfx_testing::scene {
             SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
 
-            mRenderObject.render(renderPass);
+            mPropObjects.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);
     }
