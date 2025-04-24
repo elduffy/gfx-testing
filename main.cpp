@@ -5,13 +5,20 @@
 #include <scene.hpp>
 #include <game.hpp>
 
-void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
+void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::scene::Scene &scene,
+                 SDL_Event const &event) {
     switch (event.type) {
         case SDL_EVENT_WINDOW_RESIZED: {
             scene.onResize({
                     boost::safe_numerics::checked::cast<uint32_t>(event.window.data1),
                     boost::safe_numerics::checked::cast<uint32_t>(event.window.data2),
             });
+            break;
+        }
+        case SDL_EVENT_KEY_UP: {
+            if (!event.key.down && !event.key.repeat && event.key.key == SDLK_RETURN) {
+                gameContext.mStopwatch.toggle();
+            }
             break;
         }
         case SDL_EVENT_MOUSE_MOTION: {
@@ -23,14 +30,10 @@ void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
             }
             break;
         }
-        case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        case SDL_EVENT_MOUSE_BUTTON_UP:
-            break;
         case SDL_EVENT_MOUSE_WHEEL: {
             constexpr auto UNITS_PER_MOUSE_CLICK = 0.5f;
             const float deltaRadius = (event.wheel.direction == SDL_MOUSEWHEEL_NORMAL ? -1.f : 1.f) *
                                       UNITS_PER_MOUSE_CLICK * event.wheel.y;
-            SDL_Log("delta radius %f", deltaRadius);
             scene.approachCamera(deltaRadius);
             break;
         }
@@ -41,7 +44,7 @@ void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
     }
 }
 
-void handleUpdate(gfx_testing::scene::Scene &scene) {
+void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::scene::Scene &scene) {
     scene.update();
     scene.draw();
 }
@@ -53,8 +56,8 @@ int main() {
 
     gfx_testing::scene::Scene scene(gameContext, projectRoot);
 
-    auto eventFunction = [&scene](auto const &event) { handleEvent(scene, event); };
-    auto updateFunction = [&scene] { handleUpdate(scene); };
+    auto eventFunction = [&](auto const &event) { handleEvent(gameContext, scene, event); };
+    auto updateFunction = [&] { handleUpdate(gameContext, scene); };
     SDL_Log("Begin main loop");
     gameContext.runMainLoop(eventFunction, updateFunction);
     return 0;

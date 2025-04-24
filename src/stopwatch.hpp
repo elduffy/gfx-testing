@@ -9,6 +9,8 @@ namespace gfx_testing::util {
 
         [[nodiscard]] uint64_t getTime() const;
 
+        void toggle();
+
         void pause();
 
         void resume();

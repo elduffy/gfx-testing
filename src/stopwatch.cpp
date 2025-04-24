@@ -15,6 +15,14 @@ namespace gfx_testing::util {
                        std::chrono::high_resolution_clock::now() - mResumedTime.value()).count();
     }
 
+    void Stopwatch::toggle() {
+        if (isPaused()) {
+            resume();
+        } else {
+            pause();
+        }
+    }
+
     void Stopwatch::pause() {
         mAccumulatedTime = getTime();
         mResumedTime.reset();
