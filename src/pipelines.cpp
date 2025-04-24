@@ -74,7 +74,7 @@ namespace gfx_testing::pipeline {
                                               projectRoot /
                                               "content/shaders/src/pos_norm_color_transform.vert.hlsl",
                                               0,
-                                              1, 0, 0),
+                                              2, 0, 0),
                   *sdl::SdlShader::loadShader(sdlContext,
                                               projectRoot /
                                               "content/shaders/src/norm_color.frag.hlsl",

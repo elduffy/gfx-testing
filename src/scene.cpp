@@ -17,7 +17,7 @@ namespace gfx_testing::scene {
 
     static constexpr glm::vec3 CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
-    static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 0);
+    static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
     static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
     static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
 
@@ -67,12 +67,12 @@ namespace gfx_testing::scene {
         // TODO: store the decomposed scale/rot/translation somewhere to avoid this
         auto const totalFloatSecs = static_cast<float>(mGameContext.mFrameStart) / 1000.f;
         auto const r = length(INITIAL_LIGHT_POSITION);
-        auto const theta = -1.5 * totalFloatSecs;
+        auto const theta = -0.5 * totalFloatSecs;
         return {r * cos(theta), r * sin(theta), cos(2 * theta)};
     }
 
     void Scene::update() {
-        constexpr auto RADS_PER_SECOND = glm::pi<float>() / 4.f;
+        constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
         mRenderObject.mTransform = rotate(mRenderObject.mTransform, mGameContext.mDeltaTime * RADS_PER_SECOND,
                                           glm::vec3(0, 0, 1));
@@ -117,14 +117,22 @@ namespace gfx_testing::scene {
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
                                                                &depthStencilTargetInfo);
 
+        auto const lightPos = getLightPosition();
         // Debug axes
         {
             shader::MvpTransform mvpTransform{
-                    .mModelView = mView * mDebugAxes.mTransform,
+                    .mModel = mDebugAxes.mTransform,
+                    .mView = mView,
                     .mProjection = mProjection,
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            shader::CameraLight cameraLight{
+                    .mCameraPosWs = CAMERA_POSITION,
+                    .mLightPosWs = lightPos,
+            };
+            static_assert(sizeof(cameraLight) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
 
             mDebugAxes.render(renderPass);
@@ -133,11 +141,18 @@ namespace gfx_testing::scene {
         // Point light
         {
             shader::MvpTransform mvpTransform{
-                    .mModelView = mView * mPointLight.mTransform,
+                    .mModel = mPointLight.mTransform,
+                    .mView = mView,
                     .mProjection = mProjection,
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            shader::CameraLight cameraLight{
+                    .mCameraPosWs = CAMERA_POSITION,
+                    .mLightPosWs = lightPos,
+            };
+            static_assert(sizeof(cameraLight) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
 
             mPointLight.render(renderPass);
@@ -146,17 +161,20 @@ namespace gfx_testing::scene {
         // Render object
         {
             shader::MvpTransform mvpTransform{
-                    .mModelView = mView * mRenderObject.mTransform,
+                    .mModel = mRenderObject.mTransform,
+                    .mView = mView,
                     .mProjection = mProjection,
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            shader::CameraLight cameraLight{
+                    .mCameraPosWs = CAMERA_POSITION,
+                    .mLightPosWs = lightPos,
+            };
+            static_assert(sizeof(cameraLight) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
 
             const shader::GoochParams params{
-                    .mCameraPos = glm::vec3(
-                            mProjection * mView * mRenderObject.mTransform * glm::vec4(CAMERA_POSITION, 1)),
-                    .mLightPos = glm::vec3(
-                            mProjection * mView * mRenderObject.mTransform * glm::vec4(getLightPosition(), 1)),
                     .mCoolColor = COOL_COLOR,
                     .mWarmColor = WARM_COLOR,
             };

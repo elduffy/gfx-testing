@@ -15,8 +15,14 @@ namespace gfx_testing::shader {
     };
 
     struct MvpTransform {
-        glm::mat4 mModelView;
+        glm::mat4 mModel;
+        glm::mat4 mView;
         glm::mat4 mProjection;
+    };
+
+    struct CameraLight {
+        SHADER_ALIGN glm::vec3 mCameraPosWs;
+        SHADER_ALIGN glm::vec3 mLightPosWs;
     };
 
     struct MeshData {
@@ -33,8 +39,6 @@ namespace gfx_testing::shader {
     };
 
     struct GoochParams {
-        SHADER_ALIGN glm::vec3 mCameraPos;
-        SHADER_ALIGN glm::vec3 mLightPos;
         SHADER_ALIGN glm::vec3 mCoolColor;
         SHADER_ALIGN glm::vec3 mWarmColor;
     };
