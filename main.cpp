@@ -25,8 +25,14 @@ void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
         }
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP:
+            break;
         case SDL_EVENT_MOUSE_WHEEL: {
-            // TODO: handle zoom
+            constexpr auto UNITS_PER_MOUSE_CLICK = 0.5f;
+            const float deltaRadius = (event.wheel.direction == SDL_MOUSEWHEEL_NORMAL ? -1.f : 1.f) *
+                                      UNITS_PER_MOUSE_CLICK * event.wheel.y;
+            SDL_Log("delta radius %f", deltaRadius);
+            scene.approachCamera(deltaRadius);
+            break;
         }
         default: {
             // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);

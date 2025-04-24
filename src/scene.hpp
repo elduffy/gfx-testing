@@ -17,12 +17,16 @@ namespace gfx_testing::scene {
 
         void pivotCamera(glm::vec2 const &radians);
 
+        void approachCamera(float deltaRadius);
+
         void draw() const;
 
         [[nodiscard]] util::Extent2D getViewportExtent() const;
 
     private:
         [[nodiscard]] glm::vec3 getLightPosition() const;
+
+        void updateViewMatrix();
 
         game::GameContext &mGameContext;
         util::Extent2D mViewportExtent;

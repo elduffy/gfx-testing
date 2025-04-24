@@ -45,11 +45,8 @@ namespace gfx_testing::scene {
         mGameContext(gameContext),
         mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCameraPosWs(INITIAL_CAMERA_POSITION),
+        mView(glm::identity<glm::mat4x4>()),
         mProjection(getProjection(mViewportExtent)),
-        mView(lookAt(mCameraPosWs,
-                     glm::vec3(0, 0, 0),
-                     glm::vec3(0, 0, 1)
-                )),
         mRenderObject(gameContext, model::loadObjFile(projectRoot / "content/models/basic-shapes.obj"),
                       translate(glm::mat4(1.0f), OBJECT_POSITION)),
         mDebugAxes(gameContext, model::loadObjFile(projectRoot / "content/models/debug-axes.obj"),
@@ -59,6 +56,7 @@ namespace gfx_testing::scene {
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)) {
+        updateViewMatrix();
     }
 
     void Scene::onResize(const util::Extent2D extent) {
@@ -98,10 +96,15 @@ namespace gfx_testing::scene {
         constexpr auto MAX_THETA = glm::radians(180.f) - MIN_THETA;
         newSpherical.y = glm::clamp(newSpherical.y, MIN_THETA, MAX_THETA);
         mCameraPosWs = getCartesianCoords(newSpherical);
-        mView = lookAt(mCameraPosWs,
-                       glm::vec3(0, 0, 0),
-                       glm::vec3(0, 0, 1)
-                );
+        updateViewMatrix();
+    }
+
+    void Scene::approachCamera(float const deltaRadius) {
+        constexpr auto MIN_RADIUS = 1.f;
+        auto newSpherical = getSphericalCoords(mCameraPosWs) + glm::vec3(deltaRadius, 0, 0);
+        newSpherical.x = std::max(newSpherical.x, MIN_RADIUS);
+        mCameraPosWs = getCartesianCoords(newSpherical);
+        updateViewMatrix();
     }
 
     glm::vec3 Scene::getLightPosition() const {
@@ -110,6 +113,10 @@ namespace gfx_testing::scene {
         auto const r = length(INITIAL_LIGHT_POSITION);
         auto const theta = -0.5 * totalFloatSecs;
         return {r * cos(theta), r * sin(theta), cos(2 * theta)};
+    }
+
+    void Scene::updateViewMatrix() {
+        mView = lookAt(mCameraPosWs, glm::vec3(0, 0, 0), glm::vec3(0, 0, 1));
     }
 
     void Scene::update() {
