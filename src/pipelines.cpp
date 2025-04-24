@@ -48,6 +48,9 @@ namespace gfx_testing::pipeline {
                         .num_vertex_attributes = vertexAttributes.size(),
                 },
                 .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+                .rasterizer_state = {
+                        .cull_mode = SDL_GPU_CULLMODE_BACK
+                },
                 .depth_stencil_state = {
                         .compare_op = SDL_GPU_COMPAREOP_LESS,
                         .enable_depth_test = true,
