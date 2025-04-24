@@ -77,6 +77,7 @@ namespace gfx_testing::model {
                 meshData.mIndices.push_back(index.vertex_index);
                 auto &vertex = meshData.mVertices.at(index.vertex_index);
 
+                // TODO: get flat shading to work
                 vertex.mNormal.x = attrib.normals.at(3 * index.normal_index);
                 vertex.mNormal.y = attrib.normals.at(3 * index.normal_index + 1);
                 vertex.mNormal.z = attrib.normals.at(3 * index.normal_index + 2);
