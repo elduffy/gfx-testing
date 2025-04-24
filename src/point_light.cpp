@@ -4,13 +4,12 @@
 #include <glm/ext/matrix_transform.hpp>
 
 namespace gfx_testing::render {
-    PointLight::PointLight(game::GameContext &gameContext, std::filesystem::path const &projectRoot,
-                           glm::vec3 const &initialPosition):
+    PointLight::PointLight(game::GameContext &gameContext, glm::vec3 const &initialPosition):
         mGameContext(gameContext),
         mPosWs(initialPosition),
         mPathRadius(length(initialPosition)),
         mRenderObject(gameContext,
-                      model::loadObjFile(projectRoot / "content/models/uv-sphere.obj"),
+                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj"),
                       translate(glm::mat4(1.0f), mPosWs)) {
     }
 

@@ -27,6 +27,8 @@ add_executable(gfx_testing
         src/camera.cpp
         src/point_light.hpp
         src/point_light.cpp
+        src/resource_loader.cpp
+        src/resource_loader.hpp
 )
 target_link_libraries(gfx_testing
         SDL3::SDL3

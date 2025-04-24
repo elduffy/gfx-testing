@@ -71,28 +71,40 @@ namespace gfx_testing::pipeline {
         return pipeline;
     }
 
-    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, std::filesystem::path const &projectRoot):
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ShaderCode const &defaultVertexShader,
+                         util::ShaderCode const &normColorFragShader,
+                         util::ShaderCode const &goochFragShader):
         Pipelines(sdlContext,
-                  *sdl::SdlShader::loadShader(sdlContext,
-                                              projectRoot /
-                                              "content/shaders/src/pos_norm_color_transform.vert.hlsl",
-                                              0,
-                                              2, 0, 0),
-                  *sdl::SdlShader::loadShader(sdlContext,
-                                              projectRoot /
-                                              "content/shaders/src/norm_color.frag.hlsl",
-                                              0,
-                                              1, 0, 0),
-                  *sdl::SdlShader::loadShader(sdlContext,
-                                              projectRoot /
-                                              "content/shaders/src/gooch.frag.hlsl",
-                                              0,
-                                              1, 0, 0)) {
+                  *sdl::SdlShader::createShader(sdlContext,
+                                                defaultVertexShader.mCode,
+                                                defaultVertexShader.mSize,
+                                                defaultVertexShader.mStage,
+                                                0,
+                                                2, 0, 0),
+                  *sdl::SdlShader::createShader(sdlContext,
+                                                normColorFragShader.mCode,
+                                                normColorFragShader.mSize,
+                                                normColorFragShader.mStage,
+                                                0,
+                                                1, 0, 0),
+                  *sdl::SdlShader::createShader(sdlContext,
+                                                goochFragShader.mCode,
+                                                goochFragShader.mSize,
+                                                goochFragShader.mStage,
+                                                0,
+                                                1, 0, 0)) {
     }
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext, SDL_GPUShader *defaultVertexShader,
                          SDL_GPUShader *normColorFragShader, SDL_GPUShader *goochFragShader):
         mDiffuse(sdlContext, createPipeline(sdlContext, defaultVertexShader, normColorFragShader)),
         mGooch(sdlContext, createPipeline(sdlContext, defaultVertexShader, goochFragShader)) {
+    }
+
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader):
+        Pipelines(sdlContext, resourceLoader.loadShaderCode("pos_norm_color_transform.vert.hlsl"),
+                  resourceLoader.loadShaderCode("norm_color.frag.hlsl"),
+                  resourceLoader.loadShaderCode("gooch.frag.hlsl")) {
+
     }
 }

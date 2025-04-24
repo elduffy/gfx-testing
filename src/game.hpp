@@ -8,7 +8,7 @@
 namespace gfx_testing::game {
     class GameContext {
     public:
-        GameContext(sdl::SdlContext const &sdlContext, std::string const &projectRoot);
+        GameContext(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader);
 
         template<typename EventFn, typename UpdateFn>
         void runMainLoop(EventFn &eventFn, UpdateFn &updateFn) {
@@ -43,10 +43,11 @@ namespace gfx_testing::game {
         }
 
     private:
-        util::Snapshot mLastFrame;
+        util::Snapshot mLastFrame{};
 
     public:
         sdl::SdlContext const &mSdlContext;
+        util::ResourceLoader const &mResourceLoader;
         pipeline::Pipelines mPipelines;
         util::Stopwatch mStopwatch{false};
     };

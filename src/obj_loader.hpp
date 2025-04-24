@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <shader_models.hpp>
 
 namespace gfx_testing::model {

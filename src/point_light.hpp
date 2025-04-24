@@ -5,8 +5,7 @@
 namespace gfx_testing::render {
     class PointLight {
     public:
-        explicit PointLight(game::GameContext &gameContext, std::filesystem::path const &projectRoot,
-                            glm::vec3 const &initialPosition);
+        explicit PointLight(game::GameContext &gameContext, glm::vec3 const &initialPosition);
 
         void update();
 

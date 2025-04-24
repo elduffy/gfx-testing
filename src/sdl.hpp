@@ -34,16 +34,12 @@ namespace gfx_testing::sdl {
 
         ~SdlShader();
 
-        SDL_GPUShader *operator*() const { return mShader; }
+        static SdlShader createShader(SdlContext const &context, const uint8_t *code, size_t codeSize,
+                                      SDL_GPUShaderStage stage,
+                                      uint32_t samplers, uint32_t uniformBuffers, uint32_t storageBuffers,
+                                      uint32_t storageTextures);
 
-        static SdlShader loadShader(
-            SdlContext const &context,
-            const std::filesystem::path &shaderSourcePath,
-            uint32_t samplers,
-            uint32_t uniformBuffers,
-            uint32_t storageBuffers,
-            uint32_t storageTextures
-        );
+        SDL_GPUShader *operator*() const { return mShader; }
 
         SdlContext const &mContext;
         SDL_GPUShader *mShader = nullptr;
