@@ -3,6 +3,7 @@
 #include <sdl.hpp>
 #include <chrono>
 #include <pipelines.hpp>
+#include <stopwatch.hpp>
 
 namespace gfx_testing::game {
     class GameContext {
@@ -13,10 +14,9 @@ namespace gfx_testing::game {
         void runMainLoop(EventFn &eventFn, UpdateFn &updateFn) {
             SDL_Event event;
 
+            mStopwatch.resume();
             while (true) {
-                const auto previousFrameStart = mFrameStart;
-                mFrameStart = getTime();
-                mDeltaTime = static_cast<float>(mFrameStart - previousFrameStart) / 1000.f;
+                mLastFrame.update(mStopwatch);
 
                 while (SDL_PollEvent(&event)) {
                     eventFn(event);
@@ -38,17 +38,16 @@ namespace gfx_testing::game {
             }
         }
 
-    private:
-        [[nodiscard]] uint64_t getTime() const {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::high_resolution_clock::now() - mStartTime).count();
+        [[nodiscard]] util::Snapshot const &getFrameSnapshot() const {
+            return mLastFrame;
         }
+
+    private:
+        util::Snapshot mLastFrame;
 
     public:
         sdl::SdlContext const &mSdlContext;
         pipeline::Pipelines mPipelines;
-        std::chrono::high_resolution_clock::time_point mStartTime = std::chrono::high_resolution_clock::now();
-        uint64_t mFrameStart = 0;
-        float mDeltaTime = 0.0f;
+        util::Stopwatch mStopwatch{false};
     };
 }

@@ -109,7 +109,7 @@ namespace gfx_testing::scene {
 
     glm::vec3 Scene::getLightPosition() const {
         // TODO: store the decomposed scale/rot/translation somewhere to avoid this
-        auto const totalFloatSecs = static_cast<float>(mGameContext.mFrameStart) / 1000.f;
+        auto const totalFloatSecs = static_cast<float>(mGameContext.getFrameSnapshot().mAccumulatedTime) / 1000.f;
         auto const r = length(INITIAL_LIGHT_POSITION);
         auto const theta = -0.5 * totalFloatSecs;
         return {r * cos(theta), r * sin(theta), cos(2 * theta)};
@@ -122,7 +122,8 @@ namespace gfx_testing::scene {
     void Scene::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
-        mRenderObject.mTransform = rotate(mRenderObject.mTransform, mGameContext.mDeltaTime * RADS_PER_SECOND,
+        mRenderObject.mTransform = rotate(mRenderObject.mTransform,
+                                          mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                                           glm::vec3(0, 0, 1));
         mPointLight.mTransform = translate(glm::mat4(1.0f), getLightPosition());
     }
