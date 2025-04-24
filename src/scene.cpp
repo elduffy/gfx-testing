@@ -1,4 +1,5 @@
 #include <array>
+#include <cmath>
 #include <scene.hpp>
 #include <shader_models.hpp>
 #include <obj_loader.hpp>
@@ -15,7 +16,7 @@
 
 namespace gfx_testing::scene {
 
-    static constexpr glm::vec3 CAMERA_POSITION(5, 5, 5);
+    static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
     static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
@@ -42,8 +43,10 @@ namespace gfx_testing::scene {
 
     Scene::Scene(game::GameContext &gameContext, std::filesystem::path const &projectRoot) :
         mGameContext(gameContext),
-        mProjection(getProjection(sdl::SdlContext::INITIAL_EXTENT)),
-        mView(lookAt(CAMERA_POSITION,
+        mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
+        mCameraPosWs(INITIAL_CAMERA_POSITION),
+        mProjection(getProjection(mViewportExtent)),
+        mView(lookAt(mCameraPosWs,
                      glm::vec3(0, 0, 0),
                      glm::vec3(0, 0, 1)
                 )),
@@ -59,8 +62,46 @@ namespace gfx_testing::scene {
     }
 
     void Scene::onResize(const util::Extent2D extent) {
-        mProjection = getProjection(extent);
+        mViewportExtent = extent;
+        mProjection = getProjection(mViewportExtent);
         mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
+    }
+
+    glm::vec3 getSphericalCoords(glm::vec3 const &cartesian) {
+        // https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates
+        auto const r = length(cartesian);
+        auto const t = std::acos(cartesian.z / r);
+        auto const p = glm::sign(cartesian.y) * std::acos(
+                               cartesian.x / std::sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y));
+        return {r, t, p};
+    }
+
+    glm::vec3 getCartesianCoords(glm::vec3 spherical) {
+        // https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates
+        auto const r = spherical.x;
+        auto const t = spherical.y;
+        auto const p = spherical.z;
+        auto const x = r * glm::sin(t) * glm::cos(p);
+        auto const y = r * glm::sin(t) * glm::sin(p);
+        auto const z = r * glm::cos(t);
+        return {x, y, z};
+    }
+
+    void Scene::pivotCamera(glm::vec2 const &radians) {
+        // Using ISO/physics convention.
+        // radians.x (theta): pivot top to bottom
+        // radians.y (phi): pivot left to right
+        auto const deltaTheta = radians.x;
+        auto const deltaPhi = radians.y;
+        auto newSpherical = getSphericalCoords(mCameraPosWs) + glm::vec3{0, deltaTheta, deltaPhi};
+        constexpr auto MIN_THETA = glm::radians(.1f);
+        constexpr auto MAX_THETA = glm::radians(180.f) - MIN_THETA;
+        newSpherical.y = glm::clamp(newSpherical.y, MIN_THETA, MAX_THETA);
+        mCameraPosWs = getCartesianCoords(newSpherical);
+        mView = lookAt(mCameraPosWs,
+                       glm::vec3(0, 0, 0),
+                       glm::vec3(0, 0, 1)
+                );
     }
 
     glm::vec3 Scene::getLightPosition() const {
@@ -128,7 +169,7 @@ namespace gfx_testing::scene {
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             shader::CameraLight cameraLight{
-                    .mCameraPosWs = CAMERA_POSITION,
+                    .mCameraPosWs = mCameraPosWs,
                     .mLightPosWs = lightPos,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
@@ -148,7 +189,7 @@ namespace gfx_testing::scene {
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             shader::CameraLight cameraLight{
-                    .mCameraPosWs = CAMERA_POSITION,
+                    .mCameraPosWs = mCameraPosWs,
                     .mLightPosWs = lightPos,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
@@ -168,7 +209,7 @@ namespace gfx_testing::scene {
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             shader::CameraLight cameraLight{
-                    .mCameraPosWs = CAMERA_POSITION,
+                    .mCameraPosWs = mCameraPosWs,
                     .mLightPosWs = lightPos,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
@@ -185,5 +226,9 @@ namespace gfx_testing::scene {
             mRenderObject.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);
+    }
+
+    util::Extent2D Scene::getViewportExtent() const {
+        return mViewportExtent;
     }
 }

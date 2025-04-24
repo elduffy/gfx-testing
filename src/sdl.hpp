@@ -8,7 +8,7 @@
 namespace gfx_testing::sdl {
     class SdlContext {
     public:
-        static constexpr util::Extent2D INITIAL_EXTENT = {768, 512};
+        static constexpr util::Extent2D INITIAL_EXTENT = {1280, 720};
 
         explicit SdlContext(bool gfxDebug = true);
 

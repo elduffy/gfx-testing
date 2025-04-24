@@ -14,6 +14,20 @@ void handleEvent(gfx_testing::scene::Scene &scene, SDL_Event const &event) {
             });
             break;
         }
+        case SDL_EVENT_MOUSE_MOTION: {
+            if ((event.motion.state & SDL_BUTTON_MMASK) != 0) {
+                constexpr auto RADS_PER_VIEWPORT_DIMENSIONS = 4.f;
+                auto const extent = scene.getViewportExtent().asVec2() / RADS_PER_VIEWPORT_DIMENSIONS;
+                glm::vec2 const &radians = {-event.motion.yrel / extent.y, -event.motion.xrel / extent.x};
+                scene.pivotCamera(radians);
+            }
+            break;
+        }
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+        case SDL_EVENT_MOUSE_WHEEL: {
+            // TODO: handle zoom
+        }
         default: {
             // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
             break;
