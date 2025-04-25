@@ -12,7 +12,7 @@ namespace gfx_testing::pipeline {
         };
         constexpr SDL_GPUVertexBufferDescription vertexBufferDescription = {
                 .slot = 0,
-                .pitch = sizeof(shader::PositionColorVertex),
+                .pitch = sizeof(shader::VertexData),
                 .input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
                 .instance_step_rate = 0,
         };
@@ -27,14 +27,14 @@ namespace gfx_testing::pipeline {
                         .location = 1,
                         .buffer_slot = 0,
                         .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-                        .offset = sizeof(shader::PositionColorVertex::mPosition),
+                        .offset = sizeof(shader::VertexData::mPosition),
                 },
                 SDL_GPUVertexAttribute{
                         .location = 2,
                         .buffer_slot = 0,
                         .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
-                        .offset = sizeof(shader::PositionColorVertex::mPosition) + sizeof(
-                                      shader::PositionColorVertex::mNormal),
+                        .offset = sizeof(shader::VertexData::mPosition) + sizeof(
+                                      shader::VertexData::mNormal),
                 }
         };
 

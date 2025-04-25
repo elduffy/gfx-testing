@@ -27,7 +27,7 @@ namespace gfx_testing::render {
         // Set the vertex/index data
         {
             const auto mappedBuffer = transferBuffer.map(false);
-            auto *vertexData = mappedBuffer.get<shader::PositionColorVertex>();
+            auto *vertexData = mappedBuffer.get<shader::VertexData>();
             std::ranges::copy(meshData.mVertices, vertexData);
 
             auto *indexData = mappedBuffer.get<uint16_t>(meshData.getVertexBufferSize());

@@ -8,10 +8,18 @@
 #define SHADER_ALIGN alignas(16)
 
 namespace gfx_testing::shader {
-    struct PositionColorVertex {
+    struct VertexData {
         glm::vec3 mPosition;
         glm::vec3 mNormal;
         glm::vec4 mColor;
+
+        [[nodiscard]] std::string toString() const {
+            std::stringstream ss;
+            ss << "pos = {" << mPosition.x << ", " << mPosition.y << ", " << mPosition.z << "}, ";
+            ss << "norm = {" << mNormal.x << ", " << mNormal.y << ", " << mNormal.z << "}, ";
+            ss << "col = {" << mColor.x << ", " << mColor.y << ", " << mColor.z << "}";
+            return ss.str();
+        }
     };
 
     struct MvpTransform {
@@ -26,15 +34,39 @@ namespace gfx_testing::shader {
     };
 
     struct MeshData {
-        std::vector<PositionColorVertex> mVertices;
+        std::vector<VertexData> mVertices;
         std::vector<uint16_t> mIndices;
 
         [[nodiscard]] uint32_t getVertexBufferSize() const {
-            return boost::safe_numerics::checked::cast<uint32_t>(mVertices.size() * sizeof(PositionColorVertex));
+            return boost::safe_numerics::checked::cast<uint32_t>(mVertices.size() * sizeof(VertexData));
         }
 
         [[nodiscard]] uint32_t getIndexBufferSize() const {
             return boost::safe_numerics::checked::cast<uint32_t>(mIndices.size() * sizeof(uint16_t));
+        }
+
+        [[nodiscard]] std::string toString() const {
+            std::stringstream ss;
+            ss << "MeshData {\n";
+            ss << "\tmVertices(";
+            ss << mVertices.size();
+            ss << ") = [\n";
+            for (const auto &v: mVertices) {
+                ss << "\t\t";
+                ss << v.toString();
+                ss << ",\n";
+            }
+            ss << "\t],\n";
+            ss << "\tmIndices(";
+            ss << mIndices.size();
+            ss << ") = [";
+            for (const auto &i: mIndices) {
+                ss << i;
+                ss << ", ";
+            }
+            ss << "]\n";
+            ss << "}";
+            return ss.str();
         }
     };
 
