@@ -12,7 +12,7 @@
 namespace gfx_testing::scene {
     class Scene {
     public:
-        Scene(game::GameContext &gameContext, std::filesystem::path const &projectRoot);
+        explicit Scene(game::GameContext &gameContext);
 
         void update();
 

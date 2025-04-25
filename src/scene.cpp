@@ -38,7 +38,7 @@ namespace gfx_testing::scene {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
     }
 
-    Scene::Scene(game::GameContext &gameContext, std::filesystem::path const &projectRoot) :
+    Scene::Scene(game::GameContext &gameContext) :
         mGameContext(gameContext),
         mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION),

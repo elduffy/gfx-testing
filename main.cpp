@@ -51,11 +51,10 @@ void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::scene::Scene &s
 
 int main() {
     const gfx_testing::sdl::SdlContext sdlContext;
-    const auto projectRoot = gfx_testing::util::getProjectRoot();
     gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
 
-    gfx_testing::scene::Scene scene(gameContext, projectRoot);
+    gfx_testing::scene::Scene scene(gameContext);
 
     auto eventFunction = [&](auto const &event) { handleEvent(gameContext, scene, event); };
     auto updateFunction = [&] { handleUpdate(gameContext, scene); };
