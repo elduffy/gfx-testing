@@ -9,7 +9,7 @@ namespace gfx_testing::render {
         mPosWs(initialPosition),
         mPathRadius(length(initialPosition)),
         mRenderObject(gameContext,
-                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj"),
+                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", model::NormalTreatment::AVERAGE),
                       translate(glm::mat4(1.0f), mPosWs)) {
     }
 

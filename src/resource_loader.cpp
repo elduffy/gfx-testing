@@ -30,7 +30,8 @@ namespace gfx_testing::util {
         return ShaderCode(compiledFilePath, stage);
     }
 
-    shader::MeshData ResourceLoader::loadObjModel(std::string const &filename) const {
-        return model::loadObjFile(mProjectRoot / "content/models/" / filename);
+    shader::MeshData ResourceLoader::loadObjModel(std::string const &filename,
+                                                  model::NormalTreatment normalTreatment) const {
+        return model::loadObjFile(mProjectRoot / "content/models/" / filename, normalTreatment);
     }
 }

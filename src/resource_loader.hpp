@@ -5,6 +5,7 @@
 #include <shader_models.hpp>
 #include <util.hpp>
 #include <SDL3/SDL.h>
+#include <obj_loader.hpp>
 
 namespace gfx_testing::util {
 
@@ -43,7 +44,8 @@ namespace gfx_testing::util {
 
         [[nodiscard]] ShaderCode loadShaderCode(std::string const &filename) const;
 
-        [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename) const;
+        [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename,
+                                                    model::NormalTreatment normalTreatment) const;
 
     private:
         sdl::SdlContext mSdlContext;

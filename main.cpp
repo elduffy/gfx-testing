@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <SDL3/SDL.h>
 #include <sdl.hpp>
 #include <util.hpp>
