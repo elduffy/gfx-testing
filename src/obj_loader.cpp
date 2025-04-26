@@ -76,6 +76,7 @@ namespace gfx_testing::model {
             vertexData.mNormal = glm::normalize(vertexData.mNormal);
         }
 
+        // SDL_Log("Mesh data with averaged normals %s", meshData.toString().c_str());
         return meshData;
     }
 
@@ -137,6 +138,7 @@ namespace gfx_testing::model {
             }
         }
 
+        // SDL_Log("Mesh data with split normals %s", meshData.toString().c_str());
         return meshData;
     }
 
@@ -178,11 +180,14 @@ namespace gfx_testing::model {
                                                  attrib.vertices.size(), attrib.colors.size()));
         }
 
+
         switch (normalTreatment) {
             case NormalTreatment::AVERAGE:
                 return processAveraged(reader);
             case NormalTreatment::SPLIT:
                 return processSplit(reader);
+            default:
+                throw std::runtime_error("Unrecognized normal treatment");
         }
     }
 }

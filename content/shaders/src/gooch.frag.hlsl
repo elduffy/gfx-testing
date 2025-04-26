@@ -31,5 +31,4 @@ float4 main(Input input) : SV_Target0
     float3 highlight = float3(1.0, 1.0, 1.0);
     float3 result = s * highlight + (1.0-s)*(t*warm + (1.0-t)*cool);
     return float4(result, 1.0);
-    //return float4(norm, 1);
 }
