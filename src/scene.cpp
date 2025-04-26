@@ -43,7 +43,7 @@ namespace gfx_testing::scene {
         mProjection(getProjection(mViewportExtent)),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
-                     gameContext.mResourceLoader.loadTexture("viking-room.bmp"),
+                     gameContext.mResourceLoader.loadTexture("viking-room.png"),
                      glm::scale(translate(glm::mat4(1.0f), OBJECT_POSITION), glm::vec3(3))),
         mDebugAxes(gameContext,
                    gameContext.mResourceLoader.loadObjModel(

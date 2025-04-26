@@ -38,10 +38,6 @@ namespace gfx_testing::util {
     }
 
     sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {
-        // TODO: support other formats
-        if (filename.ends_with(".bmp")) {
-            return io::loadBmp(mProjectRoot / "content/textures/" / filename);
-        }
-        throw std::runtime_error("Could not determine texture type.");
+        return io::loadImage(mProjectRoot / "content/textures/" / filename);
     }
 }

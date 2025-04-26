@@ -1,8 +1,10 @@
 #include <texture.hpp>
 
+#include "SDL3_image/SDL_image.h"
+
 namespace gfx_testing::io {
-    sdl::SdlSurface loadBmp(const std::string &path) {
-        auto *surface = SDL_LoadBMP(path.c_str());
+    sdl::SdlSurface loadImage(const std::string &path) {
+        auto *surface = IMG_Load(path.c_str());
         if (!surface) {
             throw std::runtime_error("Failed to load image: " + path);
         }

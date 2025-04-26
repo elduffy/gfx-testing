@@ -2,5 +2,5 @@
 #include <sdl.hpp>
 
 namespace gfx_testing::io {
-    sdl::SdlSurface loadBmp(const std::string &path);
+    sdl::SdlSurface loadImage(const std::string &path);
 }

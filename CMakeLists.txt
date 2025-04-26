@@ -14,6 +14,8 @@ include(cmake/fetch-catch2.cmake)
 
 find_package(SDL3 REQUIRED)
 
+add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
+
 # gfx_testing_lib main library
 add_library(gfx_testing_lib
         src/obj_loader.cpp
@@ -32,6 +34,7 @@ add_library(gfx_testing_lib
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         SDL3::SDL3
+        SDL3_image::SDL3_image
         Boost::algorithm
         Boost::safe_numerics
         Boost::scope
