@@ -16,8 +16,6 @@ namespace gfx_testing::scene {
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
-    static constexpr glm::vec3 COOL_COLOR(0, 0, 0.55);
-    static constexpr glm::vec3 WARM_COLOR(0.3, 0.3, 0);
 
     SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
         const SDL_GPUTextureCreateInfo createInfo = {
@@ -44,10 +42,12 @@ namespace gfx_testing::scene {
         mCamera(INITIAL_CAMERA_POSITION),
         mProjection(getProjection(mViewportExtent)),
         mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", model::NormalTreatment::SPLIT),
-                     translate(glm::mat4(1.0f), OBJECT_POSITION)),
+                     gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
+                     gameContext.mResourceLoader.loadTexture("viking-room.bmp"),
+                     glm::scale(translate(glm::mat4(1.0f), OBJECT_POSITION), glm::vec3(3))),
         mDebugAxes(gameContext,
-                   gameContext.mResourceLoader.loadObjModel("debug-axes.obj", model::NormalTreatment::AVERAGE),
+                   gameContext.mResourceLoader.loadObjModel(
+                           "debug-axes.obj", model::NormalTreatment::AVERAGE),
                    glm::mat4(1.0f)),
         mPointLight(gameContext, INITIAL_LIGHT_POSITION),
         mDepthTexture(gameContext.mSdlContext,
@@ -165,13 +165,13 @@ namespace gfx_testing::scene {
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
 
-            const shader::GoochParams params{
-                    .mCoolColor = COOL_COLOR,
-                    .mWarmColor = WARM_COLOR,
-            };
-            static_assert(sizeof(params) % 16 == 0);
-            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
+            // const shader::GoochParams params{
+            //         .mCoolColor = {0, 0, 0.55},
+            //         .mWarmColor = {0.3, 0.3, 0},
+            // };
+            // static_assert(sizeof(params) % 16 == 0);
+            // SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mTextured);
 
             mPropObjects.render(renderPass);
         }

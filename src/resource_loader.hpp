@@ -47,6 +47,8 @@ namespace gfx_testing::util {
         [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename,
                                                     model::NormalTreatment normalTreatment) const;
 
+        [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
+
     private:
         sdl::SdlContext mSdlContext;
         std::filesystem::path mProjectRoot = getProjectRoot();

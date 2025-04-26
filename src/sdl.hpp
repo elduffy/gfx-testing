@@ -77,9 +77,11 @@ namespace gfx_testing::sdl {
 
     class SdlGpuTexture {
     public:
-        NO_COPY_NO_MOVE(SdlGpuTexture);
+        NO_COPY(SdlGpuTexture);
 
         SdlGpuTexture(SdlContext const &context, SDL_GPUTexture *texture);
+
+        SdlGpuTexture(SdlGpuTexture &&) noexcept;
 
         ~SdlGpuTexture();
 
@@ -121,5 +123,32 @@ namespace gfx_testing::sdl {
 
         SdlContext const &mContext;
         SDL_GPUTransferBuffer *mBuffer = nullptr;
+    };
+
+    class SdlSurface {
+    public:
+        NO_COPY_NO_MOVE(SdlSurface);
+
+        explicit SdlSurface(SDL_Surface *surface);
+
+        ~SdlSurface();
+
+        SDL_Surface *operator*() const { return mSurface; }
+
+        SDL_Surface *mSurface = nullptr;
+    };
+
+    class SdlGpuSampler {
+    public:
+        NO_COPY_NO_MOVE(SdlGpuSampler);
+
+        SdlGpuSampler(SdlContext const &context, SDL_GPUSampler *sampler);
+
+        ~SdlGpuSampler();
+
+        SDL_GPUSampler *operator*() const { return mSampler; }
+
+        SdlContext const &mContext;
+        SDL_GPUSampler *mSampler = nullptr;
     };
 }

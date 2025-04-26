@@ -1,9 +1,10 @@
 #pragma once
 
 #include <sdl.hpp>
-#include <chrono>
 #include <pipelines.hpp>
 #include <stopwatch.hpp>
+
+#include "samplers.hpp"
 
 namespace gfx_testing::game {
     class GameContext {
@@ -49,6 +50,7 @@ namespace gfx_testing::game {
         sdl::SdlContext const &mSdlContext;
         util::ResourceLoader const &mResourceLoader;
         pipeline::Pipelines mPipelines;
+        render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};
     };
 }

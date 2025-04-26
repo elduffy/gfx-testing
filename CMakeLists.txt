@@ -25,10 +25,10 @@ add_library(gfx_testing_lib
         src/render_object.cpp
         src/stopwatch.cpp
         src/camera.cpp
-        src/point_light.hpp
         src/point_light.cpp
         src/resource_loader.cpp
-        src/resource_loader.hpp
+        src/samplers.cpp
+        src/texture.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         SDL3::SDL3

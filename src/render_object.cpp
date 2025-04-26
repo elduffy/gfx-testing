@@ -70,16 +70,94 @@ namespace gfx_testing::render {
         SDL_EndGPUCopyPass(copyPass);
     }
 
+
+    void transferTextureData(sdl::SdlContext const &context, SDL_Surface *surface,
+                             SDL_GPUTexture *texture) {
+        auto const width = boost::safe_numerics::checked::cast<uint32_t>(surface->w);
+        auto const height = boost::safe_numerics::checked::cast<uint32_t>(surface->h);
+        const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
+                .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+                .size = width * height * 4,
+        };
+        const sdl::SdlTransferBuffer transferBuffer{
+                context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
+        // Upload pixel data
+        {
+            const auto mappedBuffer = transferBuffer.map(false);
+            auto *imageData = mappedBuffer.get<uint8_t>();
+            SDL_memcpy(imageData, surface->pixels, surface->w * surface->h * 4);
+        }
+
+        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
+        if (commandBuffer == nullptr) {
+            throw std::runtime_error("Failed to acquire GPU command buffer");
+        }
+        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
+        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+        SDL_GPUTextureTransferInfo const source = {
+                .transfer_buffer = *transferBuffer,
+                .offset = 0,
+        };
+        SDL_GPUTextureRegion const dest = {
+                .texture = texture,
+                .w = width,
+                .h = height,
+                .d = 1,
+        };
+        SDL_UploadToGPUTexture(copyPass, &source, &dest, false);
+        SDL_EndGPUCopyPass(copyPass);
+    }
+
+    std::optional<TextureAndSampler> createGpuTexture(game::GameContext const &gameContext,
+                                                      sdl::SdlSurface const *surface) {
+        if (surface == nullptr) {
+            return {};
+        }
+
+        const SDL_GPUTextureCreateInfo createInfo = {
+                .type = SDL_GPU_TEXTURETYPE_2D,
+                .format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
+                .usage = SDL_GPU_TEXTUREUSAGE_SAMPLER,
+                .width = boost::safe_numerics::checked::cast<uint32_t>((**surface)->w),
+                .height = boost::safe_numerics::checked::cast<uint32_t>((**surface)->h),
+                .layer_count_or_depth = 1,
+                .num_levels = 1,
+        };
+        sdl::SdlGpuTexture tex = {gameContext.mSdlContext,
+                                  SDL_CreateGPUTexture(gameContext.mSdlContext.mDevice, &createInfo)};
+        if (*tex == nullptr) {
+            throw std::runtime_error("Failed to create GPU texture");
+        }
+        return {TextureAndSampler{.mTexture = std::move(tex), .mSampler = gameContext.mSamplers.mAnisotropicWrap}};
+    }
+
     RenderObject::RenderObject(game::GameContext const &gameContext,
-                               shader::MeshData const &meshData, const glm::mat4 &initialTransform):
+                               shader::MeshData const &meshData, const glm::mat4 &initialTransform) :
+        RenderObject(gameContext, meshData, nullptr, initialTransform) {
+    }
+
+    RenderObject::RenderObject(game::GameContext const &gameContext,
+                               shader::MeshData const &meshData, sdl::SdlSurface const &textureData,
+                               const glm::mat4 &initialTransform) :
+        RenderObject(gameContext, meshData, &textureData, initialTransform) {
+    }
+
+    RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+                               sdl::SdlSurface const *textureDataOpt,
+                               const glm::mat4 &initialTransform):
         mTransform(initialTransform),
         mVertexBuffer(gameContext.mSdlContext,
                       createBuffer(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_VERTEX,
                                    meshData.getVertexBufferSize())),
         mIndexBuffer(gameContext.mSdlContext,
                      createBuffer(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),
+        mTextureOpt(createGpuTexture(gameContext, textureDataOpt)),
         mIndexCount(meshData.mIndices.size()) {
         transferBufferData(gameContext.mSdlContext, meshData, *mVertexBuffer, *mIndexBuffer);
+        if (mTextureOpt.has_value()) {
+            assert(textureDataOpt != nullptr);
+            transferTextureData(gameContext.mSdlContext, textureDataOpt->mSurface, *mTextureOpt->mTexture);
+        }
     }
 
     void RenderObject::render(SDL_GPURenderPass *renderPass) const {
@@ -93,6 +171,14 @@ namespace gfx_testing::render {
         };
         SDL_BindGPUVertexBuffers(renderPass, 0, &vertexBufferBinding, 1);
         SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+
+        if (mTextureOpt.has_value()) {
+            const SDL_GPUTextureSamplerBinding samplerBinding{
+                    .texture = *mTextureOpt->mTexture,
+                    .sampler = *mTextureOpt->mSampler,
+            };
+            SDL_BindGPUFragmentSamplers(renderPass, 0, &samplerBinding, 1);
+        }
         SDL_DrawGPUIndexedPrimitives(renderPass, mIndexCount, 1, 0, 0, 0);
     }
 }

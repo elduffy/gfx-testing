@@ -2,6 +2,8 @@
 #include <resource_loader.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include "texture.hpp"
+
 namespace gfx_testing::util {
 
     ResourceLoader::ResourceLoader(sdl::SdlContext const &sdlContext):
@@ -33,5 +35,13 @@ namespace gfx_testing::util {
     shader::MeshData ResourceLoader::loadObjModel(std::string const &filename,
                                                   model::NormalTreatment normalTreatment) const {
         return model::loadObjFile(mProjectRoot / "content/models/" / filename, normalTreatment);
+    }
+
+    sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {
+        // TODO: support other formats
+        if (filename.ends_with(".bmp")) {
+            return io::loadBmp(mProjectRoot / "content/textures/" / filename);
+        }
+        throw std::runtime_error("Could not determine texture type.");
     }
 }

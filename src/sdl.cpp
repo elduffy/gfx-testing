@@ -108,6 +108,11 @@ namespace gfx_testing::sdl {
         mContext(context), mTexture(texture) {
     }
 
+    SdlGpuTexture::SdlGpuTexture(SdlGpuTexture &&other) noexcept:
+        mContext(other.mContext), mTexture(other.mTexture) {
+        other.mTexture = nullptr;
+    }
+
     SdlGpuTexture::~SdlGpuTexture() {
         SDL_ReleaseGPUTexture(mContext.mDevice, mTexture);
     }
@@ -141,5 +146,25 @@ namespace gfx_testing::sdl {
     SdlMappedTransferBuffer SdlTransferBuffer::map(bool cycle) const {
         return {mContext, mBuffer,
                 static_cast<uint8_t *>(SDL_MapGPUTransferBuffer(mContext.mDevice, mBuffer, cycle))};
+    }
+}
+
+namespace gfx_testing::sdl {
+    SdlSurface::SdlSurface(SDL_Surface *surface):
+        mSurface(surface) {
+    }
+
+    SdlSurface::~SdlSurface() {
+        SDL_DestroySurface(mSurface);
+    }
+}
+
+namespace gfx_testing::sdl {
+    SdlGpuSampler::SdlGpuSampler(SdlContext const &context, SDL_GPUSampler *sampler):
+        mContext(context), mSampler(sampler) {
+    }
+
+    SdlGpuSampler::~SdlGpuSampler() {
+        SDL_ReleaseGPUSampler(mContext.mDevice, mSampler);
     }
 }
