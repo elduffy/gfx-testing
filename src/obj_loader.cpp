@@ -83,7 +83,8 @@ namespace gfx_testing::model {
                                      attrib.vertices.at(3 * i + 2));
         }
         for (size_t i = 0; i < uvs.size(); i++) {
-            uvs[i] = glm::vec2(attrib.texcoords.at(2 * i), attrib.texcoords.at(2 * i + 1));
+            // SDL uses top-to-bottom coordinates, while OBJ assumes bottom-to-top, so the v is inverted.
+            uvs[i] = glm::vec2(attrib.texcoords.at(2 * i), 1.f - attrib.texcoords.at(2 * i + 1));
         }
         for (size_t i = 0; i < normals.size(); i++) {
             normals[i] = glm::vec3(attrib.normals.at(3 * i),
