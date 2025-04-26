@@ -7,11 +7,12 @@ namespace gfx_testing::model {
 
     enum class NormalTreatment {
         /**
-         * Keeps the same number of vertices and averages the normals for each face together
+         * Keeps the same number of vertices and averages the normals for each face together.
+         * Not suitable for texture mapping.
          */
         AVERAGE,
         /**
-         * Creates new vertices as needed to hold normals for all faces
+         * Creates new vertices as needed to hold normals/UVs for all faces
          */
         SPLIT,
     };

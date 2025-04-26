@@ -14,6 +14,7 @@ cbuffer CameraLight : register(b1, space1)
 struct Input
 {
     float3 position : SV_Position;
+    float2 uv : TEXCOORD0;
     float3 normal : NORMAL0;
     float4 color : COLOR0;
 };
@@ -21,6 +22,7 @@ struct Input
 struct Output
 {
     float4 position : SV_Position;
+    float2 uv : TEXCOORD0;
     float3 normalCamS : NORMAL0;
     float4 color : COLOR0;
     // Pointing toward the camera
@@ -39,6 +41,7 @@ Output main(Input input)
 
     Output output;
     output.position = mul(mvp, float4(input.position, 1.0f));
+    output.uv = input.uv;
     output.normalCamS = mul(mv, float4(input.normal, 0.0f)).xyz;
     output.color = input.color;
     output.cameraDirCamS = normalize(float3(0,0,0) - vertexPosCamS);

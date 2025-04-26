@@ -7,6 +7,7 @@ cbuffer Params : register(b0, space3)
 struct Input
 {
     float4 position : SV_Position;
+    float2 uv : TEXCOORD0;
     float3 normalCamS : NORMAL0;
     float4 color : COLOR0;
     // Pointing toward the camera

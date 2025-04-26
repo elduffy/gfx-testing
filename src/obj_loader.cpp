@@ -10,22 +10,6 @@
 
 namespace gfx_testing::model {
 
-
-    shader::VertexData mergeVertexData(std::vector<shader::VertexData> const &vertexData) {
-        shader::VertexData merged{
-                .mPosition = vertexData[0].mPosition,
-        };
-        for (const auto &[mPosition, mNormal, mColor]: vertexData) {
-            assert(mPosition == merged.mPosition);
-            merged.mNormal += mNormal;
-            merged.mColor += mColor;
-        }
-        merged.mNormal /= vertexData.size();
-        merged.mNormal = glm::normalize(merged.mNormal);
-        merged.mColor /= vertexData.size();
-        return merged;
-    }
-
     shader::MeshData processAveraged(tinyobj::ObjReader const &reader) {
         auto const &attrib = reader.GetAttrib();
         auto const &shapes = reader.GetShapes();
@@ -36,10 +20,13 @@ namespace gfx_testing::model {
 
         meshData.mVertices.resize(numVertices);
         for (auto i = 0; i < numVertices; i++) {
-            auto &[position, normal, color] = meshData.mVertices[i];
+            auto &[position, uv, normal, color] = meshData.mVertices[i];
             position.x = attrib.vertices.at(3 * i);
             position.y = attrib.vertices.at(3 * i + 1);
             position.z = attrib.vertices.at(3 * i + 2);
+
+            uv.x = 0;
+            uv.y = 0;
 
             normal.x = 0;
             normal.y = 0;
@@ -86,6 +73,7 @@ namespace gfx_testing::model {
 
         // First, map the raw input to their positions/normals
         std::vector<glm::vec3> positions(attrib.vertices.size() / 3);
+        std::vector<glm::vec2> uvs(attrib.texcoords.size() / 2);
         std::vector<glm::vec3> normals(attrib.normals.size() / 3);
         std::vector<glm::vec4> colors(attrib.colors.size() / 3);
 
@@ -93,6 +81,9 @@ namespace gfx_testing::model {
             positions[i] = glm::vec3(attrib.vertices.at(3 * i),
                                      attrib.vertices.at(3 * i + 1),
                                      attrib.vertices.at(3 * i + 2));
+        }
+        for (size_t i = 0; i < uvs.size(); i++) {
+            uvs[i] = glm::vec2(attrib.texcoords.at(2 * i), attrib.texcoords.at(2 * i + 1));
         }
         for (size_t i = 0; i < normals.size(); i++) {
             normals[i] = glm::vec3(attrib.normals.at(3 * i),
@@ -125,8 +116,9 @@ namespace gfx_testing::model {
 
                     if (!outputIndices.contains(vertNormIdx)) {
                         outputIndices[vertNormIdx] = nextOutputIndex++;
-                        auto &[mPosition, mNormal, mColor] = meshData.mVertices.emplace_back();
+                        auto &[mPosition, mUv, mNormal, mColor] = meshData.mVertices.emplace_back();
                         mPosition = positions.at(index.vertex_index);
+                        mUv = uvs.at(index.texcoord_index);
                         mNormal = normals.at(index.normal_index);
                         mColor = colors.at(index.vertex_index);
                     }
@@ -179,7 +171,6 @@ namespace gfx_testing::model {
             throw std::runtime_error(std::format("Vertex count {} is not the same as color count {}.",
                                                  attrib.vertices.size(), attrib.colors.size()));
         }
-
 
         switch (normalTreatment) {
             case NormalTreatment::AVERAGE:

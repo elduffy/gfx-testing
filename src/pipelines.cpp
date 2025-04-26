@@ -16,27 +16,6 @@ namespace gfx_testing::pipeline {
                 .input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
                 .instance_step_rate = 0,
         };
-        constexpr std::array vertexAttributes{
-                SDL_GPUVertexAttribute{
-                        .location = 0,
-                        .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-                        .offset = 0,
-                },
-                SDL_GPUVertexAttribute{
-                        .location = 1,
-                        .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
-                        .offset = sizeof(shader::VertexData::mPosition),
-                },
-                SDL_GPUVertexAttribute{
-                        .location = 2,
-                        .buffer_slot = 0,
-                        .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
-                        .offset = sizeof(shader::VertexData::mPosition) + sizeof(
-                                      shader::VertexData::mNormal),
-                }
-        };
 
         const SDL_GPUGraphicsPipelineCreateInfo graphicsPipelineInfo = {
                 .vertex_shader = vertexShader,
@@ -44,8 +23,8 @@ namespace gfx_testing::pipeline {
                 .vertex_input_state = SDL_GPUVertexInputState{
                         .vertex_buffer_descriptions = &vertexBufferDescription,
                         .num_vertex_buffers = 1,
-                        .vertex_attributes = &vertexAttributes[0],
-                        .num_vertex_attributes = vertexAttributes.size(),
+                        .vertex_attributes = &shader::VertexData::VERTEX_ATTRIBUTES[0],
+                        .num_vertex_attributes = shader::VertexData::VERTEX_ATTRIBUTES.size(),
                 },
                 .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
                 .rasterizer_state = {
