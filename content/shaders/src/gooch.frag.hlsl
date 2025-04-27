@@ -2,25 +2,24 @@ cbuffer Params : register(b0, space3)
 {
     float3 coolColor;
     float3 warmColor;
+    float3 lightPosMS;
+    float3 cameraPosMS;
 };
 
 struct Input
 {
     float4 position : SV_Position;
     float2 uv : TEXCOORD0;
-    float3 normalCamS : NORMAL0;
+    float3 normal : NORMAL0;
     float4 color : COLOR0;
-    // Pointing toward the camera
-    float3 cameraDirCamS: POSITION0;
-    // Pointing toward the camera
-    float3 lightDirCamS: POSITION1;
+    float3 positionMS: POSITION;
 };
 
 float4 main(Input input) : SV_Target0
 {
-    float3 norm = normalize(input.normalCamS);
-    float3 cameraDir = normalize(input.cameraDirCamS);
-    float3 lightDir = normalize(input.lightDirCamS);
+    float3 norm = normalize(input.normal);
+    float3 cameraDir = normalize(cameraPosMS - input.positionMS);
+    float3 lightDir = normalize(lightPosMS - input.positionMS);
     // See Real Time Rendering 5.1
     float3 cool = coolColor + 0.25 * input.color.xyz;
     float3 warm = warmColor + 0.25 * input.color.xyz;

@@ -112,21 +112,12 @@ namespace gfx_testing::scene {
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
                                                                &depthStencilTargetInfo);
-        // Uniforms
-        const shader::Light lightUniforms{
-                .mLightPosWs = mPointLight.mPosWs,
-        };
-        constexpr shader::GoochParams goochParams{
-                .mCoolColor = {0, 0, 0.55},
-                .mWarmColor = {0.3, 0.3, 0},
-        };
         shader::MvpTransform mvpTransform{
                 .mModel = glm::identity<glm::mat4x4>(),
                 .mView = mCamera.mView,
                 .mProjection = mProjection,
         };
 
-        SDL_PushGPUVertexUniformData(commandBuffer, 1, &lightUniforms, sizeof(lightUniforms));
         // Debug axes
         {
             mvpTransform.mModel = mDebugAxes.mTransform;
@@ -143,6 +134,13 @@ namespace gfx_testing::scene {
         }
         // Prop objects
         {
+            auto const worldToModelTransform = glm::inverse(mPropObjects.mTransform);
+            const shader::GoochParams goochParams{
+                    .mCoolColor = {0, 0, 0.55},
+                    .mWarmColor = {0.3, 0.3, 0},
+                    .mLightPosMS = worldToModelTransform * glm::vec4(mPointLight.mPosWs, 1),
+                    .mCameraPosMS = worldToModelTransform * glm::vec4(mCamera.mPosWs, 1),
+            };
             mvpTransform.mModel = mPropObjects.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));

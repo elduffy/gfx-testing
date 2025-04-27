@@ -61,15 +61,11 @@ namespace gfx_testing::shader {
 
     static_assert(sizeof(MvpTransform) % 16 == 0);
 
-    struct Light {
-        SHADER_ALIGN glm::vec3 mLightPosWs;
-    };
-
-    static_assert(sizeof(Light) % 16 == 0);
-
     struct GoochParams {
         SHADER_ALIGN glm::vec3 mCoolColor;
         SHADER_ALIGN glm::vec3 mWarmColor;
+        SHADER_ALIGN glm::vec3 mLightPosMS;
+        SHADER_ALIGN glm::vec3 mCameraPosMS;
     };
 
     static_assert(sizeof(GoochParams) % 16 == 0);

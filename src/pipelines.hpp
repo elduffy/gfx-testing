@@ -51,7 +51,7 @@ namespace gfx_testing::pipeline {
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX{
             .mFilename = "pos_norm_color_transform.vert.hlsl",
             .mStage = SDL_GPU_SHADERSTAGE_VERTEX,
-            .mUniformBuffers = 2,
+            .mUniformBuffers = 1,
     };
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
