@@ -14,7 +14,9 @@
 namespace gfx_testing::scene {
 
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
-    static constexpr glm::vec3 OBJECT_POSITION(0, 0, 0);
+    static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
+    static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);
+    static constexpr glm::vec3 TEXTURE_OBJECT_SCALE(2);
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
 
     SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
@@ -42,9 +44,12 @@ namespace gfx_testing::scene {
         mCamera(INITIAL_CAMERA_POSITION),
         mProjection(getProjection(mViewportExtent)),
         mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
-                     gameContext.mResourceLoader.loadTexture("viking-room.png"),
-                     glm::scale(translate(glm::mat4(1.0f), OBJECT_POSITION), glm::vec3(3))),
+                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", model::NormalTreatment::SPLIT),
+                     translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
+        mTextureObject(gameContext,
+                       gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
+                       gameContext.mResourceLoader.loadTexture("viking-room.png"),
+                       glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext,
                    gameContext.mResourceLoader.loadObjModel(
                            "debug-axes.obj", model::NormalTreatment::AVERAGE),
@@ -165,15 +170,34 @@ namespace gfx_testing::scene {
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
 
-            // const shader::GoochParams params{
-            //         .mCoolColor = {0, 0, 0.55},
-            //         .mWarmColor = {0.3, 0.3, 0},
-            // };
-            // static_assert(sizeof(params) % 16 == 0);
-            // SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
+            constexpr shader::GoochParams params{
+                    .mCoolColor = {0, 0, 0.55},
+                    .mWarmColor = {0.3, 0.3, 0},
+            };
+            static_assert(sizeof(params) % 16 == 0);
+            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
+
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
+            mPropObjects.render(renderPass);
+        }
+        // Textured object
+        {
+            shader::MvpTransform mvpTransform{
+                    .mModel = mTextureObject.mTransform,
+                    .mView = mCamera.mView,
+                    .mProjection = mProjection,
+            };
+            static_assert(sizeof(mvpTransform) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            shader::CameraLight cameraLight{
+                    .mCameraPosWs = mCamera.mPosWs,
+                    .mLightPosWs = mPointLight.mPosWs,
+            };
+            static_assert(sizeof(cameraLight) % 16 == 0);
+            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mTextured);
 
-            mPropObjects.render(renderPass);
+            mTextureObject.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);
     }
