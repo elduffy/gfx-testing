@@ -59,9 +59,21 @@ namespace gfx_testing::shader {
         glm::mat4 mProjection;
     };
 
+    static_assert(sizeof(MvpTransform) % 16 == 0);
+
     struct Light {
         SHADER_ALIGN glm::vec3 mLightPosWs;
     };
+
+    static_assert(sizeof(Light) % 16 == 0);
+
+    struct GoochParams {
+        SHADER_ALIGN glm::vec3 mCoolColor;
+        SHADER_ALIGN glm::vec3 mWarmColor;
+    };
+
+    static_assert(sizeof(GoochParams) % 16 == 0);
+
 
     class IndexList {
         template<typename index_t>
@@ -226,10 +238,5 @@ namespace gfx_testing::shader {
     private:
         std::vector<uint16_t> mIndices16;
         std::vector<uint32_t> mIndices32;
-    };
-
-    struct GoochParams {
-        SHADER_ALIGN glm::vec3 mCoolColor;
-        SHADER_ALIGN glm::vec3 mWarmColor;
     };
 }

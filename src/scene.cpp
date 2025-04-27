@@ -112,87 +112,48 @@ namespace gfx_testing::scene {
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
                                                                &depthStencilTargetInfo);
+        // Uniforms
+        const shader::Light lightUniforms{
+                .mLightPosWs = mPointLight.mPosWs,
+        };
+        constexpr shader::GoochParams goochParams{
+                .mCoolColor = {0, 0, 0.55},
+                .mWarmColor = {0.3, 0.3, 0},
+        };
+        shader::MvpTransform mvpTransform{
+                .mModel = glm::identity<glm::mat4x4>(),
+                .mView = mCamera.mView,
+                .mProjection = mProjection,
+        };
 
+        SDL_PushGPUVertexUniformData(commandBuffer, 1, &lightUniforms, sizeof(lightUniforms));
         // Debug axes
         {
-            shader::MvpTransform mvpTransform{
-                    .mModel = mDebugAxes.mTransform,
-                    .mView = mCamera.mView,
-                    .mProjection = mProjection,
-            };
-            static_assert(sizeof(mvpTransform) % 16 == 0);
+            mvpTransform.mModel = mDebugAxes.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::Light cameraLight{
-                    .mLightPosWs = mPointLight.mPosWs,
-            };
-            static_assert(sizeof(cameraLight) % 16 == 0);
-            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
-
             mDebugAxes.render(renderPass);
         }
-
         // Point light
         {
-            auto const &renderObject = mPointLight.mRenderObject;
-            shader::MvpTransform mvpTransform{
-                    .mModel = renderObject.mTransform,
-                    .mView = mCamera.mView,
-                    .mProjection = mProjection,
-            };
-            static_assert(sizeof(mvpTransform) % 16 == 0);
+            mvpTransform.mModel = mPointLight.mRenderObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::Light cameraLight{
-                    .mLightPosWs = mPointLight.mPosWs,
-            };
-            static_assert(sizeof(cameraLight) % 16 == 0);
-            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
-
-            renderObject.render(renderPass);
+            mPointLight.mRenderObject.render(renderPass);
         }
-
         // Prop objects
         {
-            shader::MvpTransform mvpTransform{
-                    .mModel = mPropObjects.mTransform,
-                    .mView = mCamera.mView,
-                    .mProjection = mProjection,
-            };
-            static_assert(sizeof(mvpTransform) % 16 == 0);
+            mvpTransform.mModel = mPropObjects.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::Light cameraLight{
-                    .mLightPosWs = mPointLight.mPosWs,
-            };
-            static_assert(sizeof(cameraLight) % 16 == 0);
-            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
-
-            constexpr shader::GoochParams params{
-                    .mCoolColor = {0, 0, 0.55},
-                    .mWarmColor = {0.3, 0.3, 0},
-            };
-            static_assert(sizeof(params) % 16 == 0);
-            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
-
+            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
             mPropObjects.render(renderPass);
         }
         // Textured object
         {
-            shader::MvpTransform mvpTransform{
-                    .mModel = mTextureObject.mTransform,
-                    .mView = mCamera.mView,
-                    .mProjection = mProjection,
-            };
-            static_assert(sizeof(mvpTransform) % 16 == 0);
+            mvpTransform.mModel = mTextureObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::Light cameraLight{
-                    .mLightPosWs = mPointLight.mPosWs,
-            };
-            static_assert(sizeof(cameraLight) % 16 == 0);
-            SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Textured));
-
             mTextureObject.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);
