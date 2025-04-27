@@ -13,6 +13,13 @@ namespace gfx_testing::render {
         return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
     }
 
+    template<typename index_t>
+    void copyIndexData(sdl::SdlMappedTransferBuffer const &mappedBuffer, shader::MeshData const &meshData) {
+        auto *indexData = mappedBuffer.get<index_t>(meshData.getVertexBufferSize());
+        auto const *source = meshData.mIndices.as<index_t>();
+        std::copy_n(source, meshData.mIndices.count(), indexData);
+    }
+
     void transferBufferData(sdl::SdlContext const &context, shader::MeshData const &meshData,
                             SDL_GPUBuffer *vertexBuffer,
                             SDL_GPUBuffer *indexBuffer) {
@@ -30,8 +37,16 @@ namespace gfx_testing::render {
             auto *vertexData = mappedBuffer.get<shader::VertexData>();
             std::ranges::copy(meshData.mVertices, vertexData);
 
-            auto *indexData = mappedBuffer.get<uint16_t>(meshData.getVertexBufferSize());
-            std::ranges::copy(meshData.mIndices, indexData);
+            switch (meshData.mIndices.mElementSize) {
+                case SDL_GPU_INDEXELEMENTSIZE_16BIT: {
+                    copyIndexData<uint16_t>(mappedBuffer, meshData);
+                    break;
+                }
+                case SDL_GPU_INDEXELEMENTSIZE_32BIT: {
+                    copyIndexData<uint32_t>(mappedBuffer, meshData);
+                    break;
+                }
+            }
         }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
@@ -152,7 +167,7 @@ namespace gfx_testing::render {
         mIndexBuffer(gameContext.mSdlContext,
                      createBuffer(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),
         mTextureOpt(createGpuTexture(gameContext, textureDataOpt)),
-        mIndexCount(meshData.mIndices.size()) {
+        mIndexCount(meshData.mIndices.count()) {
         transferBufferData(gameContext.mSdlContext, meshData, *mVertexBuffer, *mIndexBuffer);
         if (mTextureOpt.has_value()) {
             assert(textureDataOpt != nullptr);

@@ -16,7 +16,7 @@ namespace gfx_testing::model {
         const auto numVertices = attrib.vertices.size() / 3;
 
         std::vector<std::set<uint16_t> > normalsPerVertex(numVertices);
-        shader::MeshData meshData;
+        shader::MeshDataBuilder meshData;
 
         meshData.mVertices.resize(numVertices);
         for (auto i = 0; i < numVertices; i++) {
@@ -40,10 +40,10 @@ namespace gfx_testing::model {
 
         for (auto const &shape: shapes) {
             SDL_Log("Shape %s has %zu indices", shape.name.c_str(), shape.mesh.indices.size());
-            meshData.mIndices.reserve(meshData.mIndices.size() + shape.mesh.indices.size());
+            // meshData.mIndices.reserve(meshData.mIndices.size() + shape.mesh.indices.size());
 
             for (auto const &index: shape.mesh.indices) {
-                meshData.mIndices.push_back(index.vertex_index);
+                meshData.addIndex(index.vertex_index);
                 normalsPerVertex.at(index.vertex_index).emplace(index.normal_index);
             }
         }
@@ -64,7 +64,7 @@ namespace gfx_testing::model {
         }
 
         // SDL_Log("Mesh data with averaged normals %s", meshData.toString().c_str());
-        return meshData;
+        return meshData.build();
     }
 
     shader::MeshData processSplit(tinyobj::ObjReader const &reader) {
@@ -98,7 +98,7 @@ namespace gfx_testing::model {
                                   1.f);
         }
 
-        shader::MeshData meshData;
+        shader::MeshDataBuilder meshData;
 
         // Loop through the faces to choose output indices for each distinct vertex/normal pair
         // vertex + normal index
@@ -125,14 +125,14 @@ namespace gfx_testing::model {
                     }
 
                     auto const outputIndex = outputIndices[vertNormIdx];
-                    meshData.mIndices.push_back(outputIndex);
+                    meshData.addIndex(outputIndex);
                 }
 
             }
         }
 
         // SDL_Log("Mesh data with split normals %s", meshData.toString().c_str());
-        return meshData;
+        return meshData.build();
     }
 
     shader::MeshData loadObjFile(const std::filesystem::path &path, NormalTreatment normalTreatment) {
@@ -164,9 +164,6 @@ namespace gfx_testing::model {
 
         if (attrib.vertices.size() % 3 != 0) {
             throw std::runtime_error("Vertex count is not a multiple of 3");
-        }
-        if (attrib.vertices.size() > std::numeric_limits<uint16_t>::max()) {
-            throw std::runtime_error("Vertex count is greater than 16 bit limit. Need to refactor now :(");
         }
         if (attrib.vertices.size() != attrib.colors.size()) {
             throw std::runtime_error(std::format("Vertex count {} is not the same as color count {}.",

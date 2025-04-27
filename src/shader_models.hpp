@@ -64,16 +64,111 @@ namespace gfx_testing::shader {
         SHADER_ALIGN glm::vec3 mLightPosWs;
     };
 
-    struct MeshData {
-        std::vector<VertexData> mVertices;
-        std::vector<uint16_t> mIndices;
+    class IndexList {
+        template<typename index_t>
+        std::unique_ptr<uint8_t> copyVector(std::vector<index_t> const &indices) {
+            std::unique_ptr<uint8_t> data(new uint8_t[indices.size() * sizeof(index_t)]);
+            index_t *dest = reinterpret_cast<index_t *>(data.get());
+            std::copy(indices.begin(), indices.end(), dest);
+            return data;
+        }
 
+    public:
+        explicit IndexList(std::vector<uint16_t> const &indices) :
+            mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_16BIT) {
+        }
+
+        explicit IndexList(std::vector<uint32_t> const &indices) :
+            mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_32BIT) {
+        }
+
+        size_t count() const { return mCount; }
+
+        template<typename index_t>
+        index_t const *as() const;
+
+        uint16_t const *asUint16() const {
+            if (mElementSize != SDL_GPU_INDEXELEMENTSIZE_16BIT) {
+                throw std::runtime_error("Attempt to access 32-bit indices as 16-bit");
+            }
+            return reinterpret_cast<uint16_t const *>(mBuffer.get());
+        }
+
+        uint32_t const *asUint32() const {
+            if (mElementSize != SDL_GPU_INDEXELEMENTSIZE_32BIT) {
+                throw std::runtime_error("Attempt to access 16-bit indices as 32-bit");
+            }
+            return reinterpret_cast<uint32_t const *>(mBuffer.get());
+        }
+
+        size_t elementSize() const {
+            switch (mElementSize) {
+                case SDL_GPU_INDEXELEMENTSIZE_16BIT:
+                    return sizeof(uint16_t);
+                case SDL_GPU_INDEXELEMENTSIZE_32BIT:
+                    return sizeof(uint32_t);
+                default:
+                    throw std::runtime_error("Unexpected element size");
+            }
+        }
+
+        size_t bufferSize() const {
+            return count() * elementSize();
+        }
+
+        std::string toString() const {
+            std::stringstream ss;
+            ss << "[";
+            switch (mElementSize) {
+                case SDL_GPU_INDEXELEMENTSIZE_16BIT: {
+                    auto const *p = asUint16();
+                    for (size_t i = 0; i < mCount; ++i) {
+                        ss << p[i];
+                        ss << ", ";
+                    }
+                    break;
+                }
+                case SDL_GPU_INDEXELEMENTSIZE_32BIT: {
+                    auto const *p = asUint32();
+                    for (size_t i = 0; i < mCount; ++i) {
+                        ss << p[i];
+                        ss << ", ";
+                    }
+                    break;
+                }
+            }
+            for (size_t i = 0; i < mCount; ++i) {
+                ss << ", ";
+            }
+            ss << "]";
+            return ss.str();
+        }
+
+    private:
+        size_t const mCount;
+        std::unique_ptr<uint8_t const> mBuffer;
+
+    public:
+        SDL_GPUIndexElementSize const mElementSize;
+    };
+
+    template<>
+    inline uint16_t const *IndexList::as() const {
+        return asUint16();
+    }
+
+    template<>
+    inline uint32_t const *IndexList::as() const {
+        return asUint32();
+    }
+
+    struct MeshData {
         [[nodiscard]] uint32_t getVertexBufferSize() const {
             return boost::safe_numerics::checked::cast<uint32_t>(mVertices.size() * sizeof(VertexData));
         }
 
         [[nodiscard]] uint32_t getIndexBufferSize() const {
-            return boost::safe_numerics::checked::cast<uint32_t>(mIndices.size() * sizeof(uint16_t));
+            return boost::safe_numerics::checked::cast<uint32_t>(mIndices.bufferSize());
         }
 
         [[nodiscard]] std::string toString() const {
@@ -89,16 +184,49 @@ namespace gfx_testing::shader {
             }
             ss << "\t],\n";
             ss << "\tmIndices(";
-            ss << mIndices.size();
-            ss << ") = [";
-            for (const auto &i: mIndices) {
-                ss << i;
-                ss << ", ";
-            }
-            ss << "]\n";
+            ss << mIndices.count();
+            ss << ") = ";
+            ss << mIndices.toString();
+            ss << "\n";
             ss << "}";
             return ss.str();
         }
+
+        std::vector<VertexData> const mVertices;
+        IndexList const mIndices;
+    };
+
+    struct MeshDataBuilder {
+
+        MeshData build() {
+            if (mIndices32.size() > 0) {
+                return {
+                        .mVertices = std::move(mVertices),
+                        .mIndices = IndexList(mIndices32),
+                };
+            }
+            return {
+                    .mVertices = std::move(mVertices),
+                    .mIndices = IndexList(mIndices16),
+            };
+        }
+
+        void addIndex(int32_t index) {
+            if (mIndices32.size() > 0) {
+                mIndices32.push_back(index);
+            } else if (index <= std::numeric_limits<uint16_t>::max()) {
+                mIndices16.push_back(index);
+            } else {
+                std::ranges::move(mIndices16, std::back_inserter(mIndices32));
+                mIndices16.clear();
+            }
+        }
+
+        std::vector<VertexData> mVertices;
+
+    private:
+        std::vector<uint16_t> mIndices16;
+        std::vector<uint32_t> mIndices32;
     };
 
     struct GoochParams {
