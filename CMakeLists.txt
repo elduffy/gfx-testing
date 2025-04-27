@@ -16,6 +16,11 @@ find_package(SDL3 REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
 
+add_custom_target(build_shaders
+        COMMAND bash content/shaders/build-shaders.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
+)
+
 # gfx_testing_lib main library
 add_library(gfx_testing_lib
         src/obj_loader.cpp
@@ -40,6 +45,7 @@ target_link_libraries(gfx_testing_lib PUBLIC
         Boost::scope
         glm::glm
 )
+add_dependencies(gfx_testing_lib build_shaders)
 target_include_directories(gfx_testing_lib SYSTEM PRIVATE ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
 target_include_directories(gfx_testing_lib SYSTEM PRIVATE src/)
 

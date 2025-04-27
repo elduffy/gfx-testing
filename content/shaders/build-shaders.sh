@@ -1,7 +1,10 @@
+#!/bin/bash
 set -euo pipefail
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-mkdir -p "$SCRIPT_DIR/compiled/spirv"
+mkdir -p "$SCRIPT_DIR"/compiled/spirv
+rm -f "$SCRIPT_DIR"/compiled/spirv/*.spv
+rm -f "$SCRIPT_DIR"/compiled/spirv/*.json
 
 for filename in "$SCRIPT_DIR"/src/*.vert.hlsl; do
     if [ -f "$filename" ]; then
