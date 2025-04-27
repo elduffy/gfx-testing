@@ -36,6 +36,7 @@ add_library(gfx_testing_lib
         src/resource_loader.cpp
         src/samplers.cpp
         src/texture.cpp
+        src/frame_watcher.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         SDL3::SDL3

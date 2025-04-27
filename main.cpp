@@ -49,7 +49,9 @@ void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::scene::Scene &s
 }
 
 int main() {
-    const gfx_testing::sdl::SdlContext sdlContext;
+    constexpr auto DEBUG_MODE = true;
+    constexpr auto USE_VSYNC = false; // Unlocks frame rate if supported
+    const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, USE_VSYNC};
     gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
 

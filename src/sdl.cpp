@@ -4,7 +4,9 @@
 #include <boost/algorithm/string/replace.hpp>
 
 namespace gfx_testing::sdl {
-    SdlContext::SdlContext(const bool gfxDebug) :
+
+
+    SdlContext::SdlContext(const bool gfxDebug, bool vsync) :
         mWindow(nullptr), mDevice(nullptr) {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
             SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
@@ -33,6 +35,51 @@ namespace gfx_testing::sdl {
             SDL_Log("Failed to claim window: %s", SDL_GetError());
             throw std::runtime_error("Failed to claim window");
         }
+
+        updateSwapchainParameters(vsync);
+    }
+
+    char const *getSwapchainCompositionName(SDL_GPUSwapchainComposition composition) {
+        switch (composition) {
+            case SDL_GPU_SWAPCHAINCOMPOSITION_SDR:
+                return "SDL_GPU_SWAPCHAINCOMPOSITION_SDR";
+            case SDL_GPU_SWAPCHAINCOMPOSITION_SDR_LINEAR:
+                return "SDL_GPU_SWAPCHAINCOMPOSITION_SDR_LINEAR";
+            case SDL_GPU_SWAPCHAINCOMPOSITION_HDR_EXTENDED_LINEAR:
+                return "SDL_GPU_SWAPCHAINCOMPOSITION_HDR_EXTENDED_LINEAR";
+            case SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084:
+                return "SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084";
+        }
+        throw std::runtime_error("Unknown GPU swapchain composition");
+    }
+
+    char const *getPresentModeName(SDL_GPUPresentMode presentMode) {
+        switch (presentMode) {
+            case SDL_GPU_PRESENTMODE_VSYNC:
+                return "SDL_GPU_PRESENTMODE_VSYNC";
+            case SDL_GPU_PRESENTMODE_IMMEDIATE:
+                return "SDL_GPU_PRESENTMODE_IMMEDIATE";
+            case SDL_GPU_PRESENTMODE_MAILBOX:
+                return "SDL_GPU_PRESENTMODE_MAILBOX";
+        }
+        throw std::runtime_error("Unknown GPU present mode");
+    }
+
+    void SdlContext::updateSwapchainParameters(bool vsync) const {
+        auto presentMode = SDL_GPU_PRESENTMODE_VSYNC;
+        if (vsync) {
+            if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, SDL_GPU_PRESENTMODE_MAILBOX)) {
+                presentMode = SDL_GPU_PRESENTMODE_MAILBOX;
+            }
+        } else {
+            if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, SDL_GPU_PRESENTMODE_IMMEDIATE)) {
+                presentMode = SDL_GPU_PRESENTMODE_IMMEDIATE;
+            }
+        }
+        constexpr auto swapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
+        SDL_Log("Swapchain parameters: composition=%s, present mode=%s",
+                getSwapchainCompositionName(swapchainComposition), getPresentModeName(presentMode));
+        SDL_SetGPUSwapchainParameters(mDevice, mWindow, swapchainComposition, presentMode);
     }
 
     SdlContext::~SdlContext() {

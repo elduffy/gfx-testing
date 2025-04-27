@@ -10,10 +10,14 @@ namespace gfx_testing::sdl {
     public:
         static constexpr util::Extent2D INITIAL_EXTENT = {1280, 720};
 
-        explicit SdlContext(bool gfxDebug = true);
+        explicit SdlContext(bool gfxDebug, bool vsync);
 
         ~SdlContext();
 
+    private:
+        void updateSwapchainParameters(bool vsync) const;
+
+    public:
         SDL_Window *mWindow;
         SDL_GPUDevice *mDevice;
     };
