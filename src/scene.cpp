@@ -128,7 +128,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
 
             mDebugAxes.render(renderPass);
         }
@@ -149,7 +149,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mDiffuse);
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
 
             renderObject.render(renderPass);
         }
@@ -177,7 +177,7 @@ namespace gfx_testing::scene {
             static_assert(sizeof(params) % 16 == 0);
             SDL_PushGPUFragmentUniformData(commandBuffer, 0, &params, sizeof(params));
 
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mGooch);
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
             mPropObjects.render(renderPass);
         }
         // Textured object
@@ -195,7 +195,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 1, &cameraLight, sizeof(cameraLight));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.mTextured);
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Textured));
 
             mTextureObject.render(renderPass);
         }

@@ -28,11 +28,16 @@ namespace gfx_testing::sdl {
 
     class SdlShader {
     public:
-        NO_COPY_NO_MOVE(SdlShader);
+        NO_COPY(SdlShader);
 
         SdlShader(SdlContext const &context, SDL_GPUShader *shader);
 
         ~SdlShader();
+
+        SdlShader(SdlShader &&other) noexcept:
+            mContext(other.mContext), mShader(other.mShader) {
+            other.mShader = nullptr;
+        };
 
         static SdlShader createShader(SdlContext const &context, const uint8_t *code, size_t codeSize,
                                       SDL_GPUShaderStage stage,
@@ -47,11 +52,16 @@ namespace gfx_testing::sdl {
 
     class SdlGfxPipeline {
     public:
-        NO_COPY_NO_MOVE(SdlGfxPipeline);
+        NO_COPY(SdlGfxPipeline);
 
         SdlGfxPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline);
 
         ~SdlGfxPipeline();
+
+        SdlGfxPipeline(SdlGfxPipeline &&other) noexcept:
+            mContext(other.mContext), mPipeline(other.mPipeline) {
+            other.mPipeline = nullptr;
+        }
 
         SDL_GPUGraphicsPipeline *operator*() const { return mPipeline; }
 

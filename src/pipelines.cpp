@@ -4,6 +4,18 @@
 
 namespace gfx_testing::pipeline {
 
+    template<typename PipelineDefinitions>
+    constexpr bool isWellDefined(PipelineDefinitions const &pipelineDefinitions) {
+        std::vector<size_t> actualIndices;
+        std::vector<size_t> expectedIndices;
+        size_t i = 0;
+        for (auto const &pipelineDefinition: pipelineDefinitions) {
+            actualIndices.push_back(static_cast<size_t>(pipelineDefinition.mName));
+            expectedIndices.push_back(i++);
+        }
+        return actualIndices == expectedIndices;
+    }
+
     SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context, SDL_GPUShader *vertexShader,
                                             SDL_GPUShader *fragmentShader) {
 
@@ -50,50 +62,48 @@ namespace gfx_testing::pipeline {
         return pipeline;
     }
 
-    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ShaderCode const &defaultVertexShader,
-                         util::ShaderCode const &normColorFragShader,
-                         util::ShaderCode const &goochFragShader,
-                         util::ShaderCode const &texFragShader):
-        Pipelines(sdlContext,
-                  *sdl::SdlShader::createShader(sdlContext,
-                                                defaultVertexShader.mCode,
-                                                defaultVertexShader.mSize,
-                                                defaultVertexShader.mStage,
-                                                0,
-                                                2, 0, 0),
-                  *sdl::SdlShader::createShader(sdlContext,
-                                                normColorFragShader.mCode,
-                                                normColorFragShader.mSize,
-                                                normColorFragShader.mStage,
-                                                0,
-                                                1, 0, 0),
-                  *sdl::SdlShader::createShader(sdlContext,
-                                                goochFragShader.mCode,
-                                                goochFragShader.mSize,
-                                                goochFragShader.mStage,
-                                                0,
-                                                1, 0, 0),
-                  *sdl::SdlShader::createShader(sdlContext,
-                                                texFragShader.mCode,
-                                                texFragShader.mSize,
-                                                texFragShader.mStage,
-                                                1,
-                                                0, 0, 0)) {
+    std::map<ShaderDefinition, util::ShaderCode> loadShaderCode(util::ResourceLoader const &resourceLoader) {
+        std::map<ShaderDefinition, util::ShaderCode> shaderCodes;
+        for (auto const &shaderDef: ALL_SHADERS) {
+            shaderCodes.emplace(shaderDef, resourceLoader.loadShaderCode(shaderDef.mFilename));
+        }
+        return shaderCodes;
     }
 
-    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, SDL_GPUShader *defaultVertexShader,
-                         SDL_GPUShader *normColorFragShader, SDL_GPUShader *goochFragShader,
-                         SDL_GPUShader *textureFragShader):
-        mDiffuse(sdlContext, createPipeline(sdlContext, defaultVertexShader, normColorFragShader)),
-        mGooch(sdlContext, createPipeline(sdlContext, defaultVertexShader, goochFragShader)),
-        mTextured(sdlContext, createPipeline(sdlContext, defaultVertexShader, textureFragShader)) {
+    std::map<ShaderDefinition, sdl::SdlShader>
+    createShaders(sdl::SdlContext const &context, std::map<ShaderDefinition, util::ShaderCode> const &code) {
+        std::map<ShaderDefinition, sdl::SdlShader> shaders;
+        for (auto const &[shaderDef, shaderCode]: code) {
+            shaders.emplace(shaderDef,
+                            sdl::SdlShader::createShader(context,
+                                                         shaderCode.mCode,
+                                                         shaderCode.mSize,
+                                                         shaderDef.mStage,
+                                                         shaderDef.mSamplers,
+                                                         shaderDef.mUniformBuffers,
+                                                         shaderDef.mStorageBuffers,
+                                                         shaderDef.mStorageTextures));
+        }
+        return shaders;
+    }
+
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
+                         std::map<ShaderDefinition, util::ShaderCode> const &shaderCode):
+        Pipelines(sdlContext, createShaders(sdlContext, shaderCode)) {
+    }
+
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
+                         std::map<ShaderDefinition, sdl::SdlShader> const &shaders) {
+        static_assert(isWellDefined(ALL_PIPELINES));
+        for (auto const &pipelineDefinition: ALL_PIPELINES) {
+            auto *vertexShader = *shaders.at(pipelineDefinition.mVertexShader);
+            auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
+            mPipelines.emplace_back(sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader));
+        }
     }
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader):
-        Pipelines(sdlContext, resourceLoader.loadShaderCode("pos_norm_color_transform.vert.hlsl"),
-                  resourceLoader.loadShaderCode("norm_color.frag.hlsl"),
-                  resourceLoader.loadShaderCode("gooch.frag.hlsl"),
-                  resourceLoader.loadShaderCode("basic_textured.frag.hlsl")) {
+        Pipelines(sdlContext, loadShaderCode(resourceLoader)) {
 
     }
 }
