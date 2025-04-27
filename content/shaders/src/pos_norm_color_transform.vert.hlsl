@@ -5,9 +5,8 @@ cbuffer MvpTransform : register(b0, space1)
     float4x4 projection;
 };
 
-cbuffer CameraLight : register(b1, space1)
+cbuffer Light : register(b1, space1)
 {
-    float3 cameraPosWs;
     float3 lightPosWs;
 };
 

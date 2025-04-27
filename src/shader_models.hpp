@@ -59,8 +59,7 @@ namespace gfx_testing::shader {
         glm::mat4 mProjection;
     };
 
-    struct CameraLight {
-        SHADER_ALIGN glm::vec3 mCameraPosWs;
+    struct Light {
         SHADER_ALIGN glm::vec3 mLightPosWs;
     };
 

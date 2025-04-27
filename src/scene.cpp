@@ -122,8 +122,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::CameraLight cameraLight{
-                    .mCameraPosWs = mCamera.mPosWs,
+            shader::Light cameraLight{
                     .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
@@ -143,8 +142,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::CameraLight cameraLight{
-                    .mCameraPosWs = mCamera.mPosWs,
+            shader::Light cameraLight{
                     .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
@@ -163,8 +161,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::CameraLight cameraLight{
-                    .mCameraPosWs = mCamera.mPosWs,
+            shader::Light cameraLight{
                     .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
@@ -189,8 +186,7 @@ namespace gfx_testing::scene {
             };
             static_assert(sizeof(mvpTransform) % 16 == 0);
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            shader::CameraLight cameraLight{
-                    .mCameraPosWs = mCamera.mPosWs,
+            shader::Light cameraLight{
                     .mLightPosWs = mPointLight.mPosWs,
             };
             static_assert(sizeof(cameraLight) % 16 == 0);
