@@ -54,9 +54,7 @@ namespace gfx_testing::shader {
     };
 
     struct MvpTransform {
-        glm::mat4 mModel;
-        glm::mat4 mView;
-        glm::mat4 mProjection;
+        glm::mat4 mMvp;
     };
 
     static_assert(sizeof(MvpTransform) % 16 == 0);

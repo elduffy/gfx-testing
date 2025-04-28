@@ -142,22 +142,19 @@ namespace gfx_testing::scene {
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &mainColorTarget, 1,
                                                                &depthStencilTargetInfo);
-        shader::MvpTransform mvpTransform{
-                .mModel = glm::identity<glm::mat4x4>(),
-                .mView = mCamera.mView,
-                .mProjection = mProjection,
-        };
+        auto const vp = mProjection * mCamera.mView;
+        shader::MvpTransform mvpTransform{};
 
         // Debug axes
         {
-            mvpTransform.mModel = mDebugAxes.mTransform;
+            mvpTransform.mMvp = vp * mDebugAxes.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
             mDebugAxes.render(renderPass);
         }
         // Point light
         {
-            mvpTransform.mModel = mPointLight.mRenderObject.mTransform;
+            mvpTransform.mMvp = vp * mPointLight.mRenderObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
             mPointLight.mRenderObject.render(renderPass);
@@ -171,7 +168,7 @@ namespace gfx_testing::scene {
                     .mLightPosMS = worldToModelTransform * glm::vec4(mPointLight.mPosWs, 1),
                     .mCameraPosMS = worldToModelTransform * glm::vec4(mCamera.mPosWs, 1),
             };
-            mvpTransform.mModel = mPropObjects.mTransform;
+            mvpTransform.mMvp = vp * mPropObjects.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
@@ -179,7 +176,7 @@ namespace gfx_testing::scene {
         }
         // Textured object
         {
-            mvpTransform.mModel = mTextureObject.mTransform;
+            mvpTransform.mMvp = vp * mTextureObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Textured));
             mTextureObject.render(renderPass);
