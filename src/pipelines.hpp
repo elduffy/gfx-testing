@@ -6,6 +6,8 @@
 #include "resource_loader.hpp"
 
 namespace gfx_testing::pipeline {
+    static constexpr auto MSAA_SAMPLE_COUNT = SDL_GPU_SAMPLECOUNT_4;
+
     enum class PipelineName {
         Diffuse,
         Gooch,

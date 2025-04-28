@@ -42,6 +42,9 @@ namespace gfx_testing::pipeline {
                 .rasterizer_state = {
                         .cull_mode = SDL_GPU_CULLMODE_BACK
                 },
+                .multisample_state = {
+                        .sample_count = MSAA_SAMPLE_COUNT,
+                },
                 .depth_stencil_state = {
                         .compare_op = SDL_GPU_COMPAREOP_LESS,
                         .enable_depth_test = true,

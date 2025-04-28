@@ -28,9 +28,27 @@ namespace gfx_testing::scene {
                 .height = extent.mHeight,
                 .layer_count_or_depth = 1,
                 .num_levels = 1,
-                .sample_count = SDL_GPU_SAMPLECOUNT_1,
+                .sample_count = pipeline::MSAA_SAMPLE_COUNT,
         };
         return SDL_CreateGPUTexture(context.mDevice, &createInfo);
+    }
+
+    std::optional<sdl::SdlGpuTexture> createMultisampleTexture(sdl::SdlContext const &context, util::Extent2D extent) {
+        if constexpr (pipeline::MSAA_SAMPLE_COUNT == SDL_GPU_SAMPLECOUNT_1) {
+            return std::nullopt;
+        }
+        auto const format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow);
+        const SDL_GPUTextureCreateInfo createInfo = {
+                .type = SDL_GPU_TEXTURETYPE_2D,
+                .format = format,
+                .usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET,
+                .width = extent.mWidth,
+                .height = extent.mHeight,
+                .layer_count_or_depth = 1,
+                .num_levels = 1,
+                .sample_count = pipeline::MSAA_SAMPLE_COUNT,
+        };
+        return sdl::SdlGpuTexture{context, SDL_CreateGPUTexture(context.mDevice, &createInfo)};
     }
 
     glm::mat4x4 getProjection(const util::Extent2D extent) {
@@ -58,13 +76,18 @@ namespace gfx_testing::scene {
         mPointLight(gameContext, INITIAL_LIGHT_POSITION),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
-                                         sdl::SdlContext::INITIAL_EXTENT)) {
+                                         sdl::SdlContext::INITIAL_EXTENT)),
+        mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext,
+                                                        sdl::SdlContext::INITIAL_EXTENT)) {
     }
 
     void Scene::onResize(const util::Extent2D extent) {
         mViewportExtent = extent;
         mProjection = getProjection(mViewportExtent);
         mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
+        if (mMultisampleTextureOpt.has_value()) {
+            mMultisampleTextureOpt->reset(createDepthTexture(mGameContext.mSdlContext, extent));
+        }
     }
 
     void Scene::update() {
@@ -95,12 +118,19 @@ namespace gfx_testing::scene {
             return;
         }
 
-        SDL_GPUColorTargetInfo colorTargetInfo{
+        SDL_GPUColorTargetInfo mainColorTarget{
                 .texture = swapchainTexture,
                 .clear_color = {0, 0, 0, 1},
                 .load_op = SDL_GPU_LOADOP_CLEAR,
                 .store_op = SDL_GPU_STOREOP_STORE,
+                .resolve_texture = nullptr,
         };
+        if (mMultisampleTextureOpt.has_value()) {
+            mainColorTarget.texture = *mMultisampleTextureOpt.value();
+            mainColorTarget.store_op = SDL_GPU_STOREOP_RESOLVE;
+            mainColorTarget.resolve_texture = swapchainTexture;
+        }
+
         const SDL_GPUDepthStencilTargetInfo depthStencilTargetInfo{
                 .texture = *mDepthTexture,
                 .clear_depth = 1.f,
@@ -110,7 +140,7 @@ namespace gfx_testing::scene {
                 .stencil_store_op = SDL_GPU_STOREOP_DONT_CARE,
                 .cycle = true,
         };
-        SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1,
+        SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &mainColorTarget, 1,
                                                                &depthStencilTargetInfo);
         shader::MvpTransform mvpTransform{
                 .mModel = glm::identity<glm::mat4x4>(),
@@ -155,10 +185,16 @@ namespace gfx_testing::scene {
             mTextureObject.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);
+
         // imgui -- must occur after render pass has ended
         {
-            colorTargetInfo.load_op = SDL_GPU_LOADOP_LOAD;
-            mImGuiContext.renderFrame(commandBuffer, colorTargetInfo);
+            SDL_GPUColorTargetInfo swapchainTargetInfo{
+                    .texture = swapchainTexture,
+                    .clear_color = {0, 0, 0, 1},
+                    .load_op = SDL_GPU_LOADOP_LOAD,
+                    .store_op = SDL_GPU_STOREOP_STORE,
+            };
+            mImGuiContext.renderFrame(commandBuffer, swapchainTargetInfo);
         }
     }
 }

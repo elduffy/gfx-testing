@@ -34,5 +34,6 @@ namespace gfx_testing::scene {
         render::RenderObject mDebugAxes;
         render::PointLight mPointLight;
         sdl::SdlGpuTexture mDepthTexture;
+        std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;
     };
 }
