@@ -1,3 +1,5 @@
+#include "std_types.hlsl"
+
 cbuffer Params : register(b0, space3)
 {
     float3 coolColor;
@@ -6,16 +8,7 @@ cbuffer Params : register(b0, space3)
     float3 cameraPosMS;
 };
 
-struct Input
-{
-    float4 position : SV_Position;
-    float2 uv : TEXCOORD0;
-    float3 normal : NORMAL0;
-    float4 color : COLOR0;
-    float3 positionMS: POSITION;
-};
-
-float4 main(Input input) : SV_Target0
+float4 main(DefaultOutput input) : SV_Target0
 {
     float3 norm = normalize(input.normal);
     float3 cameraDir = normalize(cameraPosMS - input.positionMS);

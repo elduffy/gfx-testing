@@ -45,20 +45,20 @@ namespace gfx_testing::pipeline {
             .mStage = SDL_GPU_SHADERSTAGE_FRAGMENT,
             .mUniformBuffers = 1,
     };
-    static constexpr ShaderDefinition SHADER_NORM_COLOR{
-            .mFilename = "norm_color.frag.hlsl",
+    static constexpr ShaderDefinition SHADER_VERTEX_COLOR{
+            .mFilename = "vertex_color.frag.hlsl",
             .mStage = SDL_GPU_SHADERSTAGE_FRAGMENT,
             .mUniformBuffers = 1,
     };
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX{
-            .mFilename = "pos_norm_color_transform.vert.hlsl",
+            .mFilename = "default.vert.hlsl",
             .mStage = SDL_GPU_SHADERSTAGE_VERTEX,
             .mUniformBuffers = 1,
     };
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
             SHADER_GOOCH,
-            SHADER_NORM_COLOR,
+            SHADER_VERTEX_COLOR,
             SHADER_DEFAULT_VERTEX,
     };
 
@@ -67,7 +67,7 @@ namespace gfx_testing::pipeline {
     static constexpr PipelineDefinition PIPELINE_DIFFUSE{
             .mName = PipelineName::Diffuse,
             .mVertexShader = SHADER_DEFAULT_VERTEX,
-            .mFragmentShader = SHADER_NORM_COLOR,
+            .mFragmentShader = SHADER_VERTEX_COLOR,
     };
     static constexpr PipelineDefinition PIPELINE_GOOCH{
             .mName = PipelineName::Gooch,
