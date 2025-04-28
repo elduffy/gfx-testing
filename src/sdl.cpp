@@ -84,8 +84,8 @@ namespace gfx_testing::sdl {
 
     SdlContext::~SdlContext() {
         SDL_ReleaseWindowFromGPUDevice(mDevice, mWindow);
-        SDL_DestroyWindow(mWindow);
         SDL_DestroyGPUDevice(mDevice);
+        SDL_DestroyWindow(mWindow);
         SDL_Quit();
     }
 }

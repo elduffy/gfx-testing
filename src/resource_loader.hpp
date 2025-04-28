@@ -50,7 +50,7 @@ namespace gfx_testing::util {
         [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
 
     private:
-        sdl::SdlContext mSdlContext;
+        sdl::SdlContext const &mSdlContext;
         std::filesystem::path mProjectRoot = getProjectRoot();
     };
 }

@@ -8,6 +8,8 @@
 namespace gfx_testing::sdl {
     class SdlContext {
     public:
+        NO_COPY_NO_MOVE(SdlContext);
+
         static constexpr util::Extent2D INITIAL_EXTENT = {1280, 720};
 
         explicit SdlContext(bool gfxDebug, bool vsync);
