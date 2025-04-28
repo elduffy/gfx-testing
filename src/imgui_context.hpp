@@ -8,7 +8,7 @@ namespace gfx_testing::imgui {
 
         explicit ImGuiContext(sdl::SdlContext const &sdlContext);
 
-        void openWindow() { mOpenWindow = true; }
+        void toggleOpen() { mOpenWindow = !mOpenWindow; }
 
         /**
          * @return true if the event was captured by imgui

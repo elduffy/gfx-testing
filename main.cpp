@@ -25,7 +25,7 @@ void handleEvent(gfx_testing::game::GameContext &gameContext,
                 gameContext.mStopwatch.toggle();
             }
             if (!event.key.down && !event.key.repeat && event.key.key == SDLK_D) {
-                imGuiContext.openWindow();
+                imGuiContext.toggleOpen();
             }
             break;
         }
