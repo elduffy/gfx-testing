@@ -5,6 +5,7 @@
 #include <stopwatch.hpp>
 
 #include "frame_watcher.hpp"
+#include "imgui_context.hpp"
 #include "samplers.hpp"
 
 namespace gfx_testing::game {

@@ -2,7 +2,6 @@
 
 #include <camera.hpp>
 #include <sdl.hpp>
-#include <filesystem>
 #include <game.hpp>
 #include <render_object.hpp>
 #include <glm/mat4x4.hpp>
@@ -12,7 +11,7 @@
 namespace gfx_testing::scene {
     class Scene {
     public:
-        explicit Scene(game::GameContext &gameContext);
+        Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext);
 
         void update();
 
@@ -26,6 +25,7 @@ namespace gfx_testing::scene {
 
     private:
         game::GameContext &mGameContext;
+        imgui::ImGuiContext &mImGuiContext;
         util::Extent2D mViewportExtent;
         render::Camera mCamera;
         glm::mat4x4 mProjection;

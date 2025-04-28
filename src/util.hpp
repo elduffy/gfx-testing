@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <cmath>
 #include "glm/geometric.hpp"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"

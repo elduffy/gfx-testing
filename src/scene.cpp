@@ -38,8 +38,9 @@ namespace gfx_testing::scene {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
     }
 
-    Scene::Scene(game::GameContext &gameContext) :
+    Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
         mGameContext(gameContext),
+        mImGuiContext(imGuiContext),
         mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION),
         mProjection(getProjection(mViewportExtent)),
@@ -94,8 +95,7 @@ namespace gfx_testing::scene {
             return;
         }
 
-
-        const SDL_GPUColorTargetInfo colorTargetInfo{
+        SDL_GPUColorTargetInfo colorTargetInfo{
                 .texture = swapchainTexture,
                 .clear_color = {0, 0, 0, 1},
                 .load_op = SDL_GPU_LOADOP_CLEAR,
@@ -155,5 +155,10 @@ namespace gfx_testing::scene {
             mTextureObject.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);
+        // imgui -- must occur after render pass has ended
+        {
+            colorTargetInfo.load_op = SDL_GPU_LOADOP_LOAD;
+            mImGuiContext.renderFrame(commandBuffer, colorTargetInfo);
+        }
     }
 }

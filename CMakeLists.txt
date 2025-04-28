@@ -11,6 +11,7 @@ set(BOOST_ENABLE_CMAKE ON)
 include(cmake/fetch-boost.cmake)
 include(cmake/fetch-glm.cmake)
 include(cmake/fetch-catch2.cmake)
+include(cmake/fetch-imgui.cmake)
 
 find_package(SDL3 REQUIRED)
 
@@ -20,6 +21,18 @@ add_custom_target(build_shaders
         COMMAND bash content/shaders/build-shaders.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
 )
+
+# imgui build
+add_library(imgui
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp
+)
+target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 
 # gfx_testing_lib main library
 add_library(gfx_testing_lib
@@ -37,8 +50,10 @@ add_library(gfx_testing_lib
         src/samplers.cpp
         src/texture.cpp
         src/frame_watcher.cpp
+        src/imgui_context.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
+        imgui
         SDL3::SDL3
         SDL3_image::SDL3_image
         Boost::algorithm

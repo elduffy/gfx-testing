@@ -3,9 +3,15 @@
 #include <util.hpp>
 #include <scene.hpp>
 #include <game.hpp>
+#include <imgui_context.hpp>
 
-void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::scene::Scene &scene,
+void handleEvent(gfx_testing::game::GameContext &gameContext,
+                 gfx_testing::scene::Scene &scene,
+                 gfx_testing::imgui::ImGuiContext &imGuiContext,
                  SDL_Event const &event) {
+    if (imGuiContext.processEvent(event)) {
+        return;
+    }
     switch (event.type) {
         case SDL_EVENT_WINDOW_RESIZED: {
             scene.onResize({
@@ -17,6 +23,9 @@ void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::scene
         case SDL_EVENT_KEY_UP: {
             if (!event.key.down && !event.key.repeat && event.key.key == SDLK_RETURN) {
                 gameContext.mStopwatch.toggle();
+            }
+            if (!event.key.down && !event.key.repeat && event.key.key == SDLK_D) {
+                imGuiContext.openWindow();
             }
             break;
         }
@@ -52,12 +61,13 @@ int main() {
     constexpr auto DEBUG_MODE = true;
     constexpr auto USE_VSYNC = false; // Unlocks frame rate if supported
     const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, USE_VSYNC};
-    gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
+    const gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
+    gfx_testing::imgui::ImGuiContext imGuiContext{sdlContext};
 
-    gfx_testing::scene::Scene scene(gameContext);
+    gfx_testing::scene::Scene scene(gameContext, imGuiContext);
 
-    auto eventFunction = [&](auto const &event) { handleEvent(gameContext, scene, event); };
+    auto eventFunction = [&](auto const &event) { handleEvent(gameContext, scene, imGuiContext, event); };
     auto updateFunction = [&] { handleUpdate(gameContext, scene); };
     SDL_Log("Begin main loop");
     gameContext.runMainLoop(eventFunction, updateFunction);
