@@ -6,6 +6,8 @@ namespace gfx_testing::imgui {
     public:
         NO_COPY_NO_MOVE(ImGuiContext);
 
+        ~ImGuiContext();
+
         explicit ImGuiContext(sdl::SdlContext const &sdlContext);
 
         void toggleOpen() { mOpenWindow = !mOpenWindow; }
@@ -17,9 +19,9 @@ namespace gfx_testing::imgui {
 
         void renderFrame(SDL_GPUCommandBuffer *commandBuffer, SDL_GPUColorTargetInfo const &colorTargetInfo);
 
-        ~ImGuiContext();
-
     private:
+        void showDebugWindow();
+
         bool mOpenWindow{false};
     };
 }

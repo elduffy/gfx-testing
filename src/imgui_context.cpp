@@ -8,6 +8,9 @@
 #include "sdl.hpp"
 
 namespace gfx_testing::imgui {
+    // Set true to show the demo menu to try out widgets, etc
+    static auto constexpr SHOW_DEMO = false;
+
     ImGuiContext::ImGuiContext(sdl::SdlContext const &sdlContext) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -41,6 +44,21 @@ namespace gfx_testing::imgui {
         return io.WantCaptureMouse || io.WantCaptureKeyboard;
     }
 
+    void ImGuiContext::showDebugWindow() {
+        ImGuiWindowFlags windowFlags = 0;
+        windowFlags |= ImGuiWindowFlags_NoNav;
+        if (!ImGui::Begin("Debug", &mOpenWindow, windowFlags)) {
+            ImGui::End();
+            return;
+        }
+        const ImGuiIO &io = ImGui::GetIO();
+
+        if (ImGui::CollapsingHeader("Perf")) {
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        }
+        ImGui::End();
+    }
+
     void ImGuiContext::renderFrame(SDL_GPUCommandBuffer *commandBuffer,
                                    SDL_GPUColorTargetInfo const &colorTargetInfo) {
         if (!mOpenWindow) {
@@ -49,9 +67,11 @@ namespace gfx_testing::imgui {
         ImGui_ImplSDLGPU3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
-        // TODO: set nonav for Begin
         auto const wasOpen = mOpenWindow;
-        ImGui::ShowDemoWindow(&mOpenWindow);
+        if constexpr (SHOW_DEMO) {
+            ImGui::ShowDemoWindow(&mOpenWindow);
+        }
+        showDebugWindow();
         if (wasOpen && !mOpenWindow) {
             SDL_Log("Should close window");
         }
