@@ -69,10 +69,7 @@ namespace gfx_testing::scene {
                        gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext,
-                   gameContext.mResourceLoader.loadObjModel(
-                           "debug-axes.obj", model::NormalTreatment::AVERAGE),
-                   glm::mat4(1.0f)),
+        mDebugAxes(gameContext, 5.f),
         mPointLight(gameContext, INITIAL_LIGHT_POSITION),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
@@ -147,10 +144,11 @@ namespace gfx_testing::scene {
 
         // Debug axes
         {
-            mvpTransform.mMvp = vp * mDebugAxes.mTransform;
+            mvpTransform.mMvp = vp * mDebugAxes.mRenderObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
-            mDebugAxes.render(renderPass);
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Lines));
+            // TODO: how to bind separate pipeline for the geometry?
+            mDebugAxes.mRenderObject.render(renderPass);
         }
         // Point light
         {

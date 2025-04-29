@@ -204,6 +204,9 @@ namespace gfx_testing::shader {
     struct MeshDataBuilder {
 
         MeshData build() {
+            if (mIndices16.empty() && mIndices32.empty()) {
+                throw std::runtime_error("MeshDataBuilder: no indices set");
+            }
             if (mIndices32.size() > 0) {
                 return {
                         .mVertices = std::move(mVertices),

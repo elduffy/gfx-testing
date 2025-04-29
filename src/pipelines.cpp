@@ -16,8 +16,10 @@ namespace gfx_testing::pipeline {
         return actualIndices == expectedIndices;
     }
 
-    SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context, SDL_GPUShader *vertexShader,
-                                            SDL_GPUShader *fragmentShader) {
+    SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context,
+                                            SDL_GPUShader *vertexShader,
+                                            SDL_GPUShader *fragmentShader,
+                                            SDL_GPUPrimitiveType primitiveType) {
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
                 .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
@@ -38,7 +40,7 @@ namespace gfx_testing::pipeline {
                         .vertex_attributes = &shader::VertexData::VERTEX_ATTRIBUTES[0],
                         .num_vertex_attributes = shader::VertexData::VERTEX_ATTRIBUTES.size(),
                 },
-                .primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+                .primitive_type = primitiveType,
                 .rasterizer_state = {
                         .cull_mode = SDL_GPU_CULLMODE_BACK
                 },
@@ -101,7 +103,8 @@ namespace gfx_testing::pipeline {
         for (auto const &pipelineDefinition: ALL_PIPELINES) {
             auto *vertexShader = *shaders.at(pipelineDefinition.mVertexShader);
             auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
-            mPipelines.emplace_back(sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader));
+            mPipelines.emplace_back(sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader,
+                                                               pipelineDefinition.mPrimitiveType));
         }
     }
 

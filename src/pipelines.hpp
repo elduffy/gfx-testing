@@ -12,6 +12,7 @@ namespace gfx_testing::pipeline {
         Diffuse,
         Gooch,
         Textured,
+        Lines,
     };
 
     struct ShaderDefinition {
@@ -31,6 +32,7 @@ namespace gfx_testing::pipeline {
         PipelineName mName;
         ShaderDefinition mVertexShader;
         ShaderDefinition mFragmentShader;
+        SDL_GPUPrimitiveType mPrimitiveType{SDL_GPU_PRIMITIVETYPE_TRIANGLELIST};
     };
 
     // Shader definitions
@@ -79,10 +81,17 @@ namespace gfx_testing::pipeline {
             .mVertexShader = SHADER_DEFAULT_VERTEX,
             .mFragmentShader = SHADER_BASIC_TEXTURED,
     };
+    static constexpr PipelineDefinition PIPELINE_LINES{
+            .mName = PipelineName::Lines,
+            .mVertexShader = SHADER_DEFAULT_VERTEX,
+            .mFragmentShader = SHADER_VERTEX_COLOR,
+            .mPrimitiveType = SDL_GPU_PRIMITIVETYPE_LINELIST,
+    };
     static constexpr std::array ALL_PIPELINES{
             PIPELINE_DIFFUSE,
             PIPELINE_GOOCH,
             PIPELINE_TEXTURED,
+            PIPELINE_LINES,
     };
 
     class Pipelines {

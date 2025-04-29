@@ -51,6 +51,7 @@ add_library(gfx_testing_lib
         src/texture.cpp
         src/frame_watcher.cpp
         src/imgui_context.cpp
+        src/debug_axes.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui

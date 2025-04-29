@@ -6,6 +6,7 @@
 #include <render_object.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "debug_axes.hpp"
 #include "point_light.hpp"
 
 namespace gfx_testing::scene {
@@ -31,7 +32,7 @@ namespace gfx_testing::scene {
         glm::mat4x4 mProjection;
         render::RenderObject mPropObjects;
         render::RenderObject mTextureObject;
-        render::RenderObject mDebugAxes;
+        render::DebugAxes mDebugAxes;
         render::PointLight mPointLight;
         sdl::SdlGpuTexture mDepthTexture;
         std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;
