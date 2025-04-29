@@ -69,7 +69,7 @@ namespace gfx_testing::scene {
                        gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext, 5.f),
+        mDebugAxes(gameContext),
         mPointLight(gameContext, INITIAL_LIGHT_POSITION),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,

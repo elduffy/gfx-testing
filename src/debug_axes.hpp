@@ -6,7 +6,7 @@ namespace gfx_testing::render {
 
     class DebugAxes {
     public:
-        DebugAxes(game::GameContext const &gameContext, float axisLength);
+        explicit DebugAxes(game::GameContext const &gameContext);
 
         RenderObject mRenderObject;
     };
