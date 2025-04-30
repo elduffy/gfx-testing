@@ -4,6 +4,10 @@
 #include <sdl.hpp>
 
 #include "resource_loader.hpp"
+#include "default.vert.hpp"
+#include "gooch.frag.hpp"
+#include "basic_textured.frag.hpp"
+#include "vertex_color.frag.hpp"
 
 namespace gfx_testing::pipeline {
     static constexpr auto MSAA_SAMPLE_COUNT = SDL_GPU_SAMPLECOUNT_4;
@@ -18,6 +22,18 @@ namespace gfx_testing::pipeline {
     struct ShaderDefinition {
         friend bool operator<(const ShaderDefinition &lhs, const ShaderDefinition &rhs) {
             return lhs.mFilename < rhs.mFilename;
+        }
+
+        static constexpr ShaderDefinition create(char const *filename, SDL_GPUShaderStage mStage,
+                                                 shader::SpirvConsts const &consts) {
+            return {
+                    .mFilename = filename,
+                    .mStage = mStage,
+                    .mSamplers = consts.mSeparateSamplerCount,
+                    .mUniformBuffers = consts.mUboCount,
+                    .mStorageBuffers = consts.mStorageBufferCount,
+                    .mStorageTextures = consts.mStorageTextureCount,
+            };
         }
 
         char const *mFilename;
@@ -37,26 +53,22 @@ namespace gfx_testing::pipeline {
 
     // Shader definitions
 
-    static constexpr ShaderDefinition SHADER_BASIC_TEXTURED{
-            .mFilename = "basic_textured.frag.hlsl",
-            .mStage = SDL_GPU_SHADERSTAGE_FRAGMENT,
-            .mSamplers = 1,
-    };
-    static constexpr ShaderDefinition SHADER_GOOCH{
-            .mFilename = "gooch.frag.hlsl",
-            .mStage = SDL_GPU_SHADERSTAGE_FRAGMENT,
-            .mUniformBuffers = 1,
-    };
-    static constexpr ShaderDefinition SHADER_VERTEX_COLOR{
-            .mFilename = "vertex_color.frag.hlsl",
-            .mStage = SDL_GPU_SHADERSTAGE_FRAGMENT,
-            .mUniformBuffers = 1,
-    };
-    static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX{
-            .mFilename = "default.vert.hlsl",
-            .mStage = SDL_GPU_SHADERSTAGE_VERTEX,
-            .mUniformBuffers = 1,
-    };
+    static constexpr ShaderDefinition SHADER_BASIC_TEXTURED = ShaderDefinition::create(
+            "basic_textured.frag.hlsl",
+            SDL_GPU_SHADERSTAGE_FRAGMENT,
+            spirv_header_gen::generated::basic_textured_frag::CONSTS);
+    static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
+            "gooch.frag.hlsl",
+            SDL_GPU_SHADERSTAGE_FRAGMENT,
+            spirv_header_gen::generated::gooch_frag::CONSTS);
+    static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
+            "vertex_color.frag.hlsl",
+            SDL_GPU_SHADERSTAGE_FRAGMENT,
+            spirv_header_gen::generated::vertex_color_frag::CONSTS);
+    static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
+            "default.vert.hlsl",
+            SDL_GPU_SHADERSTAGE_VERTEX,
+            spirv_header_gen::generated::default_vert::CONSTS);
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
             SHADER_GOOCH,

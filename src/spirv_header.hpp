@@ -3,17 +3,13 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <SDL3/SDL_gpu.h>
 
 namespace gfx_testing::shader {
 
-    enum class ShaderMode {
-        Vertex,
-        Fragment,
-    };
-
     struct EntryPoint {
         std::string mName;
-        ShaderMode mMode;
+        SDL_GPUShaderStage mStage;
     };
 
     struct MatrixData {
@@ -79,6 +75,19 @@ namespace gfx_testing::shader {
         std::vector<Ubo> mUbos;
         std::vector<SeparateImage> mSeparateImages;
         std::vector<SeparateSampler> mSeparateSamplers;
+    };
+
+    struct SpirvConsts {
+        uint32_t mEntryPointCount;
+        uint32_t mTypeCount;
+        uint32_t mInputCount;
+        uint32_t mOutputCount;
+        uint32_t mUboCount;
+        uint32_t mSeparateImageCount;
+        uint32_t mSeparateSamplerCount;
+        // TODO: what do these look like in the reflection json?
+        uint32_t mStorageBufferCount{0};
+        uint32_t mStorageTextureCount{0};
     };
 
 }

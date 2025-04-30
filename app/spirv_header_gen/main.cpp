@@ -6,10 +6,16 @@
 #include <optional>
 #include <nlohmann/json.hpp>
 
-#include "parse.hpp"
-#include "spirv_header.hpp"
 #include "write.hpp"
+#include "boost/algorithm/string/replace.hpp"
 
+
+std::string getPackageName(std::string const &inputFile) {
+    std::string result = std::filesystem::path(inputFile).filename().string();
+    boost::replace_last(result, ".json", "");
+    boost::algorithm::replace_all(result, ".", "_");
+    return result;
+}
 
 int main(int argc, char *argv[]) {
     using namespace clipp;
@@ -34,6 +40,10 @@ int main(int argc, char *argv[]) {
         outputStream = &*outputFileStream;
     }
 
-    auto const spirvMeta = spirv_header_gen::parseSpirvMeta(inputFileStream);
-    spirv_header_gen::writeSpirvMeta(spirvMeta, outputStream);
+    auto const json = nlohmann::json::parse(inputFileStream);
+    spirv_header_gen::WriteProperties props{
+            .mPackageName = getPackageName(inputFile),
+    };
+
+    spirv_header_gen::writeSpirvMeta(props, json, outputStream);
 }

@@ -8,20 +8,25 @@ include(FetchContent)
 include(cmake/fetch-tinyobjloader.cmake)
 set(BOOST_INCLUDE_LIBRARIES algorithm safe_numerics scope)
 set(BOOST_ENABLE_CMAKE ON)
+set(INJA_USE_EMBEDDED_JSON OFF)
 include(cmake/fetch-boost.cmake)
 include(cmake/fetch-glm.cmake)
 include(cmake/fetch-catch2.cmake)
 include(cmake/fetch-imgui.cmake)
 include(cmake/fetch-clipp.cmake)
 include(cmake/fetch-nlohmann_json.cmake)
+include(cmake/fetch-inja.cmake)
 
 find_package(SDL3 REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
 
+add_subdirectory(app/spirv_header_gen)
+
 add_custom_target(build_shaders
         COMMAND bash content/shaders/build-shaders.sh
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
+        DEPENDS spirv_header_gen
 )
 
 # imgui build
@@ -67,9 +72,9 @@ target_link_libraries(gfx_testing_lib PUBLIC
 add_dependencies(gfx_testing_lib build_shaders)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC src/)
+target_include_directories(gfx_testing_lib SYSTEM PUBLIC content/shaders/compiled/headers)
 
 add_subdirectory(app/renderer)
-add_subdirectory(app/spirv_header_gen)
 
 # tests
 add_executable(tests
