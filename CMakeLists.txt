@@ -12,6 +12,8 @@ include(cmake/fetch-boost.cmake)
 include(cmake/fetch-glm.cmake)
 include(cmake/fetch-catch2.cmake)
 include(cmake/fetch-imgui.cmake)
+include(cmake/fetch-clipp.cmake)
+include(cmake/fetch-nlohmann_json.cmake)
 
 find_package(SDL3 REQUIRED)
 
@@ -51,6 +53,7 @@ add_library(gfx_testing_lib
         src/texture.cpp
         src/imgui_context.cpp
         src/debug_axes.cpp
+        src/spirv_header.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui
@@ -66,6 +69,7 @@ target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC src/)
 
 add_subdirectory(app/renderer)
+add_subdirectory(app/spirv_header_gen)
 
 # tests
 add_executable(tests
