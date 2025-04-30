@@ -6,20 +6,8 @@
 
 namespace spirv_header_gen::generated::{{ package_name }} {
 
-    constexpr gfx_testing::shader::SpirvConsts CONSTS{
-        .mEntryPointCount = {{ length(entryPoints) }},
-        .mTypeCount = {{ length(default(types, [])) }},
-        .mInputCount = {{ length(inputs) }},
-        .mOutputCount = {{ length(outputs) }},
-        .mUboCount = {{ length(default(ubos, [])) }},
-        .mSeparateImageCount = {{ length(default(separate_images, [])) }},
-        .mSeparateSamplerCount = {{ length(default(separate_samplers,[])) }},
-        .mSsboCount = {{ length(default(ssbos, [])) }},
-        .mStorageTextureCount = {{ length(default(images, [])) }},
-    };
-
     struct SpirvMeta {
-        std::array<gfx_testing::shader::EntryPoint, {{ length(entryPoints) }}> mEntryPoints;
+        gfx_testing::shader::EntryPoint mEntryPoint;
         std::array<gfx_testing::shader::Input, {{ length(inputs) }}> mInputs;
         std::array<gfx_testing::shader::Output, {{ length(outputs) }}> mOutputs;
         std::array<gfx_testing::shader::Ubo, {{ length(default(ubos, [])) }}> mUbos;
@@ -29,13 +17,11 @@ namespace spirv_header_gen::generated::{{ package_name }} {
         std::array<gfx_testing::shader::StorageTexture, {{ length(default(images, [])) }}> mStorageTextures;
     };
 
-    // Entrypoints
-    {% for ep in entryPoints %}
-    constexpr gfx_testing::shader::EntryPoint ENTRY_POINT_{{loop.index}} {
-        .mName = "{{ ep.name }}",
-        .mStage = {{ getShaderStage(ep.mode) }},
+    // Entrypoint
+    constexpr gfx_testing::shader::EntryPoint ENTRY_POINT{
+        .mName = "{{ entryPoint.name }}",
+        .mStage = {{ getShaderStage(entryPoint.mode) }},
     };
-    {% endfor %}
 
     // Types
     {% for key, type in default(types, {}) -%}
@@ -113,9 +99,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     },{% endfor %}
 
     constexpr SpirvMeta META{
-        .mEntryPoints = { {% for ep in entryPoints %}
-            ENTRY_POINT_{{loop.index}},{% endfor %}
-        },
+        .mEntryPoint = ENTRY_POINT,
         .mInputs = { {% for input in inputs %}
             INPUT_{{loop.index}},{% endfor %}
         },
@@ -136,12 +120,6 @@ namespace spirv_header_gen::generated::{{ package_name }} {
         },
         .mStorageTextures = { {% for storageTex in default(images, []) %}
             STORAGE_TEXTURE_{{loop.index}},{% endfor %}
-        },
-    };
-
-    const gfx_testing::shader::SpirvMetaDynamic DYNAMIC_META{
-        .mTypes = { {% for key, type in default(types, {}) %}
-            gfx_testing::shader::KeyedTypeDynamic::fromStatic(TYPE_{{loop.index}}),{% endfor %}
         },
     };
 }

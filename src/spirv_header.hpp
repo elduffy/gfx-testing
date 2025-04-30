@@ -92,23 +92,4 @@ namespace gfx_testing::shader {
     struct StorageTexture {
         // TODO
     };
-
-    // Common structure exported by all generated headers.
-    // Uses dynamic containers so currently it can't be constexpr.
-    struct SpirvMetaDynamic {
-        std::vector<KeyedTypeDynamic> mTypes;
-    };
-
-    struct SpirvConsts {
-        uint32_t mEntryPointCount;
-        uint32_t mTypeCount;
-        uint32_t mInputCount;
-        uint32_t mOutputCount;
-        uint32_t mUboCount;
-        uint32_t mSeparateImageCount;
-        uint32_t mSeparateSamplerCount;
-        uint32_t mSsboCount;
-        uint32_t mStorageTextureCount;
-    };
-
 }

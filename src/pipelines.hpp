@@ -24,15 +24,15 @@ namespace gfx_testing::pipeline {
             return lhs.mFilename < rhs.mFilename;
         }
 
-        static constexpr ShaderDefinition create(char const *filename, SDL_GPUShaderStage mStage,
-                                                 shader::SpirvConsts const &consts) {
+        template<typename SpirvMeta>
+        static constexpr ShaderDefinition create(char const *filename, SpirvMeta const &spirvMeta) {
             return {
                     .mFilename = filename,
-                    .mStage = mStage,
-                    .mSamplers = consts.mSeparateSamplerCount,
-                    .mUniformBuffers = consts.mUboCount,
-                    .mStorageBuffers = consts.mSsboCount,
-                    .mStorageTextures = consts.mStorageTextureCount,
+                    .mStage = spirvMeta.mEntryPoint.mStage,
+                    .mSamplers = spirvMeta.mSeparateSamplers.size(),
+                    .mUniformBuffers = spirvMeta.mUbos.size(),
+                    .mStorageBuffers = spirvMeta.mSsbos.size(),
+                    .mStorageTextures = spirvMeta.mStorageTextures.size(),
             };
         }
 
@@ -55,20 +55,16 @@ namespace gfx_testing::pipeline {
 
     static constexpr ShaderDefinition SHADER_BASIC_TEXTURED = ShaderDefinition::create(
             "basic_textured.frag.hlsl",
-            SDL_GPU_SHADERSTAGE_FRAGMENT,
-            spirv_header_gen::generated::basic_textured_frag::CONSTS);
+            spirv_header_gen::generated::basic_textured_frag::META);
     static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
             "gooch.frag.hlsl",
-            SDL_GPU_SHADERSTAGE_FRAGMENT,
-            spirv_header_gen::generated::gooch_frag::CONSTS);
+            spirv_header_gen::generated::gooch_frag::META);
     static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
             "vertex_color.frag.hlsl",
-            SDL_GPU_SHADERSTAGE_FRAGMENT,
-            spirv_header_gen::generated::vertex_color_frag::CONSTS);
+            spirv_header_gen::generated::vertex_color_frag::META);
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
             "default.vert.hlsl",
-            SDL_GPU_SHADERSTAGE_VERTEX,
-            spirv_header_gen::generated::default_vert::CONSTS);
+            spirv_header_gen::generated::default_vert::META);
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
             SHADER_GOOCH,

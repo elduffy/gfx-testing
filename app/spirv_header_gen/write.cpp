@@ -47,6 +47,11 @@ namespace spirv_header_gen {
         nlohmann::json model = json;
         model["package_name"] = writeProperties.mPackageName;
         model["gen_time"] = getGenTime();
+        if (json["entryPoints"].size() != 1) {
+            throw std::runtime_error("Only a single entry point is supported.");
+        }
+        model["entryPoint"] = json["entryPoints"].at(0);
+        model.erase("entryPoints");
 
         env.render_to(*ostream, templ, model);
     }
