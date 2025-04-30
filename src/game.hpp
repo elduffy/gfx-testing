@@ -3,9 +3,6 @@
 #include <sdl.hpp>
 #include <pipelines.hpp>
 #include <stopwatch.hpp>
-
-#include "frame_watcher.hpp"
-#include "imgui_context.hpp"
 #include "samplers.hpp"
 
 namespace gfx_testing::game {
@@ -20,7 +17,6 @@ namespace gfx_testing::game {
             mStopwatch.resume();
             while (true) {
                 mLastFrame.update(mStopwatch);
-                mFrameWatcher.onFrame();
 
                 while (SDL_PollEvent(&event)) {
                     eventFn(event);
@@ -51,7 +47,6 @@ namespace gfx_testing::game {
 
     public:
         sdl::SdlContext const &mSdlContext;
-        util::FrameWatcher mFrameWatcher;
         util::ResourceLoader const &mResourceLoader;
         pipeline::Pipelines mPipelines;
         render::Samplers mSamplers;

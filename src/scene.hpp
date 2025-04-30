@@ -7,6 +7,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "debug_axes.hpp"
+#include "imgui_context.hpp"
 #include "point_light.hpp"
 
 namespace gfx_testing::scene {
