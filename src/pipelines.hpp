@@ -31,7 +31,7 @@ namespace gfx_testing::pipeline {
                     .mStage = mStage,
                     .mSamplers = consts.mSeparateSamplerCount,
                     .mUniformBuffers = consts.mUboCount,
-                    .mStorageBuffers = consts.mStorageBufferCount,
+                    .mStorageBuffers = consts.mSsboCount,
                     .mStorageTextures = consts.mStorageTextureCount,
             };
         }

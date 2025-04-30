@@ -12,6 +12,8 @@ namespace spirv_header_gen::generated::{{ package_name }} {
         .mUboCount = {{ length(default(ubos, [])) }},
         .mSeparateImageCount = {{ length(default(separate_images, [])) }},
         .mSeparateSamplerCount = {{ length(default(separate_samplers,[])) }},
+        .mSsboCount = {{ length(default(ssbos, [])) }},
+        .mStorageTextureCount = {{ length(default(images, [])) }},
     };
 
     const gfx_testing::shader::SpirvMeta META{
@@ -74,6 +76,16 @@ namespace spirv_header_gen::generated::{{ package_name }} {
                 .mType = "{{sampler.type}}",
                 .mSet = {{sampler.set}},
                 .mBinding = {{sampler.binding}},
+            },{% endfor %}
+        },
+        .mSsbos = { {% for ssbo in default(ssbos, []) %}
+            {
+                TODO: update template for SSBO
+            },{% endfor %}
+        },
+        .mStorageTextures = { {% for storageTex in default(images, []) %}
+            {
+                TODO: update template for storage textures
             },{% endfor %}
         },
     };

@@ -67,6 +67,14 @@ namespace gfx_testing::shader {
         size_t mBinding;
     };
 
+    struct Ssbo {
+        // TODO
+    };
+
+    struct StorageTexture {
+        // TODO
+    };
+
     struct SpirvMeta {
         std::vector<EntryPoint> mEntryPoints;
         std::map<std::string, Type> mTypes;
@@ -75,6 +83,8 @@ namespace gfx_testing::shader {
         std::vector<Ubo> mUbos;
         std::vector<SeparateImage> mSeparateImages;
         std::vector<SeparateSampler> mSeparateSamplers;
+        std::vector<Ssbo> mSsbos;
+        std::vector<StorageTexture> mStorageTextures;
     };
 
     struct SpirvConsts {
@@ -85,9 +95,8 @@ namespace gfx_testing::shader {
         uint32_t mUboCount;
         uint32_t mSeparateImageCount;
         uint32_t mSeparateSamplerCount;
-        // TODO: what do these look like in the reflection json?
-        uint32_t mStorageBufferCount{0};
-        uint32_t mStorageTextureCount{0};
+        uint32_t mSsboCount;
+        uint32_t mStorageTextureCount;
     };
 
 }

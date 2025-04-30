@@ -35,6 +35,8 @@ namespace spirv_header_gen {
         auto const templatePath = getProjectRoot() / "app/spirv_header_gen/template.hpp.inja";
         const inja::Template templ = env.parse_template(templatePath);
 
+        // JSON model should look like:
+        // https://github.com/KhronosGroup/SPIRV-Cross/blob/7918775748c5e2f5c40d9918ce68825035b5a1e1/spirv_reflect.cpp#L535-L550
         nlohmann::json model = json;
         model["package_name"] = writeProperties.mPackageName;
 
