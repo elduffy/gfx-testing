@@ -8,8 +8,9 @@ namespace spirv_header_gen {
 
     struct WriteProperties {
         std::string mPackageName;
+        std::string mGenTime;
     };
 
 
-    void writeSpirvMeta(WriteProperties const &writeProperties, nlohmann::json const &json, std::ostream *ostream);
+    void writeHeader(WriteProperties const &writeProperties, nlohmann::json const &json, std::ostream *ostream);
 }

@@ -8,7 +8,7 @@
 namespace gfx_testing::shader {
 
     struct EntryPoint {
-        std::string mName;
+        char const *mName;
         SDL_GPUShaderStage mStage;
     };
 
@@ -20,42 +20,60 @@ namespace gfx_testing::shader {
     using TypeSpecificData = std::variant<MatrixData>;
 
     struct TypeMember {
-        std::string mName;
-        std::string mType;
+        char const *mName;
+        char const *mType;
         size_t mOffset;
 
         TypeSpecificData mTypeData;
     };
 
-    struct Type {
-        std::string mName;
+    template<size_t NUM_MEMBERS>
+    struct KeyedType {
+        char const *mKey;
+        char const *mName;
+        std::array<TypeMember, NUM_MEMBERS> mMembers;
+    };
+
+    struct KeyedTypeDynamic {
+        char const *mKey;
+        char const *mName;
         std::vector<TypeMember> mMembers;
+
+        template<size_t N>
+        static KeyedTypeDynamic fromStatic(KeyedType<N> const &type) {
+            KeyedTypeDynamic result{
+                    .mKey = type.mKey,
+                    .mName = type.mName,
+            };
+            std::copy(type.mMembers.begin(), type.mMembers.end(), std::back_inserter(result.mMembers));
+            return result;
+        }
     };
 
     struct Input {
-        std::string mName;
-        std::string mType;
+        char const *mName;
+        char const *mType;
         size_t mLocation;
     };
 
     struct Output {
-        std::string mName;
-        std::string mType;
+        char const *mName;
+        char const *mType;
         size_t mLocation;
     };
 
     struct Ubo {
-        std::string mName;
+        char const *mName;
         // Refers to the key in the type map
-        std::string mType;
+        char const *mType;
         size_t mBlockSize;
         size_t mSet;
         size_t mBinding;
     };
 
     struct SeparateImage {
-        std::string mName;
-        std::string mType;
+        char const *mName;
+        char const *mType;
         size_t mSet;
         size_t mBinding;
     };
@@ -75,16 +93,10 @@ namespace gfx_testing::shader {
         // TODO
     };
 
-    struct SpirvMeta {
-        std::vector<EntryPoint> mEntryPoints;
-        std::map<std::string, Type> mTypes;
-        std::vector<Input> mInputs;
-        std::vector<Output> mOutputs;
-        std::vector<Ubo> mUbos;
-        std::vector<SeparateImage> mSeparateImages;
-        std::vector<SeparateSampler> mSeparateSamplers;
-        std::vector<Ssbo> mSsbos;
-        std::vector<StorageTexture> mStorageTextures;
+    // Common structure exported by all generated headers.
+    // Uses dynamic containers so currently it can't be constexpr.
+    struct SpirvMetaDynamic {
+        std::vector<KeyedTypeDynamic> mTypes;
     };
 
     struct SpirvConsts {

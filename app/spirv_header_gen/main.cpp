@@ -45,5 +45,5 @@ int main(int argc, char *argv[]) {
             .mPackageName = getPackageName(inputFile),
     };
 
-    spirv_header_gen::writeSpirvMeta(props, json, outputStream);
+    spirv_header_gen::writeHeader(props, json, outputStream);
 }

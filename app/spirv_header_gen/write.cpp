@@ -27,8 +27,15 @@ namespace spirv_header_gen {
         throw std::runtime_error(std::format("Unsupported shader mode: {}", arg));
     }
 
-    void writeSpirvMeta(WriteProperties const &writeProperties,
-                        nlohmann::json const &json, std::ostream *ostream) {
+    std::string getGenTime() {
+        time_t now;
+        time(&now);
+        char buf[sizeof "2011-10-08T07:07:09Z"];
+        strftime(buf, sizeof buf, "%FT%TZ", gmtime(&now));
+        return {buf};
+    }
+
+    void writeHeader(WriteProperties const &writeProperties, nlohmann::json const &json, std::ostream *ostream) {
         inja::Environment env;
         env.add_callback("getShaderStage", 1, getShaderStage);
 
@@ -39,6 +46,7 @@ namespace spirv_header_gen {
         // https://github.com/KhronosGroup/SPIRV-Cross/blob/7918775748c5e2f5c40d9918ce68825035b5a1e1/spirv_reflect.cpp#L535-L550
         nlohmann::json model = json;
         model["package_name"] = writeProperties.mPackageName;
+        model["gen_time"] = getGenTime();
 
         env.render_to(*ostream, templ, model);
     }
