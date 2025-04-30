@@ -62,15 +62,10 @@ target_link_libraries(gfx_testing_lib PUBLIC
         glm::glm
 )
 add_dependencies(gfx_testing_lib build_shaders)
-target_include_directories(gfx_testing_lib SYSTEM PRIVATE ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
-target_include_directories(gfx_testing_lib SYSTEM PRIVATE src/)
+target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
+target_include_directories(gfx_testing_lib SYSTEM PUBLIC src/)
 
-# gfx_testing main executable
-add_executable(gfx_testing main.cpp)
-target_link_libraries(gfx_testing PRIVATE
-        gfx_testing_lib
-)
-target_include_directories(gfx_testing SYSTEM PRIVATE src/)
+add_subdirectory(app/renderer)
 
 # tests
 add_executable(tests
