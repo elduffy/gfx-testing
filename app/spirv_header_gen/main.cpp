@@ -17,6 +17,12 @@ std::string getPackageName(std::string const &inputFile) {
     return result;
 }
 
+std::string getSourceSpvFilename(std::string const &inputFile) {
+    std::string result = std::filesystem::path(inputFile).filename().string();
+    boost::replace_last(result, ".json", ".spv");
+    return result;
+}
+
 int main(int argc, char *argv[]) {
     using namespace clipp;
     std::string inputFile, outputFile;
@@ -41,8 +47,10 @@ int main(int argc, char *argv[]) {
     }
 
     auto const json = nlohmann::json::parse(inputFileStream);
+    auto sourceSpvFilename = getSourceSpvFilename(inputFile);
     spirv_header_gen::WriteProperties props{
             .mPackageName = getPackageName(inputFile),
+            .mSourceSpvFilename = sourceSpvFilename,
     };
 
     spirv_header_gen::writeHeader(props, json, outputStream);

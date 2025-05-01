@@ -46,6 +46,7 @@ namespace spirv_header_gen {
         // https://github.com/KhronosGroup/SPIRV-Cross/blob/7918775748c5e2f5c40d9918ce68825035b5a1e1/spirv_reflect.cpp#L535-L550
         nlohmann::json model = json;
         model["package_name"] = writeProperties.mPackageName;
+        model["source_spv_filename"] = writeProperties.mSourceSpvFilename;
         model["gen_time"] = getGenTime();
         if (json["entryPoints"].size() != 1) {
             throw std::runtime_error("Only a single entry point is supported.");

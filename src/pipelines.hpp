@@ -25,9 +25,9 @@ namespace gfx_testing::pipeline {
         }
 
         template<typename SpirvMeta>
-        static constexpr ShaderDefinition create(char const *filename, SpirvMeta const &spirvMeta) {
+        static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta) {
             return {
-                    .mFilename = filename,
+                    .mFilename = spirvMeta.mSourceFilename,
                     .mStage = spirvMeta.mEntryPoint.mStage,
                     .mSamplers = spirvMeta.mSeparateSamplers.size(),
                     .mUniformBuffers = spirvMeta.mUbos.size(),
@@ -54,16 +54,12 @@ namespace gfx_testing::pipeline {
     // Shader definitions
 
     static constexpr ShaderDefinition SHADER_BASIC_TEXTURED = ShaderDefinition::create(
-            "basic_textured.frag.hlsl",
             spirv_header_gen::generated::basic_textured_frag::META);
     static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
-            "gooch.frag.hlsl",
             spirv_header_gen::generated::gooch_frag::META);
     static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
-            "vertex_color.frag.hlsl",
             spirv_header_gen::generated::vertex_color_frag::META);
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
-            "default.vert.hlsl",
             spirv_header_gen::generated::default_vert::META);
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
