@@ -32,6 +32,7 @@ namespace gfx_testing::scene {
         render::Camera mCamera;
         glm::mat4x4 mProjection;
         render::RenderObject mPropObjects;
+        render::RenderObject mCube;
         render::RenderObject mTextureObject;
         render::DebugAxes mDebugAxes;
         render::PointLight mPointLight;

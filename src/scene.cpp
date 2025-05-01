@@ -11,10 +11,12 @@
 
 #include <pipelines.hpp>
 
+
 namespace gfx_testing::scene {
 
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
+    static constexpr glm::vec3 CUBE_POSITION(3, 3, -1);
     static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);
     static constexpr glm::vec3 TEXTURE_OBJECT_SCALE(2);
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
@@ -65,6 +67,9 @@ namespace gfx_testing::scene {
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", model::NormalTreatment::SPLIT),
                      translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
+        mCube(gameContext,
+              gameContext.mResourceLoader.loadObjModel("cube.obj", model::NormalTreatment::SPLIT),
+              glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
         mTextureObject(gameContext,
                        gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
@@ -93,6 +98,9 @@ namespace gfx_testing::scene {
         mPropObjects.mTransform = rotate(mPropObjects.mTransform,
                                          mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                                          glm::vec3(0, 0, 1));
+        mCube.mTransform = rotate(mCube.mTransform,
+                                  -mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND * 2,
+                                  glm::vec3(0, 0, 1));
         mPointLight.update();
     }
 
@@ -171,6 +179,21 @@ namespace gfx_testing::scene {
             SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
             mPropObjects.render(renderPass);
+        }
+        // Test cube
+        {
+            auto const worldToModelTransform = glm::inverse(mCube.mTransform);
+            const shader::GoochParams goochParams{
+                    .mCoolColor = {0, 0, 0.55},
+                    .mWarmColor = {0.3, 0.3, 0},
+                    .mLightPosMS = worldToModelTransform * glm::vec4(mPointLight.mPosWs, 1),
+                    .mCameraPosMS = worldToModelTransform * glm::vec4(mCamera.mPosWs, 1),
+            };
+            mvpTransform.mMvp = vp * mCube.mTransform;
+            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
+            mCube.render(renderPass);
         }
         // Textured object
         {
