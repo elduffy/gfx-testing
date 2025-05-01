@@ -1,9 +1,12 @@
 #include "std_types.hlsl"
 
-cbuffer Params : register(b0, space3)
+cbuffer GoochParams : register(b0, space3)
 {
     float3 coolColor;
     float3 warmColor;
+};
+cbuffer ObjectLighting : register(b1, space3)
+{
     float3 lightPosMS;
     float3 cameraPosMS;
 };

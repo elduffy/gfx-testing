@@ -165,34 +165,31 @@ namespace gfx_testing::scene {
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
             mPointLight.mRenderObject.render(renderPass);
         }
+        // Gooch shaded objects
+        SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
+        constexpr shader::GoochParams goochParams{
+                .mCoolColor = {0, 0, 0.55},
+                .mWarmColor = {0.3, 0.3, 0},
+        };
+        // TODO: this data is constant and could be uploaded once into a buffer
+        SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
         // Prop objects
         {
-            auto const worldToModelTransform = glm::inverse(mPropObjects.mTransform);
-            const shader::GoochParams goochParams{
-                    .mCoolColor = {0, 0, 0.55},
-                    .mWarmColor = {0.3, 0.3, 0},
-                    .mLightPosMS = worldToModelTransform * glm::vec4(mPointLight.mPosWs, 1),
-                    .mCameraPosMS = worldToModelTransform * glm::vec4(mCamera.mPosWs, 1),
-            };
+            auto const objectLighting = shader::ObjectLighting::create(mPropObjects.mTransform, mPointLight.mPosWs,
+                                                                       mCamera.mPosWs);
+            SDL_PushGPUFragmentUniformData(commandBuffer, 1, &objectLighting, sizeof(goochParams));
             mvpTransform.mMvp = vp * mPropObjects.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
             mPropObjects.render(renderPass);
         }
         // Test cube
         {
-            auto const worldToModelTransform = glm::inverse(mCube.mTransform);
-            const shader::GoochParams goochParams{
-                    .mCoolColor = {0, 0, 0.55},
-                    .mWarmColor = {0.3, 0.3, 0},
-                    .mLightPosMS = worldToModelTransform * glm::vec4(mPointLight.mPosWs, 1),
-                    .mCameraPosMS = worldToModelTransform * glm::vec4(mCamera.mPosWs, 1),
-            };
+            auto const objectLighting = shader::ObjectLighting::create(mCube.mTransform, mPointLight.mPosWs,
+                                                                       mCamera.mPosWs);
+            SDL_PushGPUFragmentUniformData(commandBuffer, 1, &objectLighting, sizeof(goochParams));
             mvpTransform.mMvp = vp * mCube.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
             mCube.render(renderPass);
         }
         // Textured object

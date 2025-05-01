@@ -62,11 +62,26 @@ namespace gfx_testing::shader {
     struct GoochParams {
         SHADER_ALIGN glm::vec3 mCoolColor;
         SHADER_ALIGN glm::vec3 mWarmColor;
-        SHADER_ALIGN glm::vec3 mLightPosMS;
-        SHADER_ALIGN glm::vec3 mCameraPosMS;
     };
 
     static_assert(sizeof(GoochParams) % 16 == 0);
+
+    struct ObjectLighting {
+        SHADER_ALIGN glm::vec3 mLightPosMS;
+        SHADER_ALIGN glm::vec3 mCameraPosMS;
+
+        static ObjectLighting create(glm::mat4 const &modelMatrix, glm::vec3 const &lightPosWs,
+                                     glm::vec3 const &cameraPosWs) {
+
+            auto const worldToModelTransform = glm::inverse(modelMatrix);
+            return {
+                    .mLightPosMS = worldToModelTransform * glm::vec4(lightPosWs, 1),
+                    .mCameraPosMS = worldToModelTransform * glm::vec4(cameraPosWs, 1),
+            };
+        }
+    };
+
+    static_assert(sizeof(ObjectLighting) % 16 == 0);
 
 
     class IndexList {

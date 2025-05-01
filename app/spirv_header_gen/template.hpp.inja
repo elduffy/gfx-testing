@@ -29,7 +29,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     // Types
     {% for key, type in default(types, {}) -%}
 
-    {% for member in type.members -%}
+    {% for member in type.members %}
     constexpr gfx_testing::shader::TypeMember TYPE_{{loop.parent.index}}_MEMBER_{{loop.index}} {
        .mName = "{{member.name}}",
        .mType = "{{member.type}}",
