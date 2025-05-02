@@ -66,9 +66,11 @@ namespace gfx_testing::scene {
         mProjection(getProjection(mViewportExtent)),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", model::NormalTreatment::SPLIT),
+                     pipeline::PipelineName::Gooch,
                      translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
         mCube(gameContext,
               gameContext.mResourceLoader.loadObjModel("cube.obj", model::NormalTreatment::SPLIT),
+              pipeline::PipelineName::Gooch,
               glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
         mTextureObject(gameContext,
                        gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
@@ -155,14 +157,16 @@ namespace gfx_testing::scene {
         {
             mvpTransform.mMvp = vp * mDebugAxes.mRenderObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Lines));
+            SDL_BindGPUGraphicsPipeline(
+                    renderPass, *mGameContext.mPipelines.get(mDebugAxes.mRenderObject.getPipelineName()));
             mDebugAxes.mRenderObject.render(renderPass);
         }
         // Point light
         {
             mvpTransform.mMvp = vp * mPointLight.mRenderObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Diffuse));
+            SDL_BindGPUGraphicsPipeline(
+                    renderPass, *mGameContext.mPipelines.get(mPointLight.mRenderObject.getPipelineName()));
             mPointLight.mRenderObject.render(renderPass);
         }
         // Gooch shaded objects
@@ -196,7 +200,7 @@ namespace gfx_testing::scene {
         {
             mvpTransform.mMvp = vp * mTextureObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Textured));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(mTextureObject.getPipelineName()));
             mTextureObject.render(renderPass);
         }
         SDL_EndGPURenderPass(renderPass);

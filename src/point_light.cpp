@@ -10,6 +10,7 @@ namespace gfx_testing::render {
         mPathRadius(length(initialPosition)),
         mRenderObject(gameContext,
                       gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", model::NormalTreatment::AVERAGE),
+                      pipeline::PipelineName::Diffuse,
                       translate(glm::mat4(1.0f), mPosWs)) {
     }
 

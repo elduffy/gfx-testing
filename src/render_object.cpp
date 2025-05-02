@@ -147,17 +147,22 @@ namespace gfx_testing::render {
     }
 
     RenderObject::RenderObject(game::GameContext const &gameContext,
-                               shader::MeshData const &meshData, const glm::mat4 &initialTransform) :
-        RenderObject(gameContext, meshData, nullptr, initialTransform) {
+                               shader::MeshData const &meshData, pipeline::PipelineName pipelineName,
+                               const glm::mat4 &initialTransform) :
+        RenderObject(gameContext, meshData, pipelineName, nullptr, initialTransform) {
+        if (pipelineName == pipeline::PipelineName::Textured) {
+            throw std::runtime_error("Use constructor with texture data for the Textured pipeline");
+        }
     }
 
     RenderObject::RenderObject(game::GameContext const &gameContext,
                                shader::MeshData const &meshData, sdl::SdlSurface const &textureData,
                                const glm::mat4 &initialTransform) :
-        RenderObject(gameContext, meshData, &textureData, initialTransform) {
+        RenderObject(gameContext, meshData, pipeline::PipelineName::Textured, &textureData, initialTransform) {
     }
 
     RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+                               pipeline::PipelineName pipelineName,
                                sdl::SdlSurface const *textureDataOpt,
                                const glm::mat4 &initialTransform):
         mTransform(initialTransform),
@@ -166,6 +171,7 @@ namespace gfx_testing::render {
                                    meshData.getVertexBufferSize())),
         mIndexBuffer(gameContext.mSdlContext,
                      createBuffer(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),
+        mPipelineName(pipelineName),
         mTextureOpt(createGpuTexture(gameContext, textureDataOpt)),
         mIndexCount(meshData.mIndices.count()) {
         transferBufferData(gameContext.mSdlContext, meshData, *mVertexBuffer, *mIndexBuffer);
