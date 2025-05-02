@@ -150,12 +150,12 @@ namespace gfx_testing::scene {
         auto const vp = mProjection * mCamera.mView;
         shader::MvpTransform mvpTransform{};
 
+        // TODO: organize objects by pipeline
         // Debug axes
         {
             mvpTransform.mMvp = vp * mDebugAxes.mRenderObject.mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Lines));
-            // TODO: how to bind separate pipeline for the geometry?
             mDebugAxes.mRenderObject.render(renderPass);
         }
         // Point light
