@@ -5,7 +5,7 @@ tbuffer GoochParams : register(t0, space2)
     float3 coolColor;
     float3 warmColor;
 };
-cbuffer ObjectLighting : register(b1, space3)
+cbuffer ObjectLighting : register(b0, space3)
 {
     float3 lightPosMS;
     float3 cameraPosMS;
