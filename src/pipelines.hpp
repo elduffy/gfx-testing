@@ -70,6 +70,8 @@ namespace gfx_testing::pipeline {
         ShaderDefinition mVertexShader;
         ShaderDefinition mFragmentShader;
         SDL_GPUPrimitiveType mPrimitiveType{SDL_GPU_PRIMITIVETYPE_TRIANGLELIST};
+
+        void pushPipelineUniforms(SDL_GPUCommandBuffer *commandBuffer) const;
     };
 
     // Shader definitions

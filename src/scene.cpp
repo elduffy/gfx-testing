@@ -178,7 +178,6 @@ namespace gfx_testing::scene {
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
         auto const viewProj = mProjection * mCamera.mView;
-        auto constexpr GOOCH_PARAMS_BINDING = spirv_header_gen::generated::gooch_frag::UBO_GoochParams.mBinding;
         auto constexpr GOOCH_OBJECT_LIGHTING_BINDING = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.
                 mBinding;
 
@@ -190,24 +189,7 @@ namespace gfx_testing::scene {
             }
 
             SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipelineDef.mName));
-
-            // Shader params
-            switch (pipelineDef.mName) {
-                case pipeline::PipelineName::Gooch: {
-                    constexpr shader::GoochParams goochParams{
-                            .mCoolColor = {0, 0, 0.55},
-                            .mWarmColor = {0.3, 0.3, 0},
-                    };
-                    // TODO: this data is constant and could be uploaded once into a buffer
-                    SDL_PushGPUFragmentUniformData(commandBuffer, GOOCH_PARAMS_BINDING, &goochParams,
-                                                   sizeof(goochParams));
-                    break;
-                }
-                case pipeline::PipelineName::Diffuse:
-                case pipeline::PipelineName::Textured:
-                case pipeline::PipelineName::Lines:
-                    break;
-            }
+            pipelineDef.pushPipelineUniforms(commandBuffer);
 
             for (auto const *renderObject: renderObjects) {
                 renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, viewProj);
