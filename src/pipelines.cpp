@@ -131,6 +131,5 @@ namespace gfx_testing::pipeline {
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader):
         Pipelines(sdlContext, loadShaderCode(resourceLoader)) {
-
     }
 }

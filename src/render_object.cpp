@@ -208,15 +208,17 @@ namespace gfx_testing::render {
                                              glm::mat4 const &viewProj,
                                              glm::vec3 const &lightPosWs,
                                              glm::vec3 const &cameraPosWs) const {
-        if (pipelineDefinition.mVertexShader.mMvpTransformBinding.has_value()) {
+        if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
             const auto mvpTransform = viewProj * mTransform;
-            SDL_PushGPUVertexUniformData(commandBuffer, *pipelineDefinition.mVertexShader.mMvpTransformBinding,
+            SDL_PushGPUVertexUniformData(commandBuffer,
+                                         *pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding,
                                          &mvpTransform, sizeof(mvpTransform));
         }
-        if (pipelineDefinition.mFragmentShader.mObjectLightingBinding.has_value()) {
+        if (pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding.has_value()) {
 
             auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, cameraPosWs);
-            SDL_PushGPUFragmentUniformData(commandBuffer, *pipelineDefinition.mFragmentShader.mObjectLightingBinding,
+            SDL_PushGPUFragmentUniformData(commandBuffer,
+                                           *pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding,
                                            &objectLighting,
                                            sizeof(objectLighting));
         }

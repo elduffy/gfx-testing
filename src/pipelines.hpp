@@ -37,15 +37,18 @@ namespace gfx_testing::pipeline {
         throw std::runtime_error("Unknown pipeline name");
     }
 
+    struct ShaderBindings {
+        std::optional<uint32_t> mMvpTransformBinding;
+        std::optional<uint32_t> mObjectLightingBinding;
+    };
+
     struct ShaderDefinition {
         friend bool operator<(const ShaderDefinition &lhs, const ShaderDefinition &rhs) {
             return lhs.mFilename < rhs.mFilename;
         }
 
         template<typename SpirvMeta>
-        static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta,
-                                                 std::optional<uint32_t> mvpTransformBinding = std::nullopt,
-                                                 std::optional<uint32_t> objectLightingBinding = std::nullopt) {
+        static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta, ShaderBindings shaderBindings) {
             return {
                     .mFilename = spirvMeta.mSourceFilename,
                     .mStage = spirvMeta.mEntryPoint.mStage,
@@ -53,8 +56,7 @@ namespace gfx_testing::pipeline {
                     .mUniformBuffers = spirvMeta.mUbos.size(),
                     .mStorageBuffers = spirvMeta.mSsbos.size(),
                     .mStorageTextures = spirvMeta.mStorageTextures.size(),
-                    .mMvpTransformBinding = mvpTransformBinding,
-                    .mObjectLightingBinding = objectLightingBinding
+                    .mShaderBindings = std::move(shaderBindings),
             };
         }
 
@@ -64,8 +66,7 @@ namespace gfx_testing::pipeline {
         uint32_t mUniformBuffers{0};
         uint32_t mStorageBuffers{0};
         uint32_t mStorageTextures{0};
-        std::optional<uint32_t> mMvpTransformBinding;
-        std::optional<uint32_t> mObjectLightingBinding;
+        ShaderBindings mShaderBindings;
     };
 
     struct PipelineDefinition {
@@ -80,16 +81,15 @@ namespace gfx_testing::pipeline {
     // Shader definitions
 
     static constexpr ShaderDefinition SHADER_BASIC_TEXTURED = ShaderDefinition::create(
-            spirv_header_gen::generated::basic_textured_frag::META);
+            spirv_header_gen::generated::basic_textured_frag::META, {});
     static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
             spirv_header_gen::generated::gooch_frag::META,
-            std::nullopt,
-            spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.mBinding);
+            {.mObjectLightingBinding = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.mBinding});
     static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
-            spirv_header_gen::generated::vertex_color_frag::META);
+            spirv_header_gen::generated::vertex_color_frag::META, {});
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
             spirv_header_gen::generated::default_vert::META,
-            spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding);
+            {.mMvpTransformBinding = spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding});
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
             SHADER_GOOCH,
