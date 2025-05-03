@@ -52,6 +52,44 @@ namespace gfx_testing::scene {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
     }
 
+    SceneObjects::SceneObjects(game::GameContext &gameContext) :
+        mGameContext(gameContext),
+        mPropObjects(gameContext,
+                     gameContext.mResourceLoader.loadObjModel(
+                             "basic-shapes.obj", model::NormalTreatment::SPLIT),
+                     pipeline::PipelineName::Gooch,
+                     translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
+        mCube(gameContext,
+              gameContext.mResourceLoader.loadObjModel(
+                      "cube.obj", model::NormalTreatment::SPLIT),
+              pipeline::PipelineName::Gooch,
+              glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
+        mTextureObject(gameContext,
+                       gameContext.mResourceLoader.loadObjModel(
+                               "viking-room.obj", model::NormalTreatment::SPLIT),
+                       gameContext.mResourceLoader.loadTexture("viking-room.png"),
+                       glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION),
+                                  TEXTURE_OBJECT_SCALE)),
+        mDebugAxes(gameContext),
+        mPointLight(gameContext, INITIAL_LIGHT_POSITION) {
+        for (auto const *objPtr: {&mDebugAxes.mRenderObject, &mPointLight.mRenderObject, &mPropObjects, &mCube,
+                                  &mTextureObject}) {
+            mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
+        }
+    }
+
+    void SceneObjects::update() {
+        constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
+
+        mPropObjects.mTransform = rotate(mPropObjects.mTransform,
+                                         mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
+                                         glm::vec3(0, 0, 1));
+        mCube.mTransform = rotate(mCube.mTransform,
+                                  -mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND * 2,
+                                  glm::vec3(0, 0, 1));
+        mPointLight.update();
+    }
+
 
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
         mGameContext(gameContext),
@@ -142,6 +180,12 @@ namespace gfx_testing::scene {
         auto const vp = mProjection * mCamera.mView;
         shader::MvpTransform mvpTransform{};
 
+        // TODO: Allow other vertex shader layouts besides default_vert
+        auto constexpr MVP_BINDING = spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding;
+        auto constexpr GOOCH_PARAMS_BINDING = spirv_header_gen::generated::gooch_frag::UBO_GoochParams.mBinding;
+        auto constexpr GOOCH_OBJECT_LIGHTING_BINDING = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.
+                mBinding;
+
         for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
             auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
 
@@ -159,7 +203,8 @@ namespace gfx_testing::scene {
                             .mWarmColor = {0.3, 0.3, 0},
                     };
                     // TODO: this data is constant and could be uploaded once into a buffer
-                    SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
+                    SDL_PushGPUFragmentUniformData(commandBuffer, GOOCH_PARAMS_BINDING, &goochParams,
+                                                   sizeof(goochParams));
                     break;
                 }
                 case pipeline::PipelineName::Diffuse:
@@ -170,15 +215,18 @@ namespace gfx_testing::scene {
 
             for (auto const *renderObject: renderObjects) {
                 mvpTransform.mMvp = vp * renderObject->mTransform;
-                SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-                auto const objectLighting = shader::ObjectLighting::create(
-                        renderObject->mTransform, mSceneObjects.mPointLight.mPosWs,
-                        mCamera.mPosWs);
-                SDL_PushGPUFragmentUniformData(commandBuffer, 1, &objectLighting, sizeof(objectLighting));
+                SDL_PushGPUVertexUniformData(commandBuffer, MVP_BINDING, &mvpTransform, sizeof(mvpTransform));
+
+                if (pipelineDef.mName == pipeline::PipelineName::Gooch) {
+                    // TODO: other pipelines will likely need this same data
+                    auto const objectLighting = shader::ObjectLighting::create(
+                            renderObject->mTransform, mSceneObjects.mPointLight.mPosWs,
+                            mCamera.mPosWs);
+                    SDL_PushGPUFragmentUniformData(commandBuffer, GOOCH_OBJECT_LIGHTING_BINDING, &objectLighting,
+                                                   sizeof(objectLighting));
+                }
                 renderObject->render(renderPass);
             }
-
-            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
         }
     }
 }
