@@ -12,7 +12,7 @@
 namespace gfx_testing::pipeline {
 
     enum class PipelineName {
-        Diffuse,
+        SimpleColor,
         Gooch,
         Textured,
         Lines,
@@ -24,8 +24,8 @@ namespace gfx_testing::pipeline {
 
     constexpr char const *getName(PipelineName pipelineName) {
         switch (pipelineName) {
-            case PipelineName::Diffuse:
-                return "Diffuse";
+            case PipelineName::SimpleColor:
+                return "SimpleColor";
             case PipelineName::Gooch:
                 return "Gooch";
             case PipelineName::Textured:
@@ -96,8 +96,8 @@ namespace gfx_testing::pipeline {
 
     // Pipeline definitions
 
-    static constexpr PipelineDefinition PIPELINE_DIFFUSE{
-            .mName = PipelineName::Diffuse,
+    static constexpr PipelineDefinition PIPELINE_SIMPLE_COLOR{
+            .mName = PipelineName::SimpleColor,
             .mVertexShader = SHADER_DEFAULT_VERTEX,
             .mFragmentShader = SHADER_VERTEX_COLOR,
     };
@@ -118,7 +118,7 @@ namespace gfx_testing::pipeline {
             .mPrimitiveType = SDL_GPU_PRIMITIVETYPE_LINELIST,
     };
     static constexpr std::array ALL_PIPELINES{
-            PIPELINE_DIFFUSE,
+            PIPELINE_SIMPLE_COLOR,
             PIPELINE_GOOCH,
             PIPELINE_TEXTURED,
             PIPELINE_LINES,

@@ -54,7 +54,7 @@ namespace gfx_testing::pipeline {
                 SDL_EndGPUCopyPass(copyPass);
                 break;
             }
-            case PipelineName::Diffuse:
+            case PipelineName::SimpleColor:
             case PipelineName::Textured:
             case PipelineName::Lines:
                 break;
