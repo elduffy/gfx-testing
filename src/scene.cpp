@@ -186,8 +186,9 @@ namespace gfx_testing::scene {
                 continue;
             }
 
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipelineDef.mName).mSdlPipeline);
-            pipelineDef.pushPipelineUniforms(commandBuffer);
+            auto const &pipeline = mGameContext.mPipelines.get(pipelineDef.mName);
+            SDL_BindGPUGraphicsPipeline(renderPass, *pipeline.mSdlPipeline);
+            pipeline.pushPipelineUniforms(commandBuffer);
 
             for (auto const *renderObject: renderObjects) {
                 renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, viewProj,

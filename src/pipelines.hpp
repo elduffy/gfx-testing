@@ -74,8 +74,6 @@ namespace gfx_testing::pipeline {
         ShaderDefinition mVertexShader;
         ShaderDefinition mFragmentShader;
         SDL_GPUPrimitiveType mPrimitiveType{SDL_GPU_PRIMITIVETYPE_TRIANGLELIST};
-
-        void pushPipelineUniforms(SDL_GPUCommandBuffer *commandBuffer) const;
     };
 
     // Shader definitions
@@ -132,6 +130,8 @@ namespace gfx_testing::pipeline {
         Pipeline(PipelineDefinition const &definition, sdl::SdlGfxPipeline sdlPipeline) :
             mDefinition(definition), mSdlPipeline(std::move(sdlPipeline)) {
         }
+
+        void pushPipelineUniforms(SDL_GPUCommandBuffer *commandBuffer) const;
 
         PipelineDefinition const &mDefinition;
         sdl::SdlGfxPipeline mSdlPipeline;

@@ -4,8 +4,8 @@
 
 namespace gfx_testing::pipeline {
 
-    void PipelineDefinition::pushPipelineUniforms(SDL_GPUCommandBuffer *commandBuffer) const {
-        switch (mName) {
+    void Pipeline::pushPipelineUniforms(SDL_GPUCommandBuffer *commandBuffer) const {
+        switch (mDefinition.mName) {
             case PipelineName::Gooch: {
                 constexpr shader::GoochParams goochParams{
                         .mCoolColor = {0, 0, 0.55},
