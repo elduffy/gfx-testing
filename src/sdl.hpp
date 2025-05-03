@@ -87,6 +87,8 @@ namespace gfx_testing::sdl {
 
         SDL_GPUBuffer *operator*() const { return mBuffer; }
 
+        static SdlGpuBuffer create(SdlContext const &context, SDL_GPUBufferUsageFlags usage, uint32_t size);
+
         SdlContext const &mContext;
         SDL_GPUBuffer *mBuffer = nullptr;
     };

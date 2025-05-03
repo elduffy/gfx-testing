@@ -148,6 +148,14 @@ namespace gfx_testing::sdl {
     SdlGpuBuffer::~SdlGpuBuffer() {
         SDL_ReleaseGPUBuffer(mContext.mDevice, mBuffer);
     }
+
+    SdlGpuBuffer SdlGpuBuffer::create(SdlContext const &context, SDL_GPUBufferUsageFlags usage, uint32_t size) {
+        const SDL_GPUBufferCreateInfo createInfo = {
+                .usage = usage,
+                .size = size,
+        };
+        return {context, SDL_CreateGPUBuffer(context.mDevice, &createInfo)};
+    }
 }
 
 namespace gfx_testing::sdl {

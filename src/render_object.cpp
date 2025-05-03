@@ -3,16 +3,6 @@
 #include <utility>
 
 namespace gfx_testing::render {
-
-
-    SDL_GPUBuffer *createBuffer(sdl::SdlContext const &context, SDL_GPUBufferUsageFlags usage, uint32_t size) {
-        const SDL_GPUBufferCreateInfo createInfo = {
-                .usage = usage,
-                .size = size,
-        };
-        return SDL_CreateGPUBuffer(context.mDevice, &createInfo);
-    }
-
     template<typename index_t>
     void copyIndexData(sdl::SdlMappedTransferBuffer const &mappedBuffer, shader::MeshData const &meshData) {
         auto *indexData = mappedBuffer.get<index_t>(meshData.getVertexBufferSize());
@@ -166,11 +156,10 @@ namespace gfx_testing::render {
                                sdl::SdlSurface const *textureDataOpt,
                                const glm::mat4 &initialTransform):
         mTransform(initialTransform),
-        mVertexBuffer(gameContext.mSdlContext,
-                      createBuffer(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_VERTEX,
-                                   meshData.getVertexBufferSize())),
-        mIndexBuffer(gameContext.mSdlContext,
-                     createBuffer(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),
+        mVertexBuffer(sdl::SdlGpuBuffer::create(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_VERTEX,
+                                                meshData.getVertexBufferSize())),
+        mIndexBuffer(sdl::SdlGpuBuffer::create(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX,
+                                               meshData.getIndexBufferSize())),
         mPipelineName(pipelineName),
         mTextureOpt(createGpuTexture(gameContext, textureDataOpt)),
         mIndexCount(meshData.mIndices.count()) {

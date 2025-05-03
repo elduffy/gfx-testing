@@ -1,6 +1,6 @@
 #include "std_types.hlsl"
 
-cbuffer GoochParams : register(b0, space3)
+tbuffer GoochParams : register(t0, space2)
 {
     float3 coolColor;
     float3 warmColor;

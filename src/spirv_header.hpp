@@ -1,9 +1,10 @@
 #pragma once
-#include <map>
-#include <string>
 #include <variant>
 #include <vector>
+#include <array>
 #include <SDL3/SDL_gpu.h>
+#include <boost/safe_numerics/checked_integer.hpp>
+#include <algorithm>
 
 namespace gfx_testing::shader {
 
@@ -97,5 +98,15 @@ namespace gfx_testing::shader {
 
     struct StorageTexture {
         // TODO
+        size_t mBinding;
     };
+
+    template<typename Bindables>
+    constexpr uint32_t getBindingSlotCount(Bindables const &bindables) {
+        size_t result = 0;
+        for (auto const &b: bindables) {
+            result = std::max(result, b.mBinding + 1);
+        }
+        return boost::safe_numerics::checked::cast<uint32_t>(result);
+    }
 }

@@ -59,6 +59,9 @@ add_library(gfx_testing_lib
         src/imgui_context.cpp
         src/debug_axes.cpp
         src/spirv_header.cpp
+        src/pipeline.cpp
+        src/pipeline.hpp
+        src/pipeline_definition.hpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui

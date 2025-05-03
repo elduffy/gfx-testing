@@ -4,27 +4,6 @@
 
 namespace gfx_testing::pipeline {
 
-    void Pipeline::pushPipelineUniforms(SDL_GPUCommandBuffer *commandBuffer) const {
-        switch (mDefinition.mName) {
-            case PipelineName::Gooch: {
-                constexpr shader::GoochParams goochParams{
-                        .mCoolColor = {0, 0, 0.55},
-                        .mWarmColor = {0.3, 0.3, 0},
-                };
-                // TODO: this data is constant and could be uploaded once into a buffer
-                SDL_PushGPUFragmentUniformData(commandBuffer,
-                                               spirv_header_gen::generated::gooch_frag::UBO_GoochParams.mBinding,
-                                               &goochParams,
-                                               sizeof(goochParams));
-                break;
-            }
-            case PipelineName::Diffuse:
-            case PipelineName::Textured:
-            case PipelineName::Lines:
-                break;
-        }
-    }
-
     template<typename PipelineDefinitions>
     constexpr bool isWellDefined(PipelineDefinitions const &pipelineDefinitions) {
         std::vector<size_t> actualIndices;
