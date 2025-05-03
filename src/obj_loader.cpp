@@ -39,12 +39,15 @@ namespace gfx_testing::model {
         }
 
         for (auto const &shape: shapes) {
-            SDL_Log("Shape %s has %zu indices", shape.name.c_str(), shape.mesh.indices.size());
+            SDL_Log("Shape '%s' has %zu indices", shape.name.c_str(), shape.mesh.indices.size());
             // meshData.mIndices.reserve(meshData.mIndices.size() + shape.mesh.indices.size());
 
             for (auto const &index: shape.mesh.indices) {
+                assert(index.vertex_index >= 0);
                 meshData.addIndex(index.vertex_index);
-                normalsPerVertex.at(index.vertex_index).emplace(index.normal_index);
+                if (index.normal_index >= 0) {
+                    normalsPerVertex.at(index.vertex_index).emplace(index.normal_index);
+                }
             }
         }
 
@@ -113,14 +116,19 @@ namespace gfx_testing::model {
 
                 for (size_t vIdx = 0; vIdx < 3; vIdx++) {
                     auto const &index = shape.mesh.indices.at(3 * faceIdx + vIdx);
+                    assert(index.vertex_index >= 0);
                     vn vertNormIdx{index.vertex_index, index.normal_index};
 
                     if (!outputIndices.contains(vertNormIdx)) {
                         outputIndices[vertNormIdx] = nextOutputIndex++;
                         auto &[mPosition, mUv, mNormal, mColor] = meshData.mVertices.emplace_back();
                         mPosition = positions.at(index.vertex_index);
-                        mUv = uvs.at(index.texcoord_index);
-                        mNormal = normals.at(index.normal_index);
+                        if (index.texcoord_index >= 0) {
+                            mUv = uvs.at(index.texcoord_index);
+                        }
+                        if (index.normal_index >= 0) {
+                            mNormal = normals.at(index.normal_index);
+                        }
                         mColor = colors.at(index.vertex_index);
                     }
 
