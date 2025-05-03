@@ -3,6 +3,9 @@
 
 #include <inja/inja.hpp>
 
+#include "boost/algorithm/string/classification.hpp"
+#include "boost/algorithm/string/detail/trim.hpp"
+
 namespace spirv_header_gen {
     std::filesystem::path getProjectRoot() {
         // TODO: share with gfx_testing::util::getProjectRoot
@@ -27,6 +30,27 @@ namespace spirv_header_gen {
         throw std::runtime_error(std::format("Unsupported shader mode: {}", arg));
     }
 
+    std::string getTypeVariableNameImpl(std::string const &typeStr) {
+        auto const newStart = boost::algorithm::detail::trim_begin(typeStr.begin(), typeStr.end(),
+                                                                   boost::is_any_of("type."));
+        return std::string{&*newStart};
+    }
+
+    std::string getTypeVariableName(inja::Arguments const &args) {
+        const auto typeStr = args.at(0)->get<std::string>();
+        return getTypeVariableNameImpl(typeStr);
+    }
+
+    std::string lookupTypeVariableName(inja::Arguments const &args) {
+        const auto typeMap = args.at(0)->get<nlohmann::json::object_t>();
+        const auto keyStr = args.at(1)->get<std::string>();
+
+        auto const &typeObj = typeMap.at(keyStr);
+        const auto typeName = typeObj["name"].get<std::string>();
+
+        return getTypeVariableNameImpl(typeName);
+    }
+
     std::string getGenTime() {
         time_t now;
         time(&now);
@@ -38,6 +62,8 @@ namespace spirv_header_gen {
     void writeHeader(WriteProperties const &writeProperties, nlohmann::json const &json, std::ostream *ostream) {
         inja::Environment env;
         env.add_callback("getShaderStage", 1, getShaderStage);
+        env.add_callback("getTypeVariableName", 1, getTypeVariableName);
+        env.add_callback("lookupTypeVariableName", 2, lookupTypeVariableName);
 
         auto const templatePath = getProjectRoot() / "app/spirv_header_gen/template.hpp.inja";
         const inja::Template templ = env.parse_template(templatePath);

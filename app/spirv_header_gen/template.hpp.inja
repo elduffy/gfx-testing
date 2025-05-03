@@ -37,13 +37,16 @@ namespace spirv_header_gen::generated::{{ package_name }} {
        {#- TODO: matrix type specific info -#}
     };{% endfor %}
 
-    constexpr gfx_testing::shader::KeyedType<{{length(type.members)}}> TYPE_{{loop.index}} {
+    inline constexpr gfx_testing::shader::KeyedType<{{length(type.members)}}> TYPE_{{loop.index}} {
        .mKey = "{{key}}",
        .mName = "{{type.name}}",
        .mMembers = { {% for member in type.members %}
            TYPE_{{loop.parent.index}}_MEMBER_{{loop.index}},{% endfor %}
        },
-    };{% endfor %}
+    };
+
+    inline constexpr auto const& TYPE_{{getTypeVariableName(type.name)}} = TYPE_{{loop.index}};
+    {% endfor %}
 
     // Inputs
     {% for input in inputs %}
@@ -63,13 +66,16 @@ namespace spirv_header_gen::generated::{{ package_name }} {
 
     // UBOs
     {% for ubo in default(ubos, []) %}
-    constexpr gfx_testing::shader::Ubo UBO_{{loop.index}} {
+    inline constexpr gfx_testing::shader::Ubo UBO_{{loop.index}} {
         .mName = "{{ubo.name}}",
         .mType = "{{ubo.type}}",
         .mBlockSize = {{ubo.block_size}},
         .mSet = {{ubo.set}},
         .mBinding = {{ubo.binding}},
-    };{% endfor %}
+    };
+    inline constexpr auto const& UBO_{{getTypeVariableName(ubo.name)}} = UBO_{{loop.index}};
+    inline constexpr auto const& UBO_{{getTypeVariableName(ubo.name)}}_TYPE = TYPE_{{lookupTypeVariableName(default(types, {}), ubo.type)}};
+    {% endfor %}
 
     // Separate Images
     {% for image in default(separate_images, []) %}

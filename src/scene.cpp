@@ -2,7 +2,6 @@
 #include <cmath>
 #include <scene.hpp>
 #include <shader_models.hpp>
-#include <obj_loader.hpp>
 #include <util.hpp>
 #include <boost/scope/scope_exit.hpp>
 
