@@ -97,14 +97,22 @@ namespace spirv_header_gen::generated::{{ package_name }} {
 
     // SSBOs
     {% for ssbo in default(ssbos, []) %}
-    constexpr gfx_testing::shader::Ssbo SSBO_{{loop.index}} {
-        TODO: update template for SSBO
-    };{% endfor %}
+    inline constexpr gfx_testing::shader::Ssbo SSBO_{{loop.index}} {
+        .mName = "{{ssbo.name}}",
+        .mType = "{{ssbo.type}}",
+        .mBlockSize = {{ssbo.block_size}},
+        .mSet = {{ssbo.set}},
+        .mBinding = {{ssbo.binding}},
+        .mReadOnly = {{ssbo.readonly}},
+    };
+    inline constexpr auto const& SSBO_{{getTypeVariableName(ssbo.name)}} = SSBO_{{loop.index}};
+    inline constexpr auto const& SSBO_{{getTypeVariableName(ssbo.name)}}_TYPE = TYPE_{{lookupTypeVariableName(default(types, {}), ssbo.type)}};
+    {% endfor %}
 
     // Storage textures
     {% for storageTex in default(images, []) %}
     constexpr gfx_testing::shader::StorageTexture STORAGE_TEXTURE_{{loop.index}} {
-        TODO: update template for storage textures
+        // TODO: update template for storage textures
     },{% endfor %}
 
     constexpr SpirvMeta META{

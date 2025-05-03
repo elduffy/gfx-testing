@@ -79,14 +79,20 @@ namespace gfx_testing::shader {
     };
 
     struct SeparateSampler {
-        std::string mName;
-        std::string mType;
+        char const *mName;
+        char const *mType;
         size_t mSet;
         size_t mBinding;
     };
 
     struct Ssbo {
-        // TODO
+        char const *mName;
+        // Refers to the key in the type map
+        char const *mType;
+        size_t mBlockSize;
+        size_t mSet;
+        size_t mBinding;
+        bool mReadOnly;
     };
 
     struct StorageTexture {
