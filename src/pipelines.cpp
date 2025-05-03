@@ -123,8 +123,13 @@ namespace gfx_testing::pipeline {
         for (auto const &pipelineDefinition: ALL_PIPELINES) {
             auto *vertexShader = *shaders.at(pipelineDefinition.mVertexShader);
             auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
-            mPipelines.emplace_back(sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader,
-                                                               pipelineDefinition.mPrimitiveType));
+            mPipelines.emplace_back(
+                    pipelineDefinition, sdl::SdlGfxPipeline{
+                            sdlContext, createPipeline(
+                                    sdlContext, vertexShader,
+                                    fragmentShader,
+                                    pipelineDefinition.
+                                    mPrimitiveType)});
             SDL_Log("Created graphics pipeline %s", getName(pipelineDefinition.mName));
         }
     }

@@ -127,6 +127,16 @@ namespace gfx_testing::pipeline {
             PIPELINE_LINES,
     };
 
+    class Pipeline {
+    public:
+        Pipeline(PipelineDefinition const &definition, sdl::SdlGfxPipeline sdlPipeline) :
+            mDefinition(definition), mSdlPipeline(std::move(sdlPipeline)) {
+        }
+
+        PipelineDefinition const &mDefinition;
+        sdl::SdlGfxPipeline mSdlPipeline;
+    };
+
     class Pipelines {
         Pipelines(sdl::SdlContext const &sdlContext, std::map<ShaderDefinition, sdl::SdlShader> const &shaders);
 
@@ -135,11 +145,11 @@ namespace gfx_testing::pipeline {
     public:
         Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader);
 
-        sdl::SdlGfxPipeline const &get(PipelineName pipelineName) const {
+        Pipeline const &get(PipelineName pipelineName) const {
             return mPipelines.at(getIndex(pipelineName));
         }
 
     private:
-        std::vector<sdl::SdlGfxPipeline> mPipelines;
+        std::vector<Pipeline> mPipelines;
     };
 }
