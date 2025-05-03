@@ -19,12 +19,11 @@ float4 main(DefaultOutput input) : SV_Target0
     // See Real Time Rendering 5.1
     float3 cool = coolColor + 0.25 * input.color.xyz;
     float3 warm = warmColor + 0.25 * input.color.xyz;
-    float diff = dot(norm, lightDir);
-    float t = (diff + 1.0) / 2.0;
-    float3 r = 2.0 * diff * norm - lightDir;
+    float t = (dot(norm, lightDir) + 1.0) / 2.0;
+    float3 r = reflect(-lightDir, norm);
     float s = saturate(100.0 * dot(r, cameraDir) - 97.0);
 
     float3 highlight = float3(1.0, 1.0, 1.0);
-    float3 result = s * highlight + (1.0-s)*(t*warm + (1.0-t)*cool);
+    float3 result = lerp(lerp(cool, warm, t), highlight, s);
     return float4(result, 1.0);
 }
