@@ -1,6 +1,7 @@
+#include "buffer_macros.hlsl"
 #include "std_types.hlsl"
 
-cbuffer MvpTransform : register(b0, space1)
+UNIFORM_BUFFER_VERT(MvpTransform, 0)
 {
     float4x4 mvp;
 };

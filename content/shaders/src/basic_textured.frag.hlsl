@@ -1,7 +1,8 @@
+#include "buffer_macros.hlsl"
 #include "std_types.hlsl"
 
-Texture2D<float4> Texture : register(t0, space2);
-SamplerState Sampler : register(s0, space2);
+SAMPLED_TEXTURE_FRAG(Texture, 0);
+SAMPLER_FRAG(Sampler, 0);
 
 float4 main(DefaultInput input) : SV_Target0
 {

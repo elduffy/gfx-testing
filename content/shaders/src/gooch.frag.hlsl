@@ -1,11 +1,13 @@
+#include "buffer_macros.hlsl"
 #include "std_types.hlsl"
 
-tbuffer GoochParams : register(t0, space2)
+STORAGE_BUFFER_FRAG(GoochParams, 0)
 {
     float3 coolColor;
     float3 warmColor;
 };
-cbuffer ObjectLighting : register(b0, space3)
+
+UNIFORM_BUFFER_FRAG(ObjectLighting, 0)
 {
     float3 lightPosMS;
     float3 cameraPosMS;
