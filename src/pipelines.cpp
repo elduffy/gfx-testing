@@ -63,7 +63,6 @@ namespace gfx_testing::pipeline {
         if (pipeline == nullptr) {
             throw std::runtime_error("Failed to create graphics pipeline");
         }
-        SDL_Log("Created graphics pipeline");
         return pipeline;
     }
 
@@ -105,6 +104,7 @@ namespace gfx_testing::pipeline {
             auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
             mPipelines.emplace_back(sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader,
                                                                pipelineDefinition.mPrimitiveType));
+            SDL_Log("Created graphics pipeline %s", getName(pipelineDefinition.mName));
         }
     }
 

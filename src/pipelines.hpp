@@ -23,13 +23,28 @@ namespace gfx_testing::pipeline {
         return static_cast<size_t>(pipelineName);
     }
 
+    constexpr char const *getName(PipelineName pipelineName) {
+        switch (pipelineName) {
+            case PipelineName::Diffuse:
+                return "Diffuse";
+            case PipelineName::Gooch:
+                return "Gooch";
+            case PipelineName::Textured:
+                return "Textured";
+            case PipelineName::Lines:
+                return "Lines";
+        }
+        throw std::runtime_error("Unknown pipeline name");
+    }
+
     struct ShaderDefinition {
         friend bool operator<(const ShaderDefinition &lhs, const ShaderDefinition &rhs) {
             return lhs.mFilename < rhs.mFilename;
         }
 
         template<typename SpirvMeta>
-        static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta) {
+        static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta,
+                                                 std::optional<uint32_t> mvpTransformBinding = std::nullopt) {
             return {
                     .mFilename = spirvMeta.mSourceFilename,
                     .mStage = spirvMeta.mEntryPoint.mStage,
@@ -37,6 +52,7 @@ namespace gfx_testing::pipeline {
                     .mUniformBuffers = spirvMeta.mUbos.size(),
                     .mStorageBuffers = spirvMeta.mSsbos.size(),
                     .mStorageTextures = spirvMeta.mStorageTextures.size(),
+                    .mMvpTransformBinding = mvpTransformBinding
             };
         }
 
@@ -46,6 +62,7 @@ namespace gfx_testing::pipeline {
         uint32_t mUniformBuffers{0};
         uint32_t mStorageBuffers{0};
         uint32_t mStorageTextures{0};
+        std::optional<uint32_t> mMvpTransformBinding;
     };
 
     struct PipelineDefinition {
@@ -64,7 +81,8 @@ namespace gfx_testing::pipeline {
     static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
             spirv_header_gen::generated::vertex_color_frag::META);
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
-            spirv_header_gen::generated::default_vert::META);
+            spirv_header_gen::generated::default_vert::META,
+            spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding);
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
             SHADER_GOOCH,
