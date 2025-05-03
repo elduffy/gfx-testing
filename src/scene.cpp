@@ -15,11 +15,6 @@
 namespace gfx_testing::scene {
 
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
-    static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
-    static constexpr glm::vec3 CUBE_POSITION(3, 3, -1);
-    static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);
-    static constexpr glm::vec3 TEXTURE_OBJECT_SCALE(2);
-    static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
 
     SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
         const SDL_GPUTextureCreateInfo createInfo = {
@@ -58,26 +53,14 @@ namespace gfx_testing::scene {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
     }
 
+
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
         mGameContext(gameContext),
         mImGuiContext(imGuiContext),
         mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION),
         mProjection(getProjection(mViewportExtent)),
-        mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", model::NormalTreatment::SPLIT),
-                     pipeline::PipelineName::Gooch,
-                     translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
-        mCube(gameContext,
-              gameContext.mResourceLoader.loadObjModel("cube.obj", model::NormalTreatment::SPLIT),
-              pipeline::PipelineName::Gooch,
-              glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
-        mTextureObject(gameContext,
-                       gameContext.mResourceLoader.loadObjModel("viking-room.obj", model::NormalTreatment::SPLIT),
-                       gameContext.mResourceLoader.loadTexture("viking-room.png"),
-                       glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext),
-        mPointLight(gameContext, INITIAL_LIGHT_POSITION),
+        mSceneObjects(gameContext),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext,
                                          sdl::SdlContext::INITIAL_EXTENT)),
@@ -95,15 +78,7 @@ namespace gfx_testing::scene {
     }
 
     void Scene::update() {
-        constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
-
-        mPropObjects.mTransform = rotate(mPropObjects.mTransform,
-                                         mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
-                                         glm::vec3(0, 0, 1));
-        mCube.mTransform = rotate(mCube.mTransform,
-                                  -mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND * 2,
-                                  glm::vec3(0, 0, 1));
-        mPointLight.update();
+        mSceneObjects.update();
     }
 
     void Scene::draw() const {
@@ -149,60 +124,7 @@ namespace gfx_testing::scene {
         };
         SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &mainColorTarget, 1,
                                                                &depthStencilTargetInfo);
-        auto const vp = mProjection * mCamera.mView;
-        shader::MvpTransform mvpTransform{};
-
-        // TODO: organize objects by pipeline
-        // Debug axes
-        {
-            mvpTransform.mMvp = vp * mDebugAxes.mRenderObject.mTransform;
-            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(
-                    renderPass, *mGameContext.mPipelines.get(mDebugAxes.mRenderObject.getPipelineName()));
-            mDebugAxes.mRenderObject.render(renderPass);
-        }
-        // Point light
-        {
-            mvpTransform.mMvp = vp * mPointLight.mRenderObject.mTransform;
-            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(
-                    renderPass, *mGameContext.mPipelines.get(mPointLight.mRenderObject.getPipelineName()));
-            mPointLight.mRenderObject.render(renderPass);
-        }
-        // Gooch shaded objects
-        SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline::PipelineName::Gooch));
-        constexpr shader::GoochParams goochParams{
-                .mCoolColor = {0, 0, 0.55},
-                .mWarmColor = {0.3, 0.3, 0},
-        };
-        // TODO: this data is constant and could be uploaded once into a buffer
-        SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
-        // Prop objects
-        {
-            auto const objectLighting = shader::ObjectLighting::create(mPropObjects.mTransform, mPointLight.mPosWs,
-                                                                       mCamera.mPosWs);
-            SDL_PushGPUFragmentUniformData(commandBuffer, 1, &objectLighting, sizeof(goochParams));
-            mvpTransform.mMvp = vp * mPropObjects.mTransform;
-            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            mPropObjects.render(renderPass);
-        }
-        // Test cube
-        {
-            auto const objectLighting = shader::ObjectLighting::create(mCube.mTransform, mPointLight.mPosWs,
-                                                                       mCamera.mPosWs);
-            SDL_PushGPUFragmentUniformData(commandBuffer, 1, &objectLighting, sizeof(goochParams));
-            mvpTransform.mMvp = vp * mCube.mTransform;
-            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
-            mCube.render(renderPass);
-        }
-        // Textured object
-        {
-            mvpTransform.mMvp = vp * mTextureObject.mTransform;
-            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(mTextureObject.getPipelineName()));
-            mTextureObject.render(renderPass);
-        }
+        drawObjects(commandBuffer, renderPass);
         SDL_EndGPURenderPass(renderPass);
 
         // imgui -- must occur after render pass has ended
@@ -214,6 +136,50 @@ namespace gfx_testing::scene {
                     .store_op = SDL_GPU_STOREOP_STORE,
             };
             mImGuiContext.renderFrame(commandBuffer, swapchainTargetInfo);
+        }
+    }
+
+    void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
+        auto const vp = mProjection * mCamera.mView;
+        shader::MvpTransform mvpTransform{};
+
+        for (auto pipeline: pipeline::ALL_PIPELINES) {
+            auto const renderObjects = mSceneObjects.getRenderObjects(pipeline.mName);
+
+            if (renderObjects.empty()) {
+                continue;
+            }
+
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline.mName));
+
+            // Shader params
+            switch (pipeline.mName) {
+                case pipeline::PipelineName::Gooch: {
+                    constexpr shader::GoochParams goochParams{
+                            .mCoolColor = {0, 0, 0.55},
+                            .mWarmColor = {0.3, 0.3, 0},
+                    };
+                    // TODO: this data is constant and could be uploaded once into a buffer
+                    SDL_PushGPUFragmentUniformData(commandBuffer, 0, &goochParams, sizeof(goochParams));
+                    break;
+                }
+                case pipeline::PipelineName::Diffuse:
+                case pipeline::PipelineName::Textured:
+                case pipeline::PipelineName::Lines:
+                    break;
+            }
+
+            for (auto const *renderObject: renderObjects) {
+                mvpTransform.mMvp = vp * renderObject->mTransform;
+                SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
+                auto const objectLighting = shader::ObjectLighting::create(
+                        renderObject->mTransform, mSceneObjects.mPointLight.mPosWs,
+                        mCamera.mPosWs);
+                SDL_PushGPUFragmentUniformData(commandBuffer, 1, &objectLighting, sizeof(objectLighting));
+                renderObject->render(renderPass);
+            }
+
+            SDL_PushGPUVertexUniformData(commandBuffer, 0, &mvpTransform, sizeof(mvpTransform));
         }
     }
 }

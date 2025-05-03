@@ -19,6 +19,10 @@ namespace gfx_testing::pipeline {
         Lines,
     };
 
+    constexpr size_t getIndex(PipelineName pipelineName) {
+        return static_cast<size_t>(pipelineName);
+    }
+
     struct ShaderDefinition {
         friend bool operator<(const ShaderDefinition &lhs, const ShaderDefinition &rhs) {
             return lhs.mFilename < rhs.mFilename;
@@ -107,7 +111,7 @@ namespace gfx_testing::pipeline {
         Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader);
 
         sdl::SdlGfxPipeline const &get(PipelineName pipelineName) const {
-            return mPipelines.at(static_cast<size_t>(pipelineName));
+            return mPipelines.at(getIndex(pipelineName));
         }
 
     private:

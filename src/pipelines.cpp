@@ -10,7 +10,7 @@ namespace gfx_testing::pipeline {
         std::vector<size_t> expectedIndices;
         size_t i = 0;
         for (auto const &pipelineDefinition: pipelineDefinitions) {
-            actualIndices.push_back(static_cast<size_t>(pipelineDefinition.mName));
+            actualIndices.push_back(getIndex(pipelineDefinition.mName));
             expectedIndices.push_back(i++);
         }
         return actualIndices == expectedIndices;
