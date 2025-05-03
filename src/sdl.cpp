@@ -177,6 +177,14 @@ namespace gfx_testing::sdl {
         mTexture = newTexture;
     }
 
+    SdlTransferBuffer SdlTransferBuffer::create(SdlContext const &context, SDL_GPUTransferBufferUsage usage,
+                                                uint32_t size) {
+        const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo{
+                .usage = usage,
+                .size = size,
+        };
+        return {context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
+    }
 }
 
 namespace gfx_testing::sdl {

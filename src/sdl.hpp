@@ -139,6 +139,8 @@ namespace gfx_testing::sdl {
 
         [[nodiscard]] SdlMappedTransferBuffer map(bool cycle) const;
 
+        static SdlTransferBuffer create(SdlContext const &context, SDL_GPUTransferBufferUsage usage, uint32_t size);
+
         SdlContext const &mContext;
         SDL_GPUTransferBuffer *mBuffer = nullptr;
     };

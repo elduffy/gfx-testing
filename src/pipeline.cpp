@@ -34,17 +34,12 @@ namespace gfx_testing::pipeline {
                 auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
                 auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-                constexpr SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
-                        .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                        .size = dataSize,
-                };
-                const sdl::SdlTransferBuffer transferBuffer{
-                        context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
+                const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
+                        context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, dataSize);
                 // Write to transfer buffer
                 {
                     const auto mappedBuffer = transferBuffer.map(false);
-                    auto *vertexData = mappedBuffer.get<shader::GoochParams>();
-                    *vertexData = params;
+                    *mappedBuffer.get<shader::GoochParams>() = params;
                 }
                 const SDL_GPUTransferBufferLocation source = {
                         .transfer_buffer = *transferBuffer,

@@ -13,13 +13,10 @@ namespace gfx_testing::render {
     void transferBufferData(sdl::SdlContext const &context, shader::MeshData const &meshData,
                             SDL_GPUBuffer *vertexBuffer,
                             SDL_GPUBuffer *indexBuffer) {
-        const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
-                .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                .size = boost::safe_numerics::checked::add(meshData.getVertexBufferSize(),
-                                                           meshData.getIndexBufferSize()),
-        };
-        const sdl::SdlTransferBuffer transferBuffer{
-                context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
+        const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
+                context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+                boost::safe_numerics::checked::add(meshData.getVertexBufferSize(),
+                                                   meshData.getIndexBufferSize()));
 
         // Set the vertex/index data
         {
