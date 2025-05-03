@@ -14,6 +14,40 @@
 #include "shader_models.hpp"
 
 namespace gfx_testing::pipeline {
+
+    template<typename Params>
+    void uploadParams(std::vector<sdl::SdlGpuBuffer> &bufferOut, sdl::SdlContext const &context, Params const &params) {
+        constexpr auto dataSize = sizeof(params);
+        const auto &buffer = bufferOut.emplace_back(
+                sdl::SdlGpuBuffer::create(context, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, dataSize));
+
+        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
+        if (commandBuffer == nullptr) {
+            throw std::runtime_error("Failed to acquire GPU command buffer");
+        }
+        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
+
+        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+        const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
+                context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, dataSize);
+        // Write to transfer buffer
+        {
+            const auto mappedBuffer = transferBuffer.map(false);
+            *mappedBuffer.get<Params>() = params;
+        }
+        const SDL_GPUTransferBufferLocation source = {
+                .transfer_buffer = *transferBuffer,
+                .offset = 0,
+        };
+        const SDL_GPUBufferRegion destination = {
+                .buffer = *buffer,
+                .offset = 0,
+                .size = dataSize,
+        };
+        SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
+        SDL_EndGPUCopyPass(copyPass);
+    }
+
     std::vector<sdl::SdlGpuBuffer> allocateStorageBuffers(sdl::SdlContext const &context,
                                                           PipelineDefinition const &pipelineDefinition) {
         std::vector<sdl::SdlGpuBuffer> result;
@@ -23,35 +57,15 @@ namespace gfx_testing::pipeline {
                         .mCoolColor = {0, 0, 0.55},
                         .mWarmColor = {0.3, 0.3, 0},
                 };
-                constexpr auto dataSize = sizeof(params);
-                const auto &buffer = result.emplace_back(
-                        sdl::SdlGpuBuffer::create(context, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, dataSize));
-
-                auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
-                if (commandBuffer == nullptr) {
-                    throw std::runtime_error("Failed to acquire GPU command buffer");
-                }
-                auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
-
-                auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-                const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
-                        context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, dataSize);
-                // Write to transfer buffer
-                {
-                    const auto mappedBuffer = transferBuffer.map(false);
-                    *mappedBuffer.get<shader::GoochParams>() = params;
-                }
-                const SDL_GPUTransferBufferLocation source = {
-                        .transfer_buffer = *transferBuffer,
-                        .offset = 0,
+                uploadParams(result, context, params);
+                break;
+            }
+            case PipelineName::Lambert: {
+                constexpr shader::LambertParams params{
+                        .mUnlitColor = {.1, .1, .1},
+                        .mLitColor = {1, 1, 1},
                 };
-                const SDL_GPUBufferRegion destination = {
-                        .buffer = *buffer,
-                        .offset = 0,
-                        .size = dataSize,
-                };
-                SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
-                SDL_EndGPUCopyPass(copyPass);
+                uploadParams(result, context, params);
                 break;
             }
             case PipelineName::SimpleColor:

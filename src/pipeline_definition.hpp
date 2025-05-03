@@ -5,6 +5,7 @@
 #include "basic_textured.frag.hpp"
 #include "default.vert.hpp"
 #include "gooch.frag.hpp"
+#include "lambert.frag.hpp"
 #include "vertex_color.frag.hpp"
 #include "boost/safe_numerics/checked_integer.hpp"
 
@@ -16,6 +17,7 @@ namespace gfx_testing::pipeline {
         Gooch,
         Textured,
         Lines,
+        Lambert,
     };
 
     constexpr size_t getIndex(PipelineName pipelineName) {
@@ -32,6 +34,8 @@ namespace gfx_testing::pipeline {
                 return "Textured";
             case PipelineName::Lines:
                 return "Lines";
+            case PipelineName::Lambert:
+                return "Lambert";
         }
         throw std::runtime_error("Unknown pipeline name");
     }
@@ -87,13 +91,17 @@ namespace gfx_testing::pipeline {
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
             spirv_header_gen::generated::default_vert::META,
             {.mMvpTransformBinding = spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding});
+    static constexpr ShaderDefinition SHADER_LAMBERT = ShaderDefinition::create(
+            spirv_header_gen::generated::lambert_frag::META,
+            {.mObjectLightingBinding = spirv_header_gen::generated::lambert_frag::UBO_ObjectLighting.mBinding});
+
     static constexpr std::array ALL_SHADERS{
             SHADER_BASIC_TEXTURED,
             SHADER_GOOCH,
             SHADER_VERTEX_COLOR,
             SHADER_DEFAULT_VERTEX,
+            SHADER_LAMBERT,
     };
-
     // Pipeline definitions
 
     static constexpr PipelineDefinition PIPELINE_SIMPLE_COLOR{
@@ -117,10 +125,16 @@ namespace gfx_testing::pipeline {
             .mFragmentShader = SHADER_VERTEX_COLOR,
             .mPrimitiveType = SDL_GPU_PRIMITIVETYPE_LINELIST,
     };
+    static constexpr PipelineDefinition PIPELINE_LAMBERT{
+            .mName = PipelineName::Lambert,
+            .mVertexShader = SHADER_DEFAULT_VERTEX,
+            .mFragmentShader = SHADER_LAMBERT,
+    };
     static constexpr std::array ALL_PIPELINES{
             PIPELINE_SIMPLE_COLOR,
             PIPELINE_GOOCH,
             PIPELINE_TEXTURED,
             PIPELINE_LINES,
+            PIPELINE_LAMBERT,
     };
 }

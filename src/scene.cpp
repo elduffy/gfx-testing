@@ -62,7 +62,7 @@ namespace gfx_testing::scene {
         mCube(gameContext,
               gameContext.mResourceLoader.loadObjModel(
                       "cube.obj", model::NormalTreatment::SPLIT),
-              pipeline::PipelineName::Gooch,
+              pipeline::PipelineName::Lambert,
               glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
         mTextureObject(gameContext,
                        gameContext.mResourceLoader.loadObjModel(

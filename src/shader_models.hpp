@@ -66,6 +66,13 @@ namespace gfx_testing::shader {
 
     static_assert(sizeof(GoochParams) % 16 == 0);
 
+    struct LambertParams {
+        SHADER_ALIGN glm::vec3 mUnlitColor;
+        SHADER_ALIGN glm::vec3 mLitColor;
+    };
+
+    static_assert(sizeof(LambertParams) % 16 == 0);
+
     struct ObjectLighting {
         SHADER_ALIGN glm::vec3 mLightPosMS;
         SHADER_ALIGN glm::vec3 mCameraPosMS;
