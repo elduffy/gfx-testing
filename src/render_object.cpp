@@ -202,4 +202,14 @@ namespace gfx_testing::render {
         }
         SDL_DrawGPUIndexedPrimitives(renderPass, mIndexCount, 1, 0, 0, 0);
     }
+
+    void RenderObject::pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
+                                             SDL_GPUCommandBuffer *commandBuffer,
+                                             glm::mat4 const &viewProj) const {
+        if (pipelineDefinition.mVertexShader.mMvpTransformBinding.has_value()) {
+            const auto mvpTransform = viewProj * mTransform;
+            SDL_PushGPUVertexUniformData(commandBuffer, *pipelineDefinition.mVertexShader.mMvpTransformBinding,
+                                         &mvpTransform, sizeof(mvpTransform));
+        }
+    }
 }

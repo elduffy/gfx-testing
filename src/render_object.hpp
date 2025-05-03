@@ -29,6 +29,10 @@ namespace gfx_testing::render {
 
         pipeline::PipelineName getPipelineName() const { return mPipelineName; }
 
+        void pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
+                                   SDL_GPUCommandBuffer *commandBuffer,
+                                   glm::mat4 const &viewProjection) const;
+
         glm::mat4 mTransform;
 
     private:

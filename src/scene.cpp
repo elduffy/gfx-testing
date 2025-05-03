@@ -177,8 +177,7 @@ namespace gfx_testing::scene {
     }
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
-        auto const vp = mProjection * mCamera.mView;
-        shader::MvpTransform mvpTransform{};
+        auto const viewProj = mProjection * mCamera.mView;
         auto constexpr GOOCH_PARAMS_BINDING = spirv_header_gen::generated::gooch_frag::UBO_GoochParams.mBinding;
         auto constexpr GOOCH_OBJECT_LIGHTING_BINDING = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.
                 mBinding;
@@ -211,11 +210,7 @@ namespace gfx_testing::scene {
             }
 
             for (auto const *renderObject: renderObjects) {
-                if (pipelineDef.mVertexShader.mMvpTransformBinding.has_value()) {
-                    mvpTransform.mMvp = vp * renderObject->mTransform;
-                    SDL_PushGPUVertexUniformData(commandBuffer, *pipelineDef.mVertexShader.mMvpTransformBinding,
-                                                 &mvpTransform, sizeof(mvpTransform));
-                }
+                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, viewProj);
 
                 if (pipelineDef.mName == pipeline::PipelineName::Gooch) {
                     // TODO: other pipelines will likely need this same data
