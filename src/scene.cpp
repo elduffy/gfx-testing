@@ -178,8 +178,6 @@ namespace gfx_testing::scene {
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
         auto const viewProj = mProjection * mCamera.mView;
-        auto constexpr GOOCH_OBJECT_LIGHTING_BINDING = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.
-                mBinding;
 
         for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
             auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
@@ -192,16 +190,8 @@ namespace gfx_testing::scene {
             pipelineDef.pushPipelineUniforms(commandBuffer);
 
             for (auto const *renderObject: renderObjects) {
-                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, viewProj);
-
-                if (pipelineDef.mName == pipeline::PipelineName::Gooch) {
-                    // TODO: other pipelines will likely need this same data
-                    auto const objectLighting = shader::ObjectLighting::create(
-                            renderObject->mTransform, mSceneObjects.mPointLight.mPosWs,
-                            mCamera.mPosWs);
-                    SDL_PushGPUFragmentUniformData(commandBuffer, GOOCH_OBJECT_LIGHTING_BINDING, &objectLighting,
-                                                   sizeof(objectLighting));
-                }
+                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, viewProj,
+                                                    mSceneObjects.mPointLight.mPosWs, mCamera.mPosWs);
                 renderObject->render(renderPass);
             }
         }

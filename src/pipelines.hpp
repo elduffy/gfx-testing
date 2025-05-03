@@ -44,7 +44,8 @@ namespace gfx_testing::pipeline {
 
         template<typename SpirvMeta>
         static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta,
-                                                 std::optional<uint32_t> mvpTransformBinding = std::nullopt) {
+                                                 std::optional<uint32_t> mvpTransformBinding = std::nullopt,
+                                                 std::optional<uint32_t> objectLightingBinding = std::nullopt) {
             return {
                     .mFilename = spirvMeta.mSourceFilename,
                     .mStage = spirvMeta.mEntryPoint.mStage,
@@ -52,7 +53,8 @@ namespace gfx_testing::pipeline {
                     .mUniformBuffers = spirvMeta.mUbos.size(),
                     .mStorageBuffers = spirvMeta.mSsbos.size(),
                     .mStorageTextures = spirvMeta.mStorageTextures.size(),
-                    .mMvpTransformBinding = mvpTransformBinding
+                    .mMvpTransformBinding = mvpTransformBinding,
+                    .mObjectLightingBinding = objectLightingBinding
             };
         }
 
@@ -63,6 +65,7 @@ namespace gfx_testing::pipeline {
         uint32_t mStorageBuffers{0};
         uint32_t mStorageTextures{0};
         std::optional<uint32_t> mMvpTransformBinding;
+        std::optional<uint32_t> mObjectLightingBinding;
     };
 
     struct PipelineDefinition {
@@ -79,7 +82,9 @@ namespace gfx_testing::pipeline {
     static constexpr ShaderDefinition SHADER_BASIC_TEXTURED = ShaderDefinition::create(
             spirv_header_gen::generated::basic_textured_frag::META);
     static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
-            spirv_header_gen::generated::gooch_frag::META);
+            spirv_header_gen::generated::gooch_frag::META,
+            std::nullopt,
+            spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.mBinding);
     static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
             spirv_header_gen::generated::vertex_color_frag::META);
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(

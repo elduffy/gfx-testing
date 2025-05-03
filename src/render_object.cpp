@@ -205,11 +205,20 @@ namespace gfx_testing::render {
 
     void RenderObject::pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
                                              SDL_GPUCommandBuffer *commandBuffer,
-                                             glm::mat4 const &viewProj) const {
+                                             glm::mat4 const &viewProj,
+                                             glm::vec3 const &lightPosWs,
+                                             glm::vec3 const &cameraPosWs) const {
         if (pipelineDefinition.mVertexShader.mMvpTransformBinding.has_value()) {
             const auto mvpTransform = viewProj * mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer, *pipelineDefinition.mVertexShader.mMvpTransformBinding,
                                          &mvpTransform, sizeof(mvpTransform));
+        }
+        if (pipelineDefinition.mFragmentShader.mObjectLightingBinding.has_value()) {
+
+            auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, cameraPosWs);
+            SDL_PushGPUFragmentUniformData(commandBuffer, *pipelineDefinition.mFragmentShader.mObjectLightingBinding,
+                                           &objectLighting,
+                                           sizeof(objectLighting));
         }
     }
 }

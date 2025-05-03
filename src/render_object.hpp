@@ -31,7 +31,8 @@ namespace gfx_testing::render {
 
         void pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
                                    SDL_GPUCommandBuffer *commandBuffer,
-                                   glm::mat4 const &viewProjection) const;
+                                   glm::mat4 const &vewProj, glm::vec3 const &lightPosWs,
+                                   glm::vec3 const &cameraPosWs) const;
 
         glm::mat4 mTransform;
 
