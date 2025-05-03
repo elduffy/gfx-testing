@@ -143,17 +143,17 @@ namespace gfx_testing::scene {
         auto const vp = mProjection * mCamera.mView;
         shader::MvpTransform mvpTransform{};
 
-        for (auto pipeline: pipeline::ALL_PIPELINES) {
-            auto const renderObjects = mSceneObjects.getRenderObjects(pipeline.mName);
+        for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
+            auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
 
             if (renderObjects.empty()) {
                 continue;
             }
 
-            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipeline.mName));
+            SDL_BindGPUGraphicsPipeline(renderPass, *mGameContext.mPipelines.get(pipelineDef.mName));
 
             // Shader params
-            switch (pipeline.mName) {
+            switch (pipelineDef.mName) {
                 case pipeline::PipelineName::Gooch: {
                     constexpr shader::GoochParams goochParams{
                             .mCoolColor = {0, 0, 0.55},
