@@ -1,7 +1,6 @@
 #include <format>
-#include <write.hpp>
-
 #include <inja/inja.hpp>
+#include <write.hpp>
 
 #include "boost/algorithm/string/classification.hpp"
 #include "boost/algorithm/string/detail/trim.hpp"
@@ -31,8 +30,8 @@ namespace spirv_header_gen {
     }
 
     std::string getTypeVariableNameImpl(std::string const &typeStr) {
-        auto const newStart = boost::algorithm::detail::trim_begin(typeStr.begin(), typeStr.end(),
-                                                                   boost::is_any_of("type."));
+        auto const newStart =
+                boost::algorithm::detail::trim_begin(typeStr.begin(), typeStr.end(), boost::is_any_of("type."));
         return std::string{&*newStart};
     }
 
@@ -82,4 +81,4 @@ namespace spirv_header_gen {
 
         env.render_to(*ostream, templ, model);
     }
-}
+} // namespace spirv_header_gen

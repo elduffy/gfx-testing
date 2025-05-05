@@ -1,9 +1,9 @@
 #pragma once
 
-#include <sdl.hpp>
 #include <pipeline/pipelines.hpp>
-#include <util/stopwatch.hpp>
 #include <render/samplers.hpp>
+#include <sdl.hpp>
+#include <util/stopwatch.hpp>
 
 namespace gfx_testing::game {
     class GameContext {
@@ -38,9 +38,7 @@ namespace gfx_testing::game {
             }
         }
 
-        [[nodiscard]] util::Snapshot const &getFrameSnapshot() const {
-            return mLastFrame;
-        }
+        [[nodiscard]] util::Snapshot const &getFrameSnapshot() const { return mLastFrame; }
 
     private:
         util::Snapshot mLastFrame{};
@@ -52,4 +50,4 @@ namespace gfx_testing::game {
         render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};
     };
-}
+} // namespace gfx_testing::game

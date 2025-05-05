@@ -16,9 +16,7 @@ namespace gfx_testing::pipeline {
         }
 
         PipelineBuffers(PipelineBuffers &&other) noexcept :
-            mStorageBuffers(std::move(other.mStorageBuffers)),
-            mStorageBufferPtrs(other.mStorageBufferPtrs) {
-        }
+            mStorageBuffers(std::move(other.mStorageBuffers)), mStorageBufferPtrs(other.mStorageBufferPtrs) {}
 
     private:
         std::vector<sdl::SdlGpuBuffer> mStorageBuffers;
@@ -41,4 +39,4 @@ namespace gfx_testing::pipeline {
         sdl::SdlGfxPipeline mSdlPipeline;
         PipelineBuffers mBuffers;
     };
-}
+} // namespace gfx_testing::pipeline

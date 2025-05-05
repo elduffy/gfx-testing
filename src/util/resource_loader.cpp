@@ -1,13 +1,11 @@
+#include <boost/algorithm/string/replace.hpp>
 #include <util/obj_loader.hpp>
 #include <util/resource_loader.hpp>
-#include <boost/algorithm/string/replace.hpp>
 #include <util/texture_loader.hpp>
 
 namespace gfx_testing::util {
 
-    ResourceLoader::ResourceLoader(sdl::SdlContext const &sdlContext):
-        mSdlContext(sdlContext) {
-    }
+    ResourceLoader::ResourceLoader(sdl::SdlContext const &sdlContext) : mSdlContext(sdlContext) {}
 
     ShaderCode ResourceLoader::loadShaderCode(std::string const &filename) const {
         auto const shaderSourcePath = mProjectRoot / "content/shaders/src" / filename;
@@ -26,17 +24,16 @@ namespace gfx_testing::util {
 
         std::string compiledFilename = shaderSourcePath.filename().string();
         boost::replace_last(compiledFilename, ".hlsl", ".spv");
-        const auto compiledFilePath = shaderSourcePath.parent_path().parent_path() / "compiled/spirv" /
-                                      compiledFilename;
+        const auto compiledFilePath =
+                shaderSourcePath.parent_path().parent_path() / "compiled/spirv" / compiledFilename;
         return ShaderCode(compiledFilePath, stage);
     }
 
-    shader::MeshData ResourceLoader::loadObjModel(std::string const &filename,
-                                                  NormalTreatment normalTreatment) const {
+    shader::MeshData ResourceLoader::loadObjModel(std::string const &filename, NormalTreatment normalTreatment) const {
         return loadObjFile(mProjectRoot / "content/models/" / filename, normalTreatment);
     }
 
     sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {
         return loadImage(mProjectRoot / "content/textures/" / filename);
     }
-}
+} // namespace gfx_testing::util

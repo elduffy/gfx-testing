@@ -1,12 +1,12 @@
 #pragma once
 
+#include <SDL3/SDL.h>
 #include <filesystem>
 #include <format>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
-#include <util/util.hpp>
-#include <SDL3/SDL.h>
 #include <util/obj_loader.hpp>
+#include <util/util.hpp>
 
 namespace gfx_testing::util {
 
@@ -14,14 +14,11 @@ namespace gfx_testing::util {
     public:
         NO_COPY(ShaderCode);
 
-        explicit ShaderCode(std::filesystem::path const &compiledFilePath, SDL_GPUShaderStage stage):
-            mSize(0),
-            mCode(static_cast<uint8_t *>(SDL_LoadFile(compiledFilePath.c_str(), &mSize))),
-            mStage(stage) {
+        explicit ShaderCode(std::filesystem::path const &compiledFilePath, SDL_GPUShaderStage stage) :
+            mSize(0), mCode(static_cast<uint8_t *>(SDL_LoadFile(compiledFilePath.c_str(), &mSize))), mStage(stage) {
             if (mCode == nullptr) {
                 throw std::runtime_error(std::format("Could not load SPIRV shader from {}: {}",
-                                                     compiledFilePath.c_str(),
-                                                     SDL_GetError()));
+                                                     compiledFilePath.c_str(), SDL_GetError()));
             }
             SDL_Log("Loaded SPIRV shader from %s of size %zu", compiledFilePath.c_str(), mSize);
         }
@@ -31,8 +28,7 @@ namespace gfx_testing::util {
             mCode = nullptr;
         }
 
-        ShaderCode(ShaderCode &&other) noexcept :
-            mSize(other.mSize), mCode(other.mCode), mStage(other.mStage) {
+        ShaderCode(ShaderCode &&other) noexcept : mSize(other.mSize), mCode(other.mCode), mStage(other.mStage) {
             other.mCode = nullptr;
         }
 
@@ -47,8 +43,7 @@ namespace gfx_testing::util {
 
         [[nodiscard]] ShaderCode loadShaderCode(std::string const &filename) const;
 
-        [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename,
-                                                    NormalTreatment normalTreatment) const;
+        [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename, NormalTreatment normalTreatment) const;
 
         [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
 
@@ -56,4 +51,4 @@ namespace gfx_testing::util {
         sdl::SdlContext const &mSdlContext;
         std::filesystem::path mProjectRoot = getProjectRoot();
     };
-}
+} // namespace gfx_testing::util

@@ -14,7 +14,6 @@ namespace gfx_testing::render {
             .enable_anisotropy = true,
     };
 
-    Samplers::Samplers(sdl::SdlContext const &context):
-        mAnisotropicWrap(context, SDL_CreateGPUSampler(context.mDevice, &ANISOTROPIC_WRAP)) {
-    }
-}
+    Samplers::Samplers(sdl::SdlContext const &context) :
+        mAnisotropicWrap(context, SDL_CreateGPUSampler(context.mDevice, &ANISOTROPIC_WRAP)) {}
+} // namespace gfx_testing::render

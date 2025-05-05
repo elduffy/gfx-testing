@@ -16,10 +16,8 @@ namespace gfx_testing::pipeline {
         return actualIndices == expectedIndices;
     }
 
-    SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context,
-                                            SDL_GPUShader *vertexShader,
-                                            SDL_GPUShader *fragmentShader,
-                                            SDL_GPUPrimitiveType primitiveType) {
+    SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context, SDL_GPUShader *vertexShader,
+                                            SDL_GPUShader *fragmentShader, SDL_GPUPrimitiveType primitiveType) {
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
                 .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
@@ -34,30 +32,32 @@ namespace gfx_testing::pipeline {
         const SDL_GPUGraphicsPipelineCreateInfo graphicsPipelineInfo = {
                 .vertex_shader = vertexShader,
                 .fragment_shader = fragmentShader,
-                .vertex_input_state = SDL_GPUVertexInputState{
-                        .vertex_buffer_descriptions = &vertexBufferDescription,
-                        .num_vertex_buffers = 1,
-                        .vertex_attributes = &shader::VertexData::VERTEX_ATTRIBUTES[0],
-                        .num_vertex_attributes = shader::VertexData::VERTEX_ATTRIBUTES.size(),
-                },
+                .vertex_input_state =
+                        SDL_GPUVertexInputState{
+                                .vertex_buffer_descriptions = &vertexBufferDescription,
+                                .num_vertex_buffers = 1,
+                                .vertex_attributes = &shader::VertexData::VERTEX_ATTRIBUTES[0],
+                                .num_vertex_attributes = shader::VertexData::VERTEX_ATTRIBUTES.size(),
+                        },
                 .primitive_type = primitiveType,
-                .rasterizer_state = {
-                        .cull_mode = SDL_GPU_CULLMODE_BACK
-                },
-                .multisample_state = {
-                        .sample_count = MSAA_SAMPLE_COUNT,
-                },
-                .depth_stencil_state = {
-                        .compare_op = SDL_GPU_COMPAREOP_LESS,
-                        .enable_depth_test = true,
-                        .enable_depth_write = true,
-                },
-                .target_info = {
-                        .color_target_descriptions = &colorTargetDescription,
-                        .num_color_targets = 1,
-                        .depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM,
-                        .has_depth_stencil_target = true,
-                },
+                .rasterizer_state = {.cull_mode = SDL_GPU_CULLMODE_BACK},
+                .multisample_state =
+                        {
+                                .sample_count = MSAA_SAMPLE_COUNT,
+                        },
+                .depth_stencil_state =
+                        {
+                                .compare_op = SDL_GPU_COMPAREOP_LESS,
+                                .enable_depth_test = true,
+                                .enable_depth_write = true,
+                        },
+                .target_info =
+                        {
+                                .color_target_descriptions = &colorTargetDescription,
+                                .num_color_targets = 1,
+                                .depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM,
+                                .has_depth_stencil_target = true,
+                        },
         };
         auto *pipeline = SDL_CreateGPUGraphicsPipeline(context.mDevice, &graphicsPipelineInfo);
         if (pipeline == nullptr) {
@@ -74,46 +74,35 @@ namespace gfx_testing::pipeline {
         return shaderCodes;
     }
 
-    std::map<ShaderDefinition, sdl::SdlShader>
-    createShaders(sdl::SdlContext const &context, std::map<ShaderDefinition, util::ShaderCode> const &code) {
+    std::map<ShaderDefinition, sdl::SdlShader> createShaders(sdl::SdlContext const &context,
+                                                             std::map<ShaderDefinition, util::ShaderCode> const &code) {
         std::map<ShaderDefinition, sdl::SdlShader> shaders;
         for (auto const &[shaderDef, shaderCode]: code) {
             shaders.emplace(shaderDef,
-                            sdl::SdlShader::createShader(context,
-                                                         shaderCode.mCode,
-                                                         shaderCode.mSize,
-                                                         shaderDef.mStage,
-                                                         shaderDef.mSamplers,
-                                                         shaderDef.mUniformBuffers,
-                                                         shaderDef.mStorageBuffers,
-                                                         shaderDef.mStorageTextures));
+                            sdl::SdlShader::createShader(context, shaderCode.mCode, shaderCode.mSize, shaderDef.mStage,
+                                                         shaderDef.mSamplers, shaderDef.mUniformBuffers,
+                                                         shaderDef.mStorageBuffers, shaderDef.mStorageTextures));
         }
         return shaders;
     }
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
-                         std::map<ShaderDefinition, util::ShaderCode> const &shaderCode):
-        Pipelines(sdlContext, createShaders(sdlContext, shaderCode)) {
-    }
+                         std::map<ShaderDefinition, util::ShaderCode> const &shaderCode) :
+        Pipelines(sdlContext, createShaders(sdlContext, shaderCode)) {}
 
-    Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
-                         std::map<ShaderDefinition, sdl::SdlShader> const &shaders) {
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, std::map<ShaderDefinition, sdl::SdlShader> const &shaders) {
         static_assert(isWellDefined(ALL_PIPELINES));
         for (auto const &pipelineDefinition: ALL_PIPELINES) {
             auto *vertexShader = *shaders.at(pipelineDefinition.mVertexShader);
             auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
             mPipelines.emplace_back(
-                    pipelineDefinition, sdl::SdlGfxPipeline{
-                            sdlContext, createPipeline(
-                                    sdlContext, vertexShader,
-                                    fragmentShader,
-                                    pipelineDefinition.
-                                    mPrimitiveType)});
+                    pipelineDefinition,
+                    sdl::SdlGfxPipeline{sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader,
+                                                                   pipelineDefinition.mPrimitiveType)});
             SDL_Log("Created graphics pipeline %s", getName(pipelineDefinition.mName));
         }
     }
 
-    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader):
-        Pipelines(sdlContext, loadShaderCode(resourceLoader)) {
-    }
-}
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader) :
+        Pipelines(sdlContext, loadShaderCode(resourceLoader)) {}
+} // namespace gfx_testing::pipeline

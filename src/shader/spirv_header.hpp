@@ -1,10 +1,10 @@
 #pragma once
+#include <SDL3/SDL_gpu.h>
+#include <algorithm>
+#include <array>
+#include <boost/safe_numerics/checked_integer.hpp>
 #include <variant>
 #include <vector>
-#include <array>
-#include <SDL3/SDL_gpu.h>
-#include <boost/safe_numerics/checked_integer.hpp>
-#include <algorithm>
 
 namespace gfx_testing::shader {
 
@@ -109,4 +109,4 @@ namespace gfx_testing::shader {
         }
         return boost::safe_numerics::checked::cast<uint32_t>(result);
     }
-}
+} // namespace gfx_testing::shader

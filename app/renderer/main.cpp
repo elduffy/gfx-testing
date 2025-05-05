@@ -1,14 +1,12 @@
+#include <SDL3/SDL.h>
 #include <game.hpp>
 #include <imgui_context.hpp>
-#include <sdl.hpp>
-#include <SDL3/SDL.h>
 #include <render/scene.hpp>
+#include <sdl.hpp>
 #include <util/util.hpp>
 
-void handleEvent(gfx_testing::game::GameContext &gameContext,
-                 gfx_testing::render::Scene &scene,
-                 gfx_testing::imgui::ImGuiContext &imGuiContext,
-                 SDL_Event const &event) {
+void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
+                 gfx_testing::imgui::ImGuiContext &imGuiContext, SDL_Event const &event) {
     if (imGuiContext.processEvent(event)) {
         return;
     }

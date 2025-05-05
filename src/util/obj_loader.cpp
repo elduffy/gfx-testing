@@ -1,10 +1,10 @@
 #define TINYOBJLOADER_IMPLEMENTATION
+#include <SDL3/SDL_log.h>
 #include <filesystem>
 #include <format>
 #include <iostream>
 #include <shader/shader_models.hpp>
 #include <tiny_obj_loader.h>
-#include <SDL3/SDL_log.h>
 #include <util/obj_loader.hpp>
 
 namespace gfx_testing::util {
@@ -14,7 +14,7 @@ namespace gfx_testing::util {
         auto const &shapes = reader.GetShapes();
         const auto numVertices = attrib.vertices.size() / 3;
 
-        std::vector<std::set<uint16_t> > normalsPerVertex(numVertices);
+        std::vector<std::set<uint16_t>> normalsPerVertex(numVertices);
         shader::MeshDataBuilder meshData;
 
         meshData.mVertices.resize(numVertices);
@@ -55,11 +55,8 @@ namespace gfx_testing::util {
             auto const &normalList = normalsPerVertex.at(v);
             vertexData.mNormal = glm::vec3(0);
             for (auto const normalIdx: normalList) {
-                vertexData.mNormal += glm::vec3{
-                        attrib.normals.at(3 * normalIdx),
-                        attrib.normals.at(3 * normalIdx + 1),
-                        attrib.normals.at(3 * normalIdx + 2)
-                };
+                vertexData.mNormal += glm::vec3{attrib.normals.at(3 * normalIdx), attrib.normals.at(3 * normalIdx + 1),
+                                                attrib.normals.at(3 * normalIdx + 2)};
             }
             vertexData.mNormal /= normalList.size();
             vertexData.mNormal = glm::normalize(vertexData.mNormal);
@@ -80,24 +77,20 @@ namespace gfx_testing::util {
         std::vector<glm::vec4> colors(attrib.colors.size() / 3);
 
         for (size_t i = 0; i < positions.size(); i++) {
-            positions[i] = glm::vec3(attrib.vertices.at(3 * i),
-                                     attrib.vertices.at(3 * i + 1),
-                                     attrib.vertices.at(3 * i + 2));
+            positions[i] =
+                    glm::vec3(attrib.vertices.at(3 * i), attrib.vertices.at(3 * i + 1), attrib.vertices.at(3 * i + 2));
         }
         for (size_t i = 0; i < uvs.size(); i++) {
             // SDL uses top-to-bottom coordinates, while OBJ assumes bottom-to-top, so the v is inverted.
             uvs[i] = glm::vec2(attrib.texcoords.at(2 * i), 1.f - attrib.texcoords.at(2 * i + 1));
         }
         for (size_t i = 0; i < normals.size(); i++) {
-            normals[i] = glm::vec3(attrib.normals.at(3 * i),
-                                   attrib.normals.at(3 * i + 1),
-                                   attrib.normals.at(3 * i + 2));
+            normals[i] =
+                    glm::vec3(attrib.normals.at(3 * i), attrib.normals.at(3 * i + 1), attrib.normals.at(3 * i + 2));
         }
         for (size_t i = 0; i < colors.size(); i++) {
-            colors[i] = glm::vec4(attrib.colors.at(3 * i),
-                                  attrib.colors.at(3 * i + 1),
-                                  attrib.colors.at(3 * i + 2),
-                                  1.f);
+            colors[i] =
+                    glm::vec4(attrib.colors.at(3 * i), attrib.colors.at(3 * i + 1), attrib.colors.at(3 * i + 2), 1.f);
         }
 
         shader::MeshDataBuilder meshData;
@@ -134,7 +127,6 @@ namespace gfx_testing::util {
                     auto const outputIndex = outputIndices[vertNormIdx];
                     meshData.addIndex(outputIndex);
                 }
-
             }
         }
 
@@ -186,4 +178,4 @@ namespace gfx_testing::util {
                 throw std::runtime_error("Unrecognized normal treatment");
         }
     }
-}
+} // namespace gfx_testing::util

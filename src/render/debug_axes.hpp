@@ -11,4 +11,4 @@ namespace gfx_testing::render {
         RenderObject mRenderObject;
     };
 
-}
+} // namespace gfx_testing::render

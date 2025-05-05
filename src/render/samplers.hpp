@@ -9,4 +9,4 @@ namespace gfx_testing::render {
 
         sdl::SdlGpuSampler mAnisotropicWrap;
     };
-}
+} // namespace gfx_testing::render

@@ -1,6 +1,6 @@
+#include <glm/ext/matrix_transform.hpp>
 #include <render/debug_axes.hpp>
 #include <shader/shader_models.hpp>
-#include "glm/ext/matrix_transform.hpp"
 
 namespace gfx_testing::render {
     void createLines(shader::MeshDataBuilder &builder) {
@@ -63,7 +63,6 @@ namespace gfx_testing::render {
         for (auto i = 0; i < builder.mVertices.size(); i++) {
             builder.addIndex(i);
         }
-
     }
 
     shader::MeshData buildMesh() {
@@ -73,7 +72,6 @@ namespace gfx_testing::render {
         return builder.build();
     }
 
-    DebugAxes::DebugAxes(game::GameContext const &gameContext):
-        mRenderObject(gameContext, buildMesh(), pipeline::PipelineName::Lines, glm::identity<glm::mat4>()) {
-    }
-}
+    DebugAxes::DebugAxes(game::GameContext const &gameContext) :
+        mRenderObject(gameContext, buildMesh(), pipeline::PipelineName::Lines, glm::identity<glm::mat4>()) {}
+} // namespace gfx_testing::render

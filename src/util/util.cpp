@@ -17,8 +17,8 @@ namespace gfx_testing::util {
         // https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates
         auto const r = glm::length(cartesian);
         auto const t = std::acos(cartesian.z / r);
-        auto const p = glm::sign(cartesian.y) * std::acos(
-                               cartesian.x / std::sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y));
+        auto const p = glm::sign(cartesian.y) *
+                       std::acos(cartesian.x / std::sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y));
         return {r, t, p};
     }
 
@@ -33,4 +33,4 @@ namespace gfx_testing::util {
         return {x, y, z};
     }
 
-}
+} // namespace gfx_testing::util

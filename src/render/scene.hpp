@@ -1,14 +1,14 @@
 #pragma once
 
 #include <game.hpp>
-#include <imgui_context.hpp>
-#include <sdl.hpp>
-#include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/mat4x4.hpp>
+#include <imgui_context.hpp>
 #include <render/camera.hpp>
 #include <render/debug_axes.hpp>
 #include <render/point_light.hpp>
 #include <render/render_object.hpp>
+#include <sdl.hpp>
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
@@ -39,8 +39,7 @@ namespace gfx_testing::render {
         render::PointLight mPointLight;
 
     private:
-        std::vector<std::vector<render::RenderObject const *> > mRenderObjectsByPipeline
-                {pipeline::ALL_PIPELINES.size()};
+        std::vector<std::vector<render::RenderObject const *>> mRenderObjectsByPipeline{pipeline::ALL_PIPELINES.size()};
     };
 
     class Scene {
@@ -69,4 +68,4 @@ namespace gfx_testing::render {
         sdl::SdlGpuTexture mDepthTexture;
         std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;
     };
-}
+} // namespace gfx_testing::render

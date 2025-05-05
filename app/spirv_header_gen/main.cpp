@@ -3,11 +3,11 @@
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <optional>
 #include <nlohmann/json.hpp>
+#include <optional>
 
-#include "write.hpp"
 #include "boost/algorithm/string/replace.hpp"
+#include "write.hpp"
 
 
 std::string getPackageName(std::string const &inputFile) {
@@ -26,10 +26,8 @@ std::string getSourceSpvFilename(std::string const &inputFile) {
 int main(int argc, char *argv[]) {
     using namespace clipp;
     std::string inputFile, outputFile;
-    const auto cli = (
-        value("input json file", inputFile),
-        option("-o", "--output") & value("output header file", outputFile)
-    );
+    const auto cli =
+            (value("input json file", inputFile), option("-o", "--output") & value("output header file", outputFile));
     if (!parse(argc, argv, cli)) {
         std::cout << make_man_page(cli, std::filesystem::path{argv[0]}.filename().string());
         return 1;

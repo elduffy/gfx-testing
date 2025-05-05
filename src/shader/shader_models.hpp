@@ -1,11 +1,11 @@
 #pragma once
-#include <vector>
+#include <SDL3/SDL.h>
 #include <array>
 #include <boost/safe_numerics/checked_default.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <SDL3/SDL.h>
+#include <vector>
 
 #define SHADER_ALIGN alignas(16)
 
@@ -49,8 +49,7 @@ namespace gfx_testing::shader {
                         .buffer_slot = 0,
                         .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
                         .offset = sizeof(mPosition) + sizeof(mUv) + sizeof(mNormal),
-                }
-        };
+                }};
     };
 
     struct MvpTransform {
@@ -102,12 +101,10 @@ namespace gfx_testing::shader {
 
     public:
         explicit IndexList(std::vector<uint16_t> const &indices) :
-            mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_16BIT) {
-        }
+            mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_16BIT) {}
 
         explicit IndexList(std::vector<uint32_t> const &indices) :
-            mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_32BIT) {
-        }
+            mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_32BIT) {}
 
         size_t count() const { return mCount; }
 
@@ -139,9 +136,7 @@ namespace gfx_testing::shader {
             }
         }
 
-        size_t bufferSize() const {
-            return count() * elementSize();
-        }
+        size_t bufferSize() const { return count() * elementSize(); }
 
         std::string toString() const {
             std::stringstream ss;
@@ -258,4 +253,4 @@ namespace gfx_testing::shader {
         std::vector<uint16_t> mIndices16;
         std::vector<uint32_t> mIndices32;
     };
-}
+} // namespace gfx_testing::shader

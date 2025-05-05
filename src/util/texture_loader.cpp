@@ -15,4 +15,4 @@ namespace gfx_testing::util {
         }
         return sdl::SdlSurface{surface};
     }
-}
+} // namespace gfx_testing::util

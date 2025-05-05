@@ -14,4 +14,4 @@ namespace spirv_header_gen {
 
 
     void writeHeader(WriteProperties const &writeProperties, nlohmann::json const &json, std::ostream *ostream);
-}
+} // namespace spirv_header_gen

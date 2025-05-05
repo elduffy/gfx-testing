@@ -1,12 +1,11 @@
 #include <render/camera.hpp>
 #include <util/util.hpp>
 
-#include "glm/trigonometric.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/trigonometric.hpp"
 
 namespace gfx_testing::render {
-    Camera::Camera(glm::vec3 const &initialPos):
-        mPosWs(initialPos), mView(glm::identity<glm::mat4x4>()) {
+    Camera::Camera(glm::vec3 const &initialPos) : mPosWs(initialPos), mView(glm::identity<glm::mat4x4>()) {
         updateViewMatrix();
     }
 
@@ -32,7 +31,5 @@ namespace gfx_testing::render {
         updateViewMatrix();
     }
 
-    void Camera::updateViewMatrix() {
-        mView = lookAt(mPosWs, glm::vec3(0, 0, 0), glm::vec3(0, 0, 1));
-    }
-}
+    void Camera::updateViewMatrix() { mView = lookAt(mPosWs, glm::vec3(0, 0, 0), glm::vec3(0, 0, 1)); }
+} // namespace gfx_testing::render

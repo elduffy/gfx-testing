@@ -14,4 +14,4 @@ namespace gfx_testing::render {
         float mPathRadius;
         RenderObject mRenderObject;
     };
-}
+} // namespace gfx_testing::render

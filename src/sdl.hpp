@@ -1,9 +1,9 @@
 #pragma once
 
-#include <algorithm>
-#include <util/util.hpp>
-#include <boost/scope/scope_exit.hpp>
 #include <SDL3/SDL.h>
+#include <algorithm>
+#include <boost/scope/scope_exit.hpp>
+#include <util/util.hpp>
 
 namespace gfx_testing::sdl {
     class SdlContext {
@@ -25,9 +25,7 @@ namespace gfx_testing::sdl {
     };
 
     [[nodiscard]] inline auto scopedSubmitCommandBuffer(SDL_GPUCommandBuffer *commandBuffer) {
-        boost::scope::scope_exit guard([commandBuffer] {
-            SDL_SubmitGPUCommandBuffer(commandBuffer);
-        });
+        boost::scope::scope_exit guard([commandBuffer] { SDL_SubmitGPUCommandBuffer(commandBuffer); });
         return std::move(guard);
     }
 
@@ -40,15 +38,13 @@ namespace gfx_testing::sdl {
 
         ~SdlShader();
 
-        SdlShader(SdlShader &&other) noexcept:
-            mContext(other.mContext), mShader(other.mShader) {
+        SdlShader(SdlShader &&other) noexcept : mContext(other.mContext), mShader(other.mShader) {
             other.mShader = nullptr;
         };
 
         static SdlShader createShader(SdlContext const &context, const uint8_t *code, size_t codeSize,
-                                      SDL_GPUShaderStage stage,
-                                      uint32_t samplers, uint32_t uniformBuffers, uint32_t storageBuffers,
-                                      uint32_t storageTextures);
+                                      SDL_GPUShaderStage stage, uint32_t samplers, uint32_t uniformBuffers,
+                                      uint32_t storageBuffers, uint32_t storageTextures);
 
         SDL_GPUShader *operator*() const { return mShader; }
 
@@ -64,8 +60,7 @@ namespace gfx_testing::sdl {
 
         ~SdlGfxPipeline();
 
-        SdlGfxPipeline(SdlGfxPipeline &&other) noexcept:
-            mContext(other.mContext), mPipeline(other.mPipeline) {
+        SdlGfxPipeline(SdlGfxPipeline &&other) noexcept : mContext(other.mContext), mPipeline(other.mPipeline) {
             other.mPipeline = nullptr;
         }
 
@@ -120,7 +115,9 @@ namespace gfx_testing::sdl {
         ~SdlMappedTransferBuffer();
 
         template<typename T>
-        T *get(const size_t offset = 0) const { return reinterpret_cast<T *>(mMappedMemory + offset); }
+        T *get(const size_t offset = 0) const {
+            return reinterpret_cast<T *>(mMappedMemory + offset);
+        }
 
         SdlContext const &mContext;
         SDL_GPUTransferBuffer *mBuffer = nullptr;
@@ -171,4 +168,4 @@ namespace gfx_testing::sdl {
         SdlContext const &mContext;
         SDL_GPUSampler *mSampler = nullptr;
     };
-}
+} // namespace gfx_testing::sdl

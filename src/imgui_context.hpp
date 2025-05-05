@@ -24,4 +24,4 @@ namespace gfx_testing::imgui {
 
         bool mOpenWindow{false};
     };
-}
+} // namespace gfx_testing::imgui

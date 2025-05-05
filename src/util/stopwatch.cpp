@@ -12,7 +12,8 @@ namespace gfx_testing::util {
             return mAccumulatedTime;
         }
         return mAccumulatedTime + std::chrono::duration_cast<std::chrono::milliseconds>(
-                       std::chrono::high_resolution_clock::now() - mResumedTime.value()).count();
+                                          std::chrono::high_resolution_clock::now() - mResumedTime.value())
+                                          .count();
     }
 
     void Stopwatch::toggle() {
@@ -28,8 +29,6 @@ namespace gfx_testing::util {
         mResumedTime.reset();
     }
 
-    void Stopwatch::resume() {
-        mResumedTime = std::chrono::high_resolution_clock::now();
-    }
+    void Stopwatch::resume() { mResumedTime = std::chrono::high_resolution_clock::now(); }
 
-}
+} // namespace gfx_testing::util

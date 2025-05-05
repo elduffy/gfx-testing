@@ -20,4 +20,4 @@ namespace gfx_testing::render {
         glm::vec3 mPosWs;
         glm::mat4x4 mView;
     };
-}
+} // namespace gfx_testing::render

@@ -1,11 +1,9 @@
-#include <imgui_context.hpp>
 #include <SDL3/SDL_log.h>
-
-#include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
-
-#include "sdl.hpp"
+#include <imgui.h>
+#include <imgui_context.hpp>
+#include <sdl.hpp>
 
 namespace gfx_testing::imgui {
     // Set true to show the demo menu to try out widgets, etc
@@ -59,8 +57,7 @@ namespace gfx_testing::imgui {
         ImGui::End();
     }
 
-    void ImGuiContext::renderFrame(SDL_GPUCommandBuffer *commandBuffer,
-                                   SDL_GPUColorTargetInfo const &colorTargetInfo) {
+    void ImGuiContext::renderFrame(SDL_GPUCommandBuffer *commandBuffer, SDL_GPUColorTargetInfo const &colorTargetInfo) {
         if (!mOpenWindow) {
             return;
         }
@@ -84,4 +81,4 @@ namespace gfx_testing::imgui {
         ImGui_ImplSDLGPU3_RenderDrawData(drawData, commandBuffer, renderPass);
         SDL_EndGPURenderPass(renderPass);
     }
-}
+} // namespace gfx_testing::imgui

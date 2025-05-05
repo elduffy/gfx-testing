@@ -11,12 +11,10 @@ namespace gfx_testing::render {
     }
 
     void transferBufferData(sdl::SdlContext const &context, shader::MeshData const &meshData,
-                            SDL_GPUBuffer *vertexBuffer,
-                            SDL_GPUBuffer *indexBuffer) {
+                            SDL_GPUBuffer *vertexBuffer, SDL_GPUBuffer *indexBuffer) {
         const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
                 context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                boost::safe_numerics::checked::add(meshData.getVertexBufferSize(),
-                                                   meshData.getIndexBufferSize()));
+                boost::safe_numerics::checked::add(meshData.getVertexBufferSize(), meshData.getIndexBufferSize()));
 
         // Set the vertex/index data
         {
@@ -73,8 +71,7 @@ namespace gfx_testing::render {
     }
 
 
-    void transferTextureData(sdl::SdlContext const &context, SDL_Surface *surface,
-                             SDL_GPUTexture *texture) {
+    void transferTextureData(sdl::SdlContext const &context, SDL_Surface *surface, SDL_GPUTexture *texture) {
         auto const width = boost::safe_numerics::checked::cast<uint32_t>(surface->w);
         auto const height = boost::safe_numerics::checked::cast<uint32_t>(surface->h);
         const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
@@ -133,32 +130,27 @@ namespace gfx_testing::render {
         return {TextureAndSampler{.mTexture = std::move(tex), .mSampler = gameContext.mSamplers.mAnisotropicWrap}};
     }
 
-    RenderObject::RenderObject(game::GameContext const &gameContext,
-                               shader::MeshData const &meshData, pipeline::PipelineName pipelineName,
-                               const glm::mat4 &initialTransform) :
+    RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+                               pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform) :
         RenderObject(gameContext, meshData, pipelineName, nullptr, initialTransform) {
         if (pipelineName == pipeline::PipelineName::Textured) {
             throw std::runtime_error("Use constructor with texture data for the Textured pipeline");
         }
     }
 
-    RenderObject::RenderObject(game::GameContext const &gameContext,
-                               shader::MeshData const &meshData, sdl::SdlSurface const &textureData,
-                               const glm::mat4 &initialTransform) :
-        RenderObject(gameContext, meshData, pipeline::PipelineName::Textured, &textureData, initialTransform) {
-    }
+    RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+                               sdl::SdlSurface const &textureData, const glm::mat4 &initialTransform) :
+        RenderObject(gameContext, meshData, pipeline::PipelineName::Textured, &textureData, initialTransform) {}
 
     RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
-                               pipeline::PipelineName pipelineName,
-                               sdl::SdlSurface const *textureDataOpt,
-                               const glm::mat4 &initialTransform):
+                               pipeline::PipelineName pipelineName, sdl::SdlSurface const *textureDataOpt,
+                               const glm::mat4 &initialTransform) :
         mTransform(initialTransform),
         mVertexBuffer(sdl::SdlGpuBuffer::create(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_VERTEX,
                                                 meshData.getVertexBufferSize())),
         mIndexBuffer(sdl::SdlGpuBuffer::create(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX,
                                                meshData.getIndexBufferSize())),
-        mPipelineName(pipelineName),
-        mTextureOpt(createGpuTexture(gameContext, textureDataOpt)),
+        mPipelineName(pipelineName), mTextureOpt(createGpuTexture(gameContext, textureDataOpt)),
         mIndexCount(meshData.mIndices.count()) {
         transferBufferData(gameContext.mSdlContext, meshData, *mVertexBuffer, *mIndexBuffer);
         if (mTextureOpt.has_value()) {
@@ -190,10 +182,8 @@ namespace gfx_testing::render {
     }
 
     void RenderObject::pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
-                                             SDL_GPUCommandBuffer *commandBuffer,
-                                             glm::mat4 const &viewProj,
-                                             glm::vec3 const &lightPosWs,
-                                             glm::vec3 const &cameraPosWs) const {
+                                             SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &viewProj,
+                                             glm::vec3 const &lightPosWs, glm::vec3 const &cameraPosWs) const {
         if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
             const auto mvpTransform = viewProj * mTransform;
             SDL_PushGPUVertexUniformData(commandBuffer,
@@ -205,8 +195,7 @@ namespace gfx_testing::render {
             auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, cameraPosWs);
             SDL_PushGPUFragmentUniformData(commandBuffer,
                                            *pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding,
-                                           &objectLighting,
-                                           sizeof(objectLighting));
+                                           &objectLighting, sizeof(objectLighting));
         }
     }
-}
+} // namespace gfx_testing::render

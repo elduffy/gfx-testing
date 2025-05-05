@@ -1,13 +1,14 @@
 #pragma once
 
-#include <stdexcept>
 #include <optional>
+#include <stdexcept>
+
 #include "basic_textured.frag.hpp"
+#include "boost/safe_numerics/checked_integer.hpp"
 #include "default.vert.hpp"
 #include "gooch.frag.hpp"
 #include "lambert.frag.hpp"
 #include "vertex_color.frag.hpp"
-#include "boost/safe_numerics/checked_integer.hpp"
 
 
 namespace gfx_testing::pipeline {
@@ -20,9 +21,7 @@ namespace gfx_testing::pipeline {
         Lambert,
     };
 
-    constexpr size_t getIndex(PipelineName pipelineName) {
-        return static_cast<size_t>(pipelineName);
-    }
+    constexpr size_t getIndex(PipelineName pipelineName) { return static_cast<size_t>(pipelineName); }
 
     constexpr char const *getName(PipelineName pipelineName) {
         switch (pipelineName) {
@@ -81,13 +80,13 @@ namespace gfx_testing::pipeline {
 
     // Shader definitions
 
-    static constexpr ShaderDefinition SHADER_BASIC_TEXTURED = ShaderDefinition::create(
-            spirv_header_gen::generated::basic_textured_frag::META, {});
+    static constexpr ShaderDefinition SHADER_BASIC_TEXTURED =
+            ShaderDefinition::create(spirv_header_gen::generated::basic_textured_frag::META, {});
     static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
             spirv_header_gen::generated::gooch_frag::META,
             {.mObjectLightingBinding = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.mBinding});
-    static constexpr ShaderDefinition SHADER_VERTEX_COLOR = ShaderDefinition::create(
-            spirv_header_gen::generated::vertex_color_frag::META, {});
+    static constexpr ShaderDefinition SHADER_VERTEX_COLOR =
+            ShaderDefinition::create(spirv_header_gen::generated::vertex_color_frag::META, {});
     static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
             spirv_header_gen::generated::default_vert::META,
             {.mMvpTransformBinding = spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding});
@@ -96,11 +95,7 @@ namespace gfx_testing::pipeline {
             {.mObjectLightingBinding = spirv_header_gen::generated::lambert_frag::UBO_ObjectLighting.mBinding});
 
     static constexpr std::array ALL_SHADERS{
-            SHADER_BASIC_TEXTURED,
-            SHADER_GOOCH,
-            SHADER_VERTEX_COLOR,
-            SHADER_DEFAULT_VERTEX,
-            SHADER_LAMBERT,
+            SHADER_BASIC_TEXTURED, SHADER_GOOCH, SHADER_VERTEX_COLOR, SHADER_DEFAULT_VERTEX, SHADER_LAMBERT,
     };
     // Pipeline definitions
 
@@ -131,10 +126,6 @@ namespace gfx_testing::pipeline {
             .mFragmentShader = SHADER_LAMBERT,
     };
     static constexpr std::array ALL_PIPELINES{
-            PIPELINE_SIMPLE_COLOR,
-            PIPELINE_GOOCH,
-            PIPELINE_TEXTURED,
-            PIPELINE_LINES,
-            PIPELINE_LAMBERT,
+            PIPELINE_SIMPLE_COLOR, PIPELINE_GOOCH, PIPELINE_TEXTURED, PIPELINE_LINES, PIPELINE_LAMBERT,
     };
-}
+} // namespace gfx_testing::pipeline

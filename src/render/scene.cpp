@@ -1,6 +1,6 @@
 #include <array>
-#include <cmath>
 #include <boost/scope/scope_exit.hpp>
+#include <cmath>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
@@ -52,25 +52,17 @@ namespace gfx_testing::render {
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
         mGameContext(gameContext),
         mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadObjModel(
-                             "basic-shapes.obj", util::NormalTreatment::SPLIT),
-                     pipeline::PipelineName::Gooch,
-                     translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
-        mCube(gameContext,
-              gameContext.mResourceLoader.loadObjModel(
-                      "cube.obj", util::NormalTreatment::SPLIT),
-              pipeline::PipelineName::Lambert,
-              glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
+                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", util::NormalTreatment::SPLIT),
+                     pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
+        mCube(gameContext, gameContext.mResourceLoader.loadObjModel("cube.obj", util::NormalTreatment::SPLIT),
+              pipeline::PipelineName::Lambert, glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
         mTextureObject(gameContext,
-                       gameContext.mResourceLoader.loadObjModel(
-                               "viking-room.obj", util::NormalTreatment::SPLIT),
+                       gameContext.mResourceLoader.loadObjModel("viking-room.obj", util::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
-                       glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION),
-                                  TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext),
-        mPointLight(gameContext, INITIAL_LIGHT_POSITION) {
-        for (auto const *objPtr: {&mDebugAxes.mRenderObject, &mPointLight.mRenderObject, &mPropObjects, &mCube,
-                                  &mTextureObject}) {
+                       glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
+        mDebugAxes(gameContext), mPointLight(gameContext, INITIAL_LIGHT_POSITION) {
+        for (auto const *objPtr:
+             {&mDebugAxes.mRenderObject, &mPointLight.mRenderObject, &mPropObjects, &mCube, &mTextureObject}) {
             mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
         }
     }
@@ -78,29 +70,21 @@ namespace gfx_testing::render {
     void SceneObjects::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
-        mPropObjects.mTransform = rotate(mPropObjects.mTransform,
-                                         mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
-                                         glm::vec3(0, 0, 1));
-        mCube.mTransform = rotate(mCube.mTransform,
-                                  -mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND * 2,
+        mPropObjects.mTransform =
+                rotate(mPropObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
+                       glm::vec3(0, 0, 1));
+        mCube.mTransform = rotate(mCube.mTransform, -mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND * 2,
                                   glm::vec3(0, 0, 1));
         mPointLight.update();
     }
 
 
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
-        mGameContext(gameContext),
-        mImGuiContext(imGuiContext),
-        mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
-        mCamera(INITIAL_CAMERA_POSITION),
-        mProjection(getProjection(mViewportExtent)),
-        mSceneObjects(gameContext),
+        mGameContext(gameContext), mImGuiContext(imGuiContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
+        mCamera(INITIAL_CAMERA_POSITION), mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
         mDepthTexture(gameContext.mSdlContext,
-                      createDepthTexture(gameContext.mSdlContext,
-                                         sdl::SdlContext::INITIAL_EXTENT)),
-        mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext,
-                                                        sdl::SdlContext::INITIAL_EXTENT)) {
-    }
+                      createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
+        mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
 
     void Scene::onResize(const util::Extent2D extent) {
         mViewportExtent = extent;
@@ -111,9 +95,7 @@ namespace gfx_testing::render {
         }
     }
 
-    void Scene::update() {
-        mSceneObjects.update();
-    }
+    void Scene::update() { mSceneObjects.update(); }
 
     void Scene::draw() const {
         SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(mGameContext.mSdlContext.mDevice);
@@ -124,8 +106,7 @@ namespace gfx_testing::render {
 
         SDL_GPUTexture *swapchainTexture = nullptr;
         if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow, &swapchainTexture,
-                                                   nullptr,
-                                                   nullptr)) {
+                                                   nullptr, nullptr)) {
             throw std::runtime_error("Failed to acquire swapchain texture");
         }
 
@@ -156,8 +137,8 @@ namespace gfx_testing::render {
                 .stencil_store_op = SDL_GPU_STOREOP_DONT_CARE,
                 .cycle = true,
         };
-        SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &mainColorTarget, 1,
-                                                               &depthStencilTargetInfo);
+        SDL_GPURenderPass *renderPass =
+                SDL_BeginGPURenderPass(commandBuffer, &mainColorTarget, 1, &depthStencilTargetInfo);
         drawObjects(commandBuffer, renderPass);
         SDL_EndGPURenderPass(renderPass);
 
@@ -194,4 +175,4 @@ namespace gfx_testing::render {
             }
         }
     }
-}
+} // namespace gfx_testing::render

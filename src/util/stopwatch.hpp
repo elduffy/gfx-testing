@@ -14,9 +14,7 @@ namespace gfx_testing::util {
 
         void resume();
 
-        [[nodiscard]] bool isPaused() const {
-            return !mResumedTime.has_value();
-        }
+        [[nodiscard]] bool isPaused() const { return !mResumedTime.has_value(); }
 
     private:
         uint64_t mAccumulatedTime = 0;
@@ -33,4 +31,4 @@ namespace gfx_testing::util {
             mDeltaTime = static_cast<float>(mAccumulatedTime - lastTime) / 1000.f;
         }
     };
-}
+} // namespace gfx_testing::util

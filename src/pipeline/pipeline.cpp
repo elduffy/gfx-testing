@@ -2,15 +2,14 @@
 // Created by eric on 5/3/25.
 //
 
-#include <pipeline/pipeline.hpp>
-
+#include <SDL3/SDL_gpu.h>
 #include <algorithm>
 #include <memory_resource>
-#include <SDL3/SDL_gpu.h>
-
-#include "pipeline_definition.hpp"
+#include <pipeline/pipeline.hpp>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
+
+#include "pipeline_definition.hpp"
 
 namespace gfx_testing::pipeline {
 
@@ -27,8 +26,8 @@ namespace gfx_testing::pipeline {
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-        const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
-                context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, dataSize);
+        const sdl::SdlTransferBuffer transferBuffer =
+                sdl::SdlTransferBuffer::create(context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, dataSize);
         // Write to transfer buffer
         {
             const auto mappedBuffer = transferBuffer.map(false);
@@ -77,11 +76,10 @@ namespace gfx_testing::pipeline {
 
     Pipeline::Pipeline(PipelineDefinition const &definition, sdl::SdlGfxPipeline sdlPipeline) :
         mDefinition(definition), mSdlPipeline(std::move(sdlPipeline)),
-        mBuffers(allocateStorageBuffers(sdlPipeline.mContext, mDefinition)) {
-    }
+        mBuffers(allocateStorageBuffers(sdlPipeline.mContext, mDefinition)) {}
 
     void Pipeline::bindStorageBuffers(SDL_GPURenderPass *renderPass) const {
         SDL_BindGPUFragmentStorageBuffers(renderPass, 0, mBuffers.mStorageBufferPtrs.data(),
                                           mBuffers.mStorageBufferPtrs.size());
     }
-}
+} // namespace gfx_testing::pipeline
