@@ -1,5 +1,5 @@
 #include <render/debug_axes.hpp>
-#include <shader_models.hpp>
+#include <shader/shader_models.hpp>
 #include "glm/ext/matrix_transform.hpp"
 
 namespace gfx_testing::render {

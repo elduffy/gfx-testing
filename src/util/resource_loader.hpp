@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <format>
 #include <sdl.hpp>
-#include <shader_models.hpp>
+#include <shader/shader_models.hpp>
 #include <util/util.hpp>
 #include <SDL3/SDL.h>
 #include <util/obj_loader.hpp>

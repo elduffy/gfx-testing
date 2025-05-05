@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "spirv_header.hpp"
+#include <shader/spirv_header.hpp>
 
 namespace spirv_header_gen::generated::{{ package_name }} {
 

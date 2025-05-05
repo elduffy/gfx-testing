@@ -1,6 +1,6 @@
 #pragma once
 #include <sdl.hpp>
-#include <shader_models.hpp>
+#include <shader/shader_models.hpp>
 
 namespace gfx_testing::render {
     struct TextureAndSampler {

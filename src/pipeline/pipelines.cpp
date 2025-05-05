@@ -1,6 +1,6 @@
 #include <array>
 #include <pipeline/pipelines.hpp>
-#include <shader_models.hpp>
+#include <shader/shader_models.hpp>
 
 namespace gfx_testing::pipeline {
 

@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
-#include <shader_models.hpp>
+#include <shader/shader_models.hpp>
 #include <tiny_obj_loader.h>
 #include <SDL3/SDL_log.h>
 #include <util/obj_loader.hpp>
