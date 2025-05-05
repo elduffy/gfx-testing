@@ -1,15 +1,15 @@
 #pragma once
 
-#include <camera.hpp>
+#include <render/camera.hpp>
 #include <sdl.hpp>
 #include <game.hpp>
-#include <render_object.hpp>
+#include <render/render_object.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include "debug_axes.hpp"
+#include "render/debug_axes.hpp"
 #include "imgui_context.hpp"
-#include "point_light.hpp"
+#include "render/point_light.hpp"
 
 namespace gfx_testing::scene {
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);

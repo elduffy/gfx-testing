@@ -3,7 +3,7 @@
 #include <sdl.hpp>
 #include <pipelines.hpp>
 #include <stopwatch.hpp>
-#include "samplers.hpp"
+#include <render/samplers.hpp>
 
 namespace gfx_testing::game {
     class GameContext {

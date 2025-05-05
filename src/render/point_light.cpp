@@ -1,4 +1,4 @@
-#include <point_light.hpp>
+#include <render/point_light.hpp>
 #include <obj_loader.hpp>
 
 #include <glm/ext/matrix_transform.hpp>

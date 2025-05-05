@@ -49,15 +49,15 @@ add_library(gfx_testing_lib
         src/scene.cpp
         src/game.cpp
         src/pipelines.cpp
-        src/render_object.cpp
+        src/render/render_object.cpp
         src/stopwatch.cpp
-        src/camera.cpp
-        src/point_light.cpp
+        src/render/camera.cpp
+        src/render/point_light.cpp
         src/resource_loader.cpp
-        src/samplers.cpp
+        src/render/samplers.cpp
         src/texture.cpp
         src/imgui_context.cpp
-        src/debug_axes.cpp
+        src/render/debug_axes.cpp
         src/spirv_header.cpp
         src/pipeline.cpp
         src/pipeline.hpp

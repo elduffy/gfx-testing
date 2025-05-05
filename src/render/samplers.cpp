@@ -1,5 +1,5 @@
 
-#include <samplers.hpp>
+#include <render/samplers.hpp>
 
 namespace gfx_testing::render {
 

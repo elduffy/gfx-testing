@@ -1,5 +1,5 @@
 #include <game.hpp>
-#include <render_object.hpp>
+#include <render/render_object.hpp>
 #include <utility>
 
 namespace gfx_testing::render {

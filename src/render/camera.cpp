@@ -1,4 +1,4 @@
-#include <camera.hpp>
+#include <render/camera.hpp>
 #include <util.hpp>
 
 #include "glm/trigonometric.hpp"

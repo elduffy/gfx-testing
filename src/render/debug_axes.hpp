@@ -1,6 +1,6 @@
 #pragma once
-#include "game.hpp"
-#include "render_object.hpp"
+#include <game.hpp>
+#include <render/render_object.hpp>
 
 namespace gfx_testing::render {
 
