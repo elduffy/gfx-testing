@@ -1,12 +1,12 @@
-#include <SDL3/SDL.h>
-#include <sdl.hpp>
-#include <util/util.hpp>
-#include <scene.hpp>
 #include <game.hpp>
 #include <imgui_context.hpp>
+#include <sdl.hpp>
+#include <SDL3/SDL.h>
+#include <render/scene.hpp>
+#include <util/util.hpp>
 
 void handleEvent(gfx_testing::game::GameContext &gameContext,
-                 gfx_testing::scene::Scene &scene,
+                 gfx_testing::render::Scene &scene,
                  gfx_testing::imgui::ImGuiContext &imGuiContext,
                  SDL_Event const &event) {
     if (imGuiContext.processEvent(event)) {
@@ -52,7 +52,7 @@ void handleEvent(gfx_testing::game::GameContext &gameContext,
     }
 }
 
-void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::scene::Scene &scene) {
+void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::render::Scene &scene) {
     scene.update();
     scene.draw();
 }
@@ -65,7 +65,7 @@ int main() {
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
     gfx_testing::imgui::ImGuiContext imGuiContext{sdlContext};
 
-    gfx_testing::scene::Scene scene(gameContext, imGuiContext);
+    gfx_testing::render::Scene scene(gameContext, imGuiContext);
 
     auto eventFunction = [&](auto const &event) { handleEvent(gameContext, scene, imGuiContext, event); };
     auto updateFunction = [&] { handleUpdate(gameContext, scene); };

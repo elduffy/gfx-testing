@@ -1,17 +1,16 @@
 #pragma once
 
-#include <render/camera.hpp>
-#include <sdl.hpp>
 #include <game.hpp>
-#include <render/render_object.hpp>
+#include <imgui_context.hpp>
+#include <sdl.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <render/camera.hpp>
+#include <render/debug_axes.hpp>
+#include <render/point_light.hpp>
+#include <render/render_object.hpp>
 
-#include "render/debug_axes.hpp"
-#include "imgui_context.hpp"
-#include "render/point_light.hpp"
-
-namespace gfx_testing::scene {
+namespace gfx_testing::render {
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
     static constexpr glm::vec3 CUBE_POSITION(3, 3, -1);
     static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);

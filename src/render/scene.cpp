@@ -1,17 +1,14 @@
 #include <array>
 #include <cmath>
-#include <scene.hpp>
-#include <shader_models.hpp>
-#include <util/util.hpp>
 #include <boost/scope/scope_exit.hpp>
-
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-
 #include <pipeline/pipelines.hpp>
+#include <render/scene.hpp>
+#include <util/util.hpp>
 
 
-namespace gfx_testing::scene {
+namespace gfx_testing::render {
 
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
 
