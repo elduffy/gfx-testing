@@ -1,5 +1,5 @@
 #include <array>
-#include <pipelines.hpp>
+#include <pipeline/pipelines.hpp>
 #include <shader_models.hpp>
 
 namespace gfx_testing::pipeline {

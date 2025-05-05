@@ -1,6 +1,6 @@
 #pragma once
-#include "pipeline_definition.hpp"
-#include "sdl.hpp"
+#include <pipeline/pipeline_definition.hpp>
+#include <sdl.hpp>
 
 
 namespace gfx_testing::pipeline {

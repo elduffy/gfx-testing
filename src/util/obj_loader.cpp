@@ -2,13 +2,12 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
-#include <numeric>
 #include <shader_models.hpp>
 #include <tiny_obj_loader.h>
 #include <SDL3/SDL_log.h>
-#include <obj_loader.hpp>
+#include <util/obj_loader.hpp>
 
-namespace gfx_testing::model {
+namespace gfx_testing::util {
 
     shader::MeshData processAveraged(tinyobj::ObjReader const &reader) {
         auto const &attrib = reader.GetAttrib();

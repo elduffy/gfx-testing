@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <util.hpp>
+#include <util/util.hpp>
 #include <boost/scope/scope_exit.hpp>
 #include <SDL3/SDL.h>
 

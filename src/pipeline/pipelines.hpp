@@ -3,7 +3,7 @@
 #include <map>
 #include <sdl.hpp>
 
-#include "resource_loader.hpp"
+#include "util/resource_loader.hpp"
 #include "pipeline.hpp"
 #include "pipeline_definition.hpp"
 

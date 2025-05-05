@@ -1,6 +1,5 @@
 #pragma once
 #include <chrono>
-#include <cstdint>
 
 namespace gfx_testing::util {
     class Stopwatch {

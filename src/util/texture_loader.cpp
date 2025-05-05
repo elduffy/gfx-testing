@@ -1,8 +1,8 @@
-#include <texture.hpp>
+#include <util/texture_loader.hpp>
 
 #include "SDL3_image/SDL_image.h"
 
-namespace gfx_testing::io {
+namespace gfx_testing::util {
     sdl::SdlSurface loadImage(const std::string &path) {
         auto *surface = IMG_Load(path.c_str());
         if (!surface) {

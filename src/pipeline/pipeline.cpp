@@ -2,16 +2,15 @@
 // Created by eric on 5/3/25.
 //
 
-#include "pipeline.hpp"
+#include <pipeline/pipeline.hpp>
 
 #include <algorithm>
 #include <memory_resource>
 #include <SDL3/SDL_gpu.h>
 
-#include "gooch.frag.hpp"
 #include "pipeline_definition.hpp"
-#include "sdl.hpp"
-#include "shader_models.hpp"
+#include <sdl.hpp>
+#include <shader_models.hpp>
 
 namespace gfx_testing::pipeline {
 

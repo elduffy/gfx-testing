@@ -1,5 +1,5 @@
 #include <render/point_light.hpp>
-#include <obj_loader.hpp>
+#include <util/obj_loader.hpp>
 
 #include <glm/ext/matrix_transform.hpp>
 
@@ -9,7 +9,7 @@ namespace gfx_testing::render {
         mPosWs(initialPosition),
         mPathRadius(length(initialPosition)),
         mRenderObject(gameContext,
-                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", model::NormalTreatment::AVERAGE),
+                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", util::NormalTreatment::AVERAGE),
                       pipeline::PipelineName::SimpleColor,
                       translate(glm::mat4(1.0f), mPosWs)) {
     }

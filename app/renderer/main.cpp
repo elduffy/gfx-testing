@@ -1,6 +1,6 @@
 #include <SDL3/SDL.h>
 #include <sdl.hpp>
-#include <util.hpp>
+#include <util/util.hpp>
 #include <scene.hpp>
 #include <game.hpp>
 #include <imgui_context.hpp>

@@ -1,4 +1,4 @@
-#include <stopwatch.hpp>
+#include <util/stopwatch.hpp>
 
 namespace gfx_testing::util {
     Stopwatch::Stopwatch(bool start) {

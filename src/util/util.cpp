@@ -1,4 +1,4 @@
-#include <util.hpp>
+#include <util/util.hpp>
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot() {

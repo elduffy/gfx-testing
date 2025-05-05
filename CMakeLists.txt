@@ -43,25 +43,24 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 
 # gfx_testing_lib main library
 add_library(gfx_testing_lib
-        src/obj_loader.cpp
-        src/sdl.cpp
-        src/util.cpp
-        src/scene.cpp
         src/game.cpp
-        src/pipelines.cpp
-        src/render/render_object.cpp
-        src/stopwatch.cpp
-        src/render/camera.cpp
-        src/render/point_light.cpp
-        src/resource_loader.cpp
-        src/render/samplers.cpp
-        src/texture.cpp
         src/imgui_context.cpp
+        src/pipeline/pipeline.cpp
+        src/pipeline/pipeline_definition.hpp
+        src/pipeline/pipeline.hpp
+        src/pipeline/pipelines.cpp
+        src/render/camera.cpp
         src/render/debug_axes.cpp
-        src/spirv_header.cpp
-        src/pipeline.cpp
-        src/pipeline.hpp
-        src/pipeline_definition.hpp
+        src/render/point_light.cpp
+        src/render/render_object.cpp
+        src/render/samplers.cpp
+        src/scene.cpp
+        src/sdl.cpp
+        src/util/obj_loader.cpp
+        src/util/resource_loader.cpp
+        src/util/stopwatch.cpp
+        src/util/texture_loader.cpp
+        src/util/util.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui

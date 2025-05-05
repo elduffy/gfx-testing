@@ -1,8 +1,7 @@
-#include <obj_loader.hpp>
-#include <resource_loader.hpp>
+#include <util/obj_loader.hpp>
+#include <util/resource_loader.hpp>
 #include <boost/algorithm/string/replace.hpp>
-
-#include "texture.hpp"
+#include <util/texture_loader.hpp>
 
 namespace gfx_testing::util {
 
@@ -33,11 +32,11 @@ namespace gfx_testing::util {
     }
 
     shader::MeshData ResourceLoader::loadObjModel(std::string const &filename,
-                                                  model::NormalTreatment normalTreatment) const {
-        return model::loadObjFile(mProjectRoot / "content/models/" / filename, normalTreatment);
+                                                  NormalTreatment normalTreatment) const {
+        return loadObjFile(mProjectRoot / "content/models/" / filename, normalTreatment);
     }
 
     sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {
-        return io::loadImage(mProjectRoot / "content/textures/" / filename);
+        return loadImage(mProjectRoot / "content/textures/" / filename);
     }
 }

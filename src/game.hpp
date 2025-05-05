@@ -1,8 +1,8 @@
 #pragma once
 
 #include <sdl.hpp>
-#include <pipelines.hpp>
-#include <stopwatch.hpp>
+#include <pipeline/pipelines.hpp>
+#include <util/stopwatch.hpp>
 #include <render/samplers.hpp>
 
 namespace gfx_testing::game {

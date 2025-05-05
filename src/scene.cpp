@@ -2,13 +2,13 @@
 #include <cmath>
 #include <scene.hpp>
 #include <shader_models.hpp>
-#include <util.hpp>
+#include <util/util.hpp>
 #include <boost/scope/scope_exit.hpp>
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include <pipelines.hpp>
+#include <pipeline/pipelines.hpp>
 
 
 namespace gfx_testing::scene {
@@ -56,17 +56,17 @@ namespace gfx_testing::scene {
         mGameContext(gameContext),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel(
-                             "basic-shapes.obj", model::NormalTreatment::SPLIT),
+                             "basic-shapes.obj", util::NormalTreatment::SPLIT),
                      pipeline::PipelineName::Gooch,
                      translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
         mCube(gameContext,
               gameContext.mResourceLoader.loadObjModel(
-                      "cube.obj", model::NormalTreatment::SPLIT),
+                      "cube.obj", util::NormalTreatment::SPLIT),
               pipeline::PipelineName::Lambert,
               glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
         mTextureObject(gameContext,
                        gameContext.mResourceLoader.loadObjModel(
-                               "viking-room.obj", model::NormalTreatment::SPLIT),
+                               "viking-room.obj", util::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION),
                                   TEXTURE_OBJECT_SCALE)),
