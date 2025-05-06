@@ -54,15 +54,16 @@ namespace gfx_testing::render {
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", util::NormalTreatment::SPLIT),
                      pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
-        mCube(gameContext, gameContext.mResourceLoader.loadObjModel("cube.obj", util::NormalTreatment::SPLIT),
-              pipeline::PipelineName::Lambert, glm::translate(glm::identity<glm::mat4>(), CUBE_POSITION)),
+        mLandscape(gameContext, gameContext.mResourceLoader.loadObjModel("cube.obj", util::NormalTreatment::SPLIT),
+                   pipeline::PipelineName::Lambert,
+                   glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE)),
         mTextureObject(gameContext,
                        gameContext.mResourceLoader.loadObjModel("viking-room.obj", util::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLight(gameContext, INITIAL_LIGHT_POSITION) {
         for (auto const *objPtr:
-             {&mDebugAxes.mRenderObject, &mPointLight.mRenderObject, &mPropObjects, &mCube, &mTextureObject}) {
+             {&mDebugAxes.mRenderObject, &mPointLight.mRenderObject, &mPropObjects, &mLandscape, &mTextureObject}) {
             mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
         }
     }
@@ -73,8 +74,6 @@ namespace gfx_testing::render {
         mPropObjects.mTransform =
                 rotate(mPropObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                        glm::vec3(0, 0, 1));
-        mCube.mTransform = rotate(mCube.mTransform, -mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND * 2,
-                                  glm::vec3(0, 0, 1));
         mPointLight.update();
     }
 

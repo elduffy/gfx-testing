@@ -61,7 +61,7 @@ namespace gfx_testing::pipeline {
             case PipelineName::Lambert: {
                 constexpr shader::LambertParams params{
                         .mUnlitColor = {.1, .1, .1},
-                        .mLitColor = {1, 1, 1},
+                        .mLitColor = {.3, .3, .3},
                 };
                 uploadParams(result, context, params);
                 break;

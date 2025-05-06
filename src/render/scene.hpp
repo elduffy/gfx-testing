@@ -12,7 +12,8 @@
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
-    static constexpr glm::vec3 CUBE_POSITION(3, 3, -1);
+    static constexpr glm::vec3 LANDSCAPE_POSITION(0, 0, -10);
+    static constexpr glm::vec3 LANDSCAPE_SCALE(20, 20, .5);
     static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);
     static constexpr glm::vec3 TEXTURE_OBJECT_SCALE(2);
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
@@ -22,7 +23,7 @@ namespace gfx_testing::render {
     public:
         explicit SceneObjects(game::GameContext &gameContext);
 
-        std::vector<render::RenderObject const *> const &getRenderObjects(pipeline::PipelineName pipelineName) const {
+        std::vector<RenderObject const *> const &getRenderObjects(pipeline::PipelineName pipelineName) const {
             return mRenderObjectsByPipeline.at(pipeline::getIndex(pipelineName));
         }
 
@@ -30,16 +31,16 @@ namespace gfx_testing::render {
 
     private:
         game::GameContext &mGameContext;
-        render::RenderObject mPropObjects;
-        render::RenderObject mCube;
-        render::RenderObject mTextureObject;
-        render::DebugAxes mDebugAxes;
+        RenderObject mPropObjects;
+        RenderObject mLandscape;
+        RenderObject mTextureObject;
+        DebugAxes mDebugAxes;
 
     public:
-        render::PointLight mPointLight;
+        PointLight mPointLight;
 
     private:
-        std::vector<std::vector<render::RenderObject const *>> mRenderObjectsByPipeline{pipeline::ALL_PIPELINES.size()};
+        std::vector<std::vector<RenderObject const *>> mRenderObjectsByPipeline{pipeline::ALL_PIPELINES.size()};
     };
 
     class Scene {
@@ -54,7 +55,7 @@ namespace gfx_testing::render {
 
         [[nodiscard]] util::Extent2D getViewportExtent() const { return mViewportExtent; };
 
-        render::Camera &getCamera() { return mCamera; }
+        Camera &getCamera() { return mCamera; }
 
     private:
         void drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const;
@@ -62,7 +63,7 @@ namespace gfx_testing::render {
         game::GameContext &mGameContext;
         imgui::ImGuiContext &mImGuiContext;
         util::Extent2D mViewportExtent;
-        render::Camera mCamera;
+        Camera mCamera;
         glm::mat4x4 mProjection;
         SceneObjects mSceneObjects;
         sdl::SdlGpuTexture mDepthTexture;
