@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <algorithm>
+#include <boost/safe_numerics/checked_default.hpp>
 #include <boost/scope/scope_exit.hpp>
 #include <util/util.hpp>
 
@@ -153,6 +154,14 @@ namespace gfx_testing::sdl {
 
         SDL_Surface *operator*() const { return mSurface; }
         SdlSurface &operator=(SdlSurface &&other) noexcept;
+
+        util::Extent2D getExtent() const {
+            assert(mSurface);
+            return {
+                    .mWidth = boost::safe_numerics::checked::cast<uint32_t>(mSurface->w),
+                    .mHeight = boost::safe_numerics::checked::cast<uint32_t>(mSurface->h),
+            };
+        }
 
         SDL_Surface *mSurface = nullptr;
     };

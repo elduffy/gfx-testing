@@ -21,6 +21,10 @@ namespace gfx_testing::util {
         uint32_t mWidth;
         uint32_t mHeight;
 
+        friend bool operator==(const Extent2D &lhs, const Extent2D &rhs) {
+            return lhs.mWidth == rhs.mWidth && lhs.mHeight == rhs.mHeight;
+        }
+
         [[nodiscard]] glm::vec2 asVec2() const { return {mWidth, mHeight}; }
     };
 
