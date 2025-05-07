@@ -3,6 +3,7 @@
 #include <imgui_context.hpp>
 #include <render/scene.hpp>
 #include <sdl.hpp>
+#include <util/texture_loader.hpp>
 #include <util/util.hpp>
 
 void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
@@ -60,6 +61,9 @@ int main() {
     constexpr auto USE_VSYNC = false; // Unlocks frame rate if supported
     const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, USE_VSYNC};
     const gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
+
+    auto const map = resourceLoader.loadCubeMap("field");
+
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
     gfx_testing::imgui::ImGuiContext imGuiContext{sdlContext};
 

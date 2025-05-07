@@ -56,6 +56,7 @@ add_library(gfx_testing_lib
         src/render/samplers.cpp
         src/render/scene.cpp
         src/sdl.cpp
+        src/util/cube_map.cpp
         src/util/obj_loader.cpp
         src/util/resource_loader.cpp
         src/util/stopwatch.cpp

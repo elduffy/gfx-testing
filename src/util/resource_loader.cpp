@@ -36,4 +36,8 @@ namespace gfx_testing::util {
     sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {
         return loadImage(mProjectRoot / "content/textures/" / filename);
     }
+
+    CubeMap ResourceLoader::loadCubeMap(std::string const &dirname) const {
+        return util::loadCubeMap(mProjectRoot / "content/cubemaps/" / dirname);
+    }
 } // namespace gfx_testing::util

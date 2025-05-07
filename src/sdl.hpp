@@ -144,13 +144,15 @@ namespace gfx_testing::sdl {
 
     class SdlSurface {
     public:
-        NO_COPY_NO_MOVE(SdlSurface);
+        NO_COPY(SdlSurface);
 
+        SdlSurface() = default;
         explicit SdlSurface(SDL_Surface *surface);
-
+        SdlSurface(SdlSurface &&other) noexcept;
         ~SdlSurface();
 
         SDL_Surface *operator*() const { return mSurface; }
+        SdlSurface &operator=(SdlSurface &&other) noexcept;
 
         SDL_Surface *mSurface = nullptr;
     };

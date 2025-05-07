@@ -5,6 +5,7 @@
 #include <format>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
+#include <util/cube_map.hpp>
 #include <util/obj_loader.hpp>
 #include <util/util.hpp>
 
@@ -46,6 +47,8 @@ namespace gfx_testing::util {
         [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename, NormalTreatment normalTreatment) const;
 
         [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
+
+        [[nodiscard]] CubeMap loadCubeMap(std::string const &dirname) const;
 
     private:
         sdl::SdlContext const &mSdlContext;

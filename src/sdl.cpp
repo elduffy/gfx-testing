@@ -188,7 +188,15 @@ namespace gfx_testing::sdl {
 namespace gfx_testing::sdl {
     SdlSurface::SdlSurface(SDL_Surface *surface) : mSurface(surface) {}
 
+    SdlSurface::SdlSurface(SdlSurface &&other) noexcept : mSurface(other.mSurface) { other.mSurface = nullptr; }
+
     SdlSurface::~SdlSurface() { SDL_DestroySurface(mSurface); }
+
+    SdlSurface &SdlSurface::operator=(SdlSurface &&other) noexcept {
+        mSurface = other.mSurface;
+        other.mSurface = nullptr;
+        return *this;
+    }
 } // namespace gfx_testing::sdl
 
 namespace gfx_testing::sdl {
