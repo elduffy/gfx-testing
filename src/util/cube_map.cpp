@@ -53,12 +53,12 @@ namespace gfx_testing::util {
         };
         for (uint32_t face = 0; face < 6; ++face) {
             auto const &surface = surfaces.at(face);
-            source.pixels_per_row = boost::safe_numerics::checked::cast<uint32_t>((*surface)->pitch),
+            source.pixels_per_row = boost::safe_numerics::checked::cast<uint32_t>((*surface)->w),
             source.offset = face * bytesPerLayer;
             dest.texture = *texture;
             dest.layer = face;
+            SDL_UploadToGPUTexture(copyPass, &source, &dest, false);
         }
-        SDL_UploadToGPUTexture(copyPass, &source, &dest, false);
         SDL_EndGPUCopyPass(copyPass);
     }
 

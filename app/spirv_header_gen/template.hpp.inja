@@ -13,11 +13,11 @@ namespace spirv_header_gen::generated::{{ package_name }} {
         gfx_testing::shader::EntryPoint mEntryPoint;
         std::array<gfx_testing::shader::Input, {{ length(inputs) }}> mInputs;
         std::array<gfx_testing::shader::Output, {{ length(outputs) }}> mOutputs;
-        std::array<gfx_testing::shader::Ubo, {{ length(default(ubos, [])) }}> mUbos;
-        std::array<gfx_testing::shader::SeparateImage, {{ length(default(separate_images, [])) }}> mSeparateImages;
-        std::array<gfx_testing::shader::SeparateSampler, {{ length(default(separate_samplers, [])) }}> mSeparateSamplers;
-        std::array<gfx_testing::shader::Ssbo, {{ length(default(ssbos, [])) }}> mSsbos;
-        std::array<gfx_testing::shader::StorageTexture, {{ length(default(images, [])) }}> mStorageTextures;
+        std::array<gfx_testing::shader::Ubo, {{ length(ubos) }}> mUbos;
+        std::array<gfx_testing::shader::SeparateImage, {{ length(separate_images) }}> mSeparateImages;
+        std::array<gfx_testing::shader::SeparateSampler, {{ length(separate_samplers) }}> mSeparateSamplers;
+        std::array<gfx_testing::shader::Ssbo, {{ length(ssbos) }}> mSsbos;
+        std::array<gfx_testing::shader::StorageTexture, {{ length(images) }}> mStorageTextures;
     };
 
     // Entrypoint
@@ -27,7 +27,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     };
 
     // Types
-    {% for key, type in default(types, {}) -%}
+    {% for key, type in types -%}
 
     {% for member in type.members %}
     constexpr gfx_testing::shader::TypeMember TYPE_{{loop.parent.index}}_MEMBER_{{loop.index}} {
@@ -65,7 +65,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     };{% endfor %}
 
     // UBOs
-    {% for ubo in default(ubos, []) %}
+    {% for ubo in ubos %}
     inline constexpr gfx_testing::shader::Ubo UBO_{{loop.index}} {
         .mName = "{{ubo.name}}",
         .mType = "{{ubo.type}}",
@@ -78,7 +78,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     {% endfor %}
 
     // Separate Images
-    {% for image in default(separate_images, []) %}
+    {% for image in separate_images %}
     constexpr gfx_testing::shader::SeparateImage SEPARATE_IMAGE_{{loop.index}} {
         .mName = "{{image.name}}",
         .mType = "{{image.type}}",
@@ -87,7 +87,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     };{% endfor %}
 
     // Separate Samplers
-    {% for sampler in default(separate_samplers, []) %}
+    {% for sampler in separate_samplers %}
     constexpr gfx_testing::shader::SeparateSampler SEPARATE_SAMPLER_{{loop.index}} {
         .mName = "{{sampler.name}}",
         .mType = "{{sampler.type}}",
@@ -96,7 +96,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     };{% endfor %}
 
     // SSBOs
-    {% for ssbo in default(ssbos, []) %}
+    {% for ssbo in ssbos %}
     inline constexpr gfx_testing::shader::Ssbo SSBO_{{loop.index}} {
         .mName = "{{ssbo.name}}",
         .mType = "{{ssbo.type}}",
@@ -110,7 +110,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     {% endfor %}
 
     // Storage textures
-    {% for storageTex in default(images, []) %}
+    {% for storageTex in images %}
     constexpr gfx_testing::shader::StorageTexture STORAGE_TEXTURE_{{loop.index}} {
         // TODO: update template for storage textures
     },{% endfor %}

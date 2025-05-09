@@ -79,6 +79,20 @@ namespace spirv_header_gen {
         model["entryPoint"] = json["entryPoints"].at(0);
         model.erase("entryPoints");
 
+        // array defaults
+        for (auto const *field:
+             {"inputs", "outputs", "ubos", "separate_images", "separate_samplers", "ssbos", "images"}) {
+            if (!model.contains(field)) {
+                model[field] = nlohmann::json::array();
+            }
+        }
+        // object defaults
+        for (auto const *field: {"types"}) {
+            if (!model.contains(field)) {
+                model[field] = nlohmann::json::object();
+            }
+        }
+
         env.render_to(*ostream, templ, model);
     }
 } // namespace spirv_header_gen

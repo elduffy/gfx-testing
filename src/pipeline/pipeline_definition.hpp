@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <skybox.frag.hpp>
+#include <skybox.vert.hpp>
 #include <stdexcept>
 
 #include "basic_textured.frag.hpp"
@@ -19,6 +21,7 @@ namespace gfx_testing::pipeline {
         Textured,
         Lines,
         Lambert,
+        Skybox,
     };
 
     constexpr size_t getIndex(PipelineName pipelineName) { return static_cast<size_t>(pipelineName); }
@@ -35,6 +38,8 @@ namespace gfx_testing::pipeline {
                 return "Lines";
             case PipelineName::Lambert:
                 return "Lambert";
+            case PipelineName::Skybox:
+                return "Skybox";
         }
         throw std::runtime_error("Unknown pipeline name");
     }
@@ -80,6 +85,18 @@ namespace gfx_testing::pipeline {
 
     // Shader definitions
 
+    // Vertex
+
+    static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
+            spirv_header_gen::generated::default_vert::META,
+            {.mMvpTransformBinding = spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding});
+
+    static constexpr ShaderDefinition SHADER_SKYBOX_VERTEX = ShaderDefinition::create(
+            spirv_header_gen::generated::skybox_vert::META,
+            {.mMvpTransformBinding = spirv_header_gen::generated::skybox_vert::UBO_MvpTransform.mBinding});
+
+    // Fragment
+
     static constexpr ShaderDefinition SHADER_BASIC_TEXTURED =
             ShaderDefinition::create(spirv_header_gen::generated::basic_textured_frag::META, {});
     static constexpr ShaderDefinition SHADER_GOOCH = ShaderDefinition::create(
@@ -87,15 +104,22 @@ namespace gfx_testing::pipeline {
             {.mObjectLightingBinding = spirv_header_gen::generated::gooch_frag::UBO_ObjectLighting.mBinding});
     static constexpr ShaderDefinition SHADER_VERTEX_COLOR =
             ShaderDefinition::create(spirv_header_gen::generated::vertex_color_frag::META, {});
-    static constexpr ShaderDefinition SHADER_DEFAULT_VERTEX = ShaderDefinition::create(
-            spirv_header_gen::generated::default_vert::META,
-            {.mMvpTransformBinding = spirv_header_gen::generated::default_vert::UBO_MvpTransform.mBinding});
     static constexpr ShaderDefinition SHADER_LAMBERT = ShaderDefinition::create(
             spirv_header_gen::generated::lambert_frag::META,
             {.mObjectLightingBinding = spirv_header_gen::generated::lambert_frag::UBO_ObjectLighting.mBinding});
+    static constexpr ShaderDefinition SHADER_SKYBOX_FRAGMENT =
+            ShaderDefinition::create(spirv_header_gen::generated::skybox_frag::META, {});
 
     static constexpr std::array ALL_SHADERS{
-            SHADER_BASIC_TEXTURED, SHADER_GOOCH, SHADER_VERTEX_COLOR, SHADER_DEFAULT_VERTEX, SHADER_LAMBERT,
+            // Vertex
+            SHADER_DEFAULT_VERTEX,
+            SHADER_SKYBOX_VERTEX,
+            // Fragment
+            SHADER_BASIC_TEXTURED,
+            SHADER_GOOCH,
+            SHADER_VERTEX_COLOR,
+            SHADER_LAMBERT,
+            SHADER_SKYBOX_FRAGMENT,
     };
     // Pipeline definitions
 
@@ -125,7 +149,11 @@ namespace gfx_testing::pipeline {
             .mVertexShader = SHADER_DEFAULT_VERTEX,
             .mFragmentShader = SHADER_LAMBERT,
     };
-    static constexpr std::array ALL_PIPELINES{
-            PIPELINE_SIMPLE_COLOR, PIPELINE_GOOCH, PIPELINE_TEXTURED, PIPELINE_LINES, PIPELINE_LAMBERT,
+    static constexpr PipelineDefinition PIPELINE_SKYBOX{
+            .mName = PipelineName::Skybox,
+            .mVertexShader = SHADER_SKYBOX_VERTEX,
+            .mFragmentShader = SHADER_SKYBOX_FRAGMENT,
     };
+    static constexpr std::array ALL_PIPELINES{PIPELINE_SIMPLE_COLOR, PIPELINE_GOOCH,   PIPELINE_TEXTURED,
+                                              PIPELINE_LINES,        PIPELINE_LAMBERT, PIPELINE_SKYBOX};
 } // namespace gfx_testing::pipeline

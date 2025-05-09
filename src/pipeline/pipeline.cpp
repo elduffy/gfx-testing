@@ -4,7 +4,6 @@
 
 #include <SDL3/SDL_gpu.h>
 #include <algorithm>
-#include <memory_resource>
 #include <pipeline/pipeline.hpp>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
@@ -69,6 +68,7 @@ namespace gfx_testing::pipeline {
             case PipelineName::SimpleColor:
             case PipelineName::Textured:
             case PipelineName::Lines:
+            case PipelineName::Skybox:
                 break;
         }
         return result;

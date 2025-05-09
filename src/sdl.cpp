@@ -64,6 +64,7 @@ namespace gfx_testing::sdl {
     void SdlContext::updateSwapchainParameters(bool vsync) const {
         auto presentMode = SDL_GPU_PRESENTMODE_VSYNC;
         if (vsync) {
+            // TODO: mailbox mode runs a LOT hotter and higher FPS than actual VSYNC.
             if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, SDL_GPU_PRESENTMODE_MAILBOX)) {
                 presentMode = SDL_GPU_PRESENTMODE_MAILBOX;
             }

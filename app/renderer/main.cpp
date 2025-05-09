@@ -62,11 +62,6 @@ int main() {
     const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, USE_VSYNC};
     const gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
 
-    {
-        auto const cubeMap = resourceLoader.loadCubeMap("field");
-        auto const tex = cubeMap.createTexture(sdlContext);
-    }
-
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
     gfx_testing::imgui::ImGuiContext imGuiContext{sdlContext};
 

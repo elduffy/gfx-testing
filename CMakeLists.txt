@@ -55,6 +55,7 @@ add_library(gfx_testing_lib
         src/render/render_object.cpp
         src/render/samplers.cpp
         src/render/scene.cpp
+        src/render/sky_box.cpp
         src/sdl.cpp
         src/util/cube_map.cpp
         src/util/obj_loader.cpp

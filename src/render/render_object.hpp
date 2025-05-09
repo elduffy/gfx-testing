@@ -16,6 +16,10 @@ namespace gfx_testing::render {
         RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
                      sdl::SdlSurface const &textureData, const glm::mat4 &initialTransform);
 
+        RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+                     pipeline::PipelineName pipelineName, sdl::SdlGpuTexture texture,
+                     const glm::mat4 &initialTransform);
+
     private:
         RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
                      pipeline::PipelineName pipelineName, sdl::SdlSurface const *textureDataOpt,

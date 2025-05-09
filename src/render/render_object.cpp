@@ -143,6 +143,19 @@ namespace gfx_testing::render {
         RenderObject(gameContext, meshData, pipeline::PipelineName::Textured, &textureData, initialTransform) {}
 
     RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+                               pipeline::PipelineName pipelineName, sdl::SdlGpuTexture texture,
+                               const glm::mat4 &initialTransform) :
+        mTransform(initialTransform),
+        mVertexBuffer(sdl::SdlGpuBuffer::create(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_VERTEX,
+                                                meshData.getVertexBufferSize())),
+        mIndexBuffer(sdl::SdlGpuBuffer::create(gameContext.mSdlContext, SDL_GPU_BUFFERUSAGE_INDEX,
+                                               meshData.getIndexBufferSize())),
+        mPipelineName(pipelineName), mTextureOpt{{std::move(texture), gameContext.mSamplers.mAnisotropicWrap}},
+        mIndexCount(meshData.mIndices.count()) {
+        transferBufferData(gameContext.mSdlContext, meshData, *mVertexBuffer, *mIndexBuffer);
+    }
+
+    RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
                                pipeline::PipelineName pipelineName, sdl::SdlSurface const *textureDataOpt,
                                const glm::mat4 &initialTransform) :
         mTransform(initialTransform),

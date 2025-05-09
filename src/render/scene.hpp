@@ -8,11 +8,12 @@
 #include <render/debug_axes.hpp>
 #include <render/point_light.hpp>
 #include <render/render_object.hpp>
+#include <render/sky_box.hpp>
 #include <sdl.hpp>
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
-    static constexpr glm::vec3 LANDSCAPE_POSITION(0, 0, -10);
+    static constexpr glm::vec3 LANDSCAPE_POSITION(0, 0, -15);
     static constexpr glm::vec3 LANDSCAPE_SCALE(20, 20, .5);
     static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);
     static constexpr glm::vec3 TEXTURE_OBJECT_SCALE(2);
@@ -31,6 +32,7 @@ namespace gfx_testing::render {
 
     private:
         game::GameContext &mGameContext;
+        SkyBox mSkyBox;
         RenderObject mPropObjects;
         RenderObject mLandscape;
         RenderObject mTextureObject;

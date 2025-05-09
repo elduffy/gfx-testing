@@ -5,6 +5,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
 #include <render/scene.hpp>
+#include <tiny_obj_loader.h>
 #include <util/util.hpp>
 
 
@@ -26,9 +27,9 @@ namespace gfx_testing::render {
         return SDL_CreateGPUTexture(context.mDevice, &createInfo);
     }
 
-    std::optional<sdl::SdlGpuTexture> createMultisampleTexture(sdl::SdlContext const &context, util::Extent2D extent) {
+    SDL_GPUTexture *createMultisampleTexture(sdl::SdlContext const &context, util::Extent2D extent) {
         if constexpr (pipeline::MSAA_SAMPLE_COUNT == SDL_GPU_SAMPLECOUNT_1) {
-            return std::nullopt;
+            return nullptr;
         }
         auto const format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow);
         const SDL_GPUTextureCreateInfo createInfo = {
@@ -41,16 +42,23 @@ namespace gfx_testing::render {
                 .num_levels = 1,
                 .sample_count = pipeline::MSAA_SAMPLE_COUNT,
         };
-        return sdl::SdlGpuTexture{context, SDL_CreateGPUTexture(context.mDevice, &createInfo)};
+        return SDL_CreateGPUTexture(context.mDevice, &createInfo);
+    }
+
+    std::optional<sdl::SdlGpuTexture> optionalFromPointer(sdl::SdlContext const &context, SDL_GPUTexture *texture) {
+        if (texture == nullptr) {
+            return std::nullopt;
+        }
+        return {{context, texture}};
     }
 
     glm::mat4x4 getProjection(const util::Extent2D extent) {
         auto const aspect = static_cast<float>(extent.mWidth) / static_cast<float>(extent.mHeight);
-        return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
+        return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
     }
 
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
-        mGameContext(gameContext),
+        mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", util::NormalTreatment::SPLIT),
                      pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
@@ -62,8 +70,8 @@ namespace gfx_testing::render {
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLight(gameContext, INITIAL_LIGHT_POSITION) {
-        for (auto const *objPtr:
-             {&mDebugAxes.mRenderObject, &mPointLight.mRenderObject, &mPropObjects, &mLandscape, &mTextureObject}) {
+        for (auto const *objPtr: {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPointLight.mRenderObject,
+                                  &mPropObjects, &mLandscape, &mTextureObject}) {
             mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
         }
     }
@@ -83,14 +91,16 @@ namespace gfx_testing::render {
         mCamera(INITIAL_CAMERA_POSITION), mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
-        mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
+        mMultisampleTextureOpt(optionalFromPointer(
+                gameContext.mSdlContext,
+                createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT))) {}
 
     void Scene::onResize(const util::Extent2D extent) {
         mViewportExtent = extent;
         mProjection = getProjection(mViewportExtent);
         mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
         if (mMultisampleTextureOpt.has_value()) {
-            mMultisampleTextureOpt->reset(createDepthTexture(mGameContext.mSdlContext, extent));
+            mMultisampleTextureOpt.value().reset(createMultisampleTexture(mGameContext.mSdlContext, extent));
         }
     }
 
