@@ -25,13 +25,12 @@ namespace gfx_testing::util {
             throw std::runtime_error("Path is not a directory");
         }
 
-        // The files are defined in the blender standard right-handed world orientation (Z+ up, Y+ forward).
-        // Cubemaps expect a left-handed system (Y+ up, Z+ forward), so swizzle X/Y.
-        // See https://community.khronos.org/t/image-orientation-for-cubemaps-actually-a-very-old-topic/105338/4
+        // The files are defined in a left-handed system (Y+ up, Z+ forward) that differs from our standard.
+        // Load them as is, then swizzle X/Y in the shader.
         const std::map<char const *, SDL_GPUCubeMapFace> prefixToFaceMap{
                 {"px.", SDL_GPU_CUBEMAPFACE_POSITIVEX}, {"nx.", SDL_GPU_CUBEMAPFACE_NEGATIVEX},
-                {"py.", SDL_GPU_CUBEMAPFACE_POSITIVEZ}, {"ny.", SDL_GPU_CUBEMAPFACE_NEGATIVEZ},
-                {"pz.", SDL_GPU_CUBEMAPFACE_POSITIVEY}, {"nz.", SDL_GPU_CUBEMAPFACE_NEGATIVEY},
+                {"py.", SDL_GPU_CUBEMAPFACE_POSITIVEY}, {"ny.", SDL_GPU_CUBEMAPFACE_NEGATIVEY},
+                {"pz.", SDL_GPU_CUBEMAPFACE_POSITIVEZ}, {"nz.", SDL_GPU_CUBEMAPFACE_NEGATIVEZ},
         };
 
         std::vector<sdl::SdlSurface> result{6};
