@@ -58,7 +58,7 @@ namespace gfx_testing::render {
     }
 
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
-        mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("debug")),
+        mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", util::NormalTreatment::SPLIT),
                      pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
