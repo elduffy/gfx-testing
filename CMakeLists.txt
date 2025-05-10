@@ -58,6 +58,7 @@ add_library(gfx_testing_lib
         src/render/sky_box.cpp
         src/sdl.cpp
         src/util/cube_map.cpp
+        src/util/fps_capper.cpp
         src/util/obj_loader.cpp
         src/util/resource_loader.cpp
         src/util/stopwatch.cpp

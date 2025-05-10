@@ -59,15 +59,18 @@ void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::render::Scene &
 int main() {
     constexpr auto DEBUG_MODE = true;
 
-    const std::vector presentModes{
-            // SDL_GPU_PRESENTMODE_MAILBOX,
-            // SDL_GPU_PRESENTMODE_IMMEDIATE,
-            SDL_GPU_PRESENTMODE_VSYNC,
-    };
+    constexpr gfx_testing::game::GameSettings gameSettings{.mTargetFps = 120.f};
+    std::vector<SDL_GPUPresentMode> presentModes;
+    if constexpr (gameSettings.mTargetFps.has_value()) {
+        presentModes.push_back(SDL_GPU_PRESENTMODE_MAILBOX);
+        presentModes.push_back(SDL_GPU_PRESENTMODE_IMMEDIATE);
+    }
+    presentModes.push_back(SDL_GPU_PRESENTMODE_VSYNC);
+
     const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, presentModes};
     const gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
 
-    gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);
+    gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader, gameSettings);
     gfx_testing::imgui::ImGuiContext imGuiContext{sdlContext};
 
     gfx_testing::render::Scene scene(gameContext, imGuiContext);

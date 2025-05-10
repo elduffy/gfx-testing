@@ -117,6 +117,7 @@ namespace gfx_testing::render {
                                                    nullptr, nullptr)) {
             throw std::runtime_error("Failed to acquire swapchain texture");
         }
+        mGameContext.maybeLimitFps();
 
         if (swapchainTexture == nullptr) {
             SDL_Log("Swapchain texture is null");

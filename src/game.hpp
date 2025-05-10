@@ -3,12 +3,18 @@
 #include <pipeline/pipelines.hpp>
 #include <render/samplers.hpp>
 #include <sdl.hpp>
+#include <util/fps_capper.hpp>
 #include <util/stopwatch.hpp>
 
 namespace gfx_testing::game {
+    struct GameSettings {
+        std::optional<float> mTargetFps = std::nullopt;
+    };
+
     class GameContext {
     public:
-        GameContext(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader);
+        GameContext(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader,
+                    GameSettings const &settings);
 
         template<typename EventFn, typename UpdateFn>
         void runMainLoop(EventFn &eventFn, UpdateFn &updateFn) {
@@ -40,6 +46,8 @@ namespace gfx_testing::game {
 
         [[nodiscard]] util::Snapshot const &getFrameSnapshot() const { return mLastFrame; }
 
+        void maybeLimitFps() { mFpsCapper.wait(); }
+
     private:
         util::Snapshot mLastFrame{};
 
@@ -49,5 +57,6 @@ namespace gfx_testing::game {
         pipeline::Pipelines mPipelines;
         render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};
+        util::FpsCapper mFpsCapper;
     };
 } // namespace gfx_testing::game
