@@ -17,7 +17,8 @@ namespace gfx_testing::pipeline {
     }
 
     SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context, SDL_GPUShader *vertexShader,
-                                            SDL_GPUShader *fragmentShader, SDL_GPUPrimitiveType primitiveType) {
+                                            SDL_GPUShader *fragmentShader, SDL_GPUPrimitiveType primitiveType,
+                                            bool isBackground) {
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
                 .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
@@ -49,7 +50,7 @@ namespace gfx_testing::pipeline {
                         {
                                 .compare_op = SDL_GPU_COMPAREOP_LESS,
                                 .enable_depth_test = true,
-                                .enable_depth_write = true,
+                                .enable_depth_write = !isBackground,
                         },
                 .target_info =
                         {
@@ -98,7 +99,8 @@ namespace gfx_testing::pipeline {
             mPipelines.emplace_back(
                     pipelineDefinition,
                     sdl::SdlGfxPipeline{sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader,
-                                                                   pipelineDefinition.mPrimitiveType)});
+                                                                   pipelineDefinition.mPrimitiveType,
+                                                                   pipelineDefinition.isBackground)});
             SDL_Log("Created graphics pipeline %s", getName(pipelineDefinition.mName));
         }
     }

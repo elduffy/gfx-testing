@@ -1,4 +1,5 @@
 #pragma once
+#include <render/camera.hpp>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
 
@@ -31,8 +32,8 @@ namespace gfx_testing::render {
         pipeline::PipelineName getPipelineName() const { return mPipelineName; }
 
         void pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
-                                   SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &vewProj,
-                                   glm::vec3 const &lightPosWs, glm::vec3 const &cameraPosWs) const;
+                                   SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &projection,
+                                   glm::vec3 const &lightPosWs, Camera const &camera) const;
 
         glm::mat4 mTransform;
 

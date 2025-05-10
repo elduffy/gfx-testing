@@ -85,10 +85,25 @@ namespace gfx_testing::render {
         mPointLight.update();
     }
 
+    std::vector<pipeline::PipelineName> getRenderOrder() {
+        std::vector<pipeline::PipelineName> result;
+        result.reserve(pipeline::ALL_PIPELINES.size());
+
+        for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
+            if (pipelineDef.mName == pipeline::PipelineName::Skybox) {
+                result.emplace(result.begin(), pipelineDef.mName);
+            } else {
+                result.push_back(pipelineDef.mName);
+            }
+        }
+        assert(result.size() == pipeline::ALL_PIPELINES.size());
+        return result;
+    }
 
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
         mGameContext(gameContext), mImGuiContext(imGuiContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION), mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
+        mRenderOrder(getRenderOrder()),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
         mMultisampleTextureOpt(optionalFromPointer(
@@ -164,9 +179,8 @@ namespace gfx_testing::render {
     }
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
-        auto const viewProj = mProjection * mCamera.mView;
-
-        for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
+        for (auto const pipelineName: mRenderOrder) {
+            auto const &pipelineDef = pipeline::ALL_PIPELINES.at(getIndex(pipelineName));
             auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
 
             if (renderObjects.empty()) {
@@ -178,8 +192,8 @@ namespace gfx_testing::render {
             pipeline.bindStorageBuffers(renderPass);
 
             for (auto const *renderObject: renderObjects) {
-                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, viewProj,
-                                                    mSceneObjects.mPointLight.mPosWs, mCamera.mPosWs);
+                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection,
+                                                    mSceneObjects.mPointLight.mPosWs, mCamera);
                 renderObject->render(renderPass);
             }
         }
