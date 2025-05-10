@@ -85,25 +85,9 @@ namespace gfx_testing::render {
         mPointLight.update();
     }
 
-    std::vector<pipeline::PipelineName> getRenderOrder() {
-        std::vector<pipeline::PipelineName> result;
-        result.reserve(pipeline::ALL_PIPELINES.size());
-
-        for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
-            if (pipelineDef.mName == pipeline::PipelineName::Skybox) {
-                result.emplace(result.begin(), pipelineDef.mName);
-            } else {
-                result.push_back(pipelineDef.mName);
-            }
-        }
-        assert(result.size() == pipeline::ALL_PIPELINES.size());
-        return result;
-    }
-
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
         mGameContext(gameContext), mImGuiContext(imGuiContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION), mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
-        mRenderOrder(getRenderOrder()),
         mDepthTexture(gameContext.mSdlContext,
                       createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
         mMultisampleTextureOpt(optionalFromPointer(
@@ -179,8 +163,7 @@ namespace gfx_testing::render {
     }
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
-        for (auto const pipelineName: mRenderOrder) {
-            auto const &pipelineDef = pipeline::ALL_PIPELINES.at(getIndex(pipelineName));
+        for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
             auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
 
             if (renderObjects.empty()) {

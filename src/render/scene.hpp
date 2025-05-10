@@ -68,7 +68,6 @@ namespace gfx_testing::render {
         Camera mCamera;
         glm::mat4x4 mProjection;
         SceneObjects mSceneObjects;
-        std::vector<pipeline::PipelineName> mRenderOrder;
         sdl::SdlGpuTexture mDepthTexture;
         std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;
     };
