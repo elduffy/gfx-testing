@@ -58,8 +58,13 @@ void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::render::Scene &
 
 int main() {
     constexpr auto DEBUG_MODE = true;
-    constexpr auto USE_VSYNC = false; // Unlocks frame rate if supported
-    const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, USE_VSYNC};
+
+    const std::vector presentModes{
+            // SDL_GPU_PRESENTMODE_MAILBOX,
+            // SDL_GPU_PRESENTMODE_IMMEDIATE,
+            SDL_GPU_PRESENTMODE_VSYNC,
+    };
+    const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, presentModes};
     const gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
 
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader);

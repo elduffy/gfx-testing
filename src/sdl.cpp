@@ -5,7 +5,8 @@
 namespace gfx_testing::sdl {
 
 
-    SdlContext::SdlContext(const bool gfxDebug, bool vsync) : mWindow(nullptr), mDevice(nullptr) {
+    SdlContext::SdlContext(const bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes) :
+        mWindow(nullptr), mDevice(nullptr) {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
             SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
             throw std::runtime_error("Failed to initialize SDL");
@@ -32,7 +33,7 @@ namespace gfx_testing::sdl {
             throw std::runtime_error("Failed to claim window");
         }
 
-        updateSwapchainParameters(vsync);
+        updateSwapchainParameters(presentModes);
     }
 
     char const *getSwapchainCompositionName(SDL_GPUSwapchainComposition composition) {
@@ -61,16 +62,12 @@ namespace gfx_testing::sdl {
         throw std::runtime_error("Unknown GPU present mode");
     }
 
-    void SdlContext::updateSwapchainParameters(bool vsync) const {
+    void SdlContext::updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes) const {
         auto presentMode = SDL_GPU_PRESENTMODE_VSYNC;
-        if (vsync) {
-            // TODO: mailbox mode runs a LOT hotter and higher FPS than actual VSYNC.
-            if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, SDL_GPU_PRESENTMODE_MAILBOX)) {
-                presentMode = SDL_GPU_PRESENTMODE_MAILBOX;
-            }
-        } else {
-            if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, SDL_GPU_PRESENTMODE_IMMEDIATE)) {
-                presentMode = SDL_GPU_PRESENTMODE_IMMEDIATE;
+        for (auto const &modeToTry: presentModes) {
+            if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, modeToTry)) {
+                presentMode = modeToTry;
+                break;
             }
         }
         constexpr auto swapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;

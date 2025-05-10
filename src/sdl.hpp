@@ -5,6 +5,7 @@
 #include <boost/safe_numerics/checked_default.hpp>
 #include <boost/scope/scope_exit.hpp>
 #include <util/util.hpp>
+#include <vector>
 
 namespace gfx_testing::sdl {
     class SdlContext {
@@ -13,12 +14,12 @@ namespace gfx_testing::sdl {
 
         static constexpr util::Extent2D INITIAL_EXTENT = {1280, 720};
 
-        explicit SdlContext(bool gfxDebug, bool vsync);
+        explicit SdlContext(bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes);
 
         ~SdlContext();
 
     private:
-        void updateSwapchainParameters(bool vsync) const;
+        void updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes) const;
 
     public:
         SDL_Window *mWindow;
