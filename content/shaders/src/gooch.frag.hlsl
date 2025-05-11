@@ -1,5 +1,6 @@
 #include "buffer_macros.hlsl"
 #include "std_types.hlsl"
+#include "object_lighting.hlsl"
 
 STORAGE_BUFFER_FRAG(GoochParams, 0)
 {
@@ -7,15 +8,7 @@ STORAGE_BUFFER_FRAG(GoochParams, 0)
     float3 warmColor;
 };
 
-#define MAX_NUM_LIGHTS 8
-
-UNIFORM_BUFFER_FRAG(ObjectLighting, 0)
-{
-    float3 cameraPosMS;
-    float pad;
-    uint numLights;
-    float3 lightPosMS[MAX_NUM_LIGHTS];
-};
+OBJECT_LIGHTING(ObjectLighting, 0);
 
 float4 main(DefaultOutput input) : SV_Target0
 {
@@ -27,7 +20,7 @@ float4 main(DefaultOutput input) : SV_Target0
 
     float t = 0;
     float s = 0;
-    for (int i = 0; i < min(numLights, MAX_NUM_LIGHTS); i++) {
+    FOR_EACH_LIGHT(i) {
         float3 lightDir = normalize(lightPosMS[i] - input.positionMS);
         t = max(t, (dot(norm, lightDir) + 1.0) / 2.0);
         float3 r = reflect(-lightDir, norm);
