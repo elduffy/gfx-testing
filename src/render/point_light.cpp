@@ -3,17 +3,23 @@
 #include <util/obj_loader.hpp>
 
 namespace gfx_testing::render {
-    PointLight::PointLight(game::GameContext &gameContext, glm::vec3 const &initialPosition) :
-        mGameContext(gameContext), mPosWs(initialPosition), mPathRadius(length(initialPosition)),
+    glm::vec3 getPosition(uint64_t time, float pathRadius, float phase) {
+        auto const totalFloatSecs = static_cast<float>(time) / 1000.f;
+        auto const theta = phase - 0.5 * totalFloatSecs;
+        constexpr auto AMPLITUDE = 2.f;
+        return {pathRadius * cos(theta), pathRadius * sin(theta), AMPLITUDE * cos(2 * theta)};
+    }
+
+    PointLight::PointLight(game::GameContext &gameContext, float pathRadius, float phase) :
+        mGameContext(gameContext),
+        mPosWs(getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, pathRadius, phase)),
+        mPathRadius(pathRadius), mPhase(phase),
         mRenderObject(gameContext,
                       gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", util::NormalTreatment::AVERAGE),
                       pipeline::PipelineName::SimpleColor, translate(glm::mat4(1.0f), mPosWs)) {}
 
     void PointLight::update() {
-        auto const totalFloatSecs = static_cast<float>(mGameContext.getFrameSnapshot().mAccumulatedTime) / 1000.f;
-        auto const theta = -0.5 * totalFloatSecs;
-        constexpr auto AMPLITUDE = 2.f;
-        mPosWs = {mPathRadius * cos(theta), mPathRadius * sin(theta), AMPLITUDE * cos(2 * theta)};
+        mPosWs = getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, mPathRadius, mPhase);
         mRenderObject.mTransform = glm::translate(glm::mat4(1.0f), mPosWs);
     }
 } // namespace gfx_testing::render

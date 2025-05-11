@@ -57,6 +57,18 @@ namespace gfx_testing::render {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
     }
 
+    std::vector<PointLight> initPointLights(game::GameContext &gameContext) {
+        constexpr auto NUM_POINT_LIGHTS = 3;
+        std::vector<PointLight> pointLights;
+        pointLights.reserve(NUM_POINT_LIGHTS);
+        for (auto i = 0; i < NUM_POINT_LIGHTS; ++i) {
+            auto const phase = (2 * glm::pi<float>() * static_cast<float>(i)) / NUM_POINT_LIGHTS;
+            const auto &l = pointLights.emplace_back(gameContext, glm::length(INITIAL_LIGHT_POSITION), phase);
+            SDL_Log("PointLight #%i at %f %f %f", i, l.mPosWs.x, l.mPosWs.y, l.mPosWs.z);
+        }
+        return pointLights;
+    }
+
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
         mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
@@ -69,10 +81,14 @@ namespace gfx_testing::render {
                        gameContext.mResourceLoader.loadObjModel("viking-room.obj", util::NormalTreatment::SPLIT),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext), mPointLight(gameContext, INITIAL_LIGHT_POSITION) {
-        for (auto const *objPtr: {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPointLight.mRenderObject,
-                                  &mPropObjects, &mLandscape, &mTextureObject}) {
+        mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
+        for (auto const *objPtr:
+             {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPropObjects, &mLandscape, &mTextureObject}) {
             mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
+        }
+        for (auto const &light: mPointLights) {
+            mRenderObjectsByPipeline.at(pipeline::getIndex(light.mRenderObject.getPipelineName()))
+                    .push_back(&light.mRenderObject);
         }
     }
 
@@ -82,7 +98,9 @@ namespace gfx_testing::render {
         mPropObjects.mTransform =
                 rotate(mPropObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                        glm::vec3(0, 0, 1));
-        mPointLight.update();
+        for (auto &light: mPointLights) {
+            light.update();
+        }
     }
 
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
@@ -164,6 +182,10 @@ namespace gfx_testing::render {
     }
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
+        std::vector<glm::vec3> lightPosWs{mSceneObjects.mPointLights.size()};
+        for (size_t i = 0; i < mSceneObjects.mPointLights.size(); i++) {
+            lightPosWs[i] = mSceneObjects.mPointLights.at(i).mPosWs;
+        }
         for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
             auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
 
@@ -176,8 +198,7 @@ namespace gfx_testing::render {
             pipeline.bindStorageBuffers(renderPass);
 
             for (auto const *renderObject: renderObjects) {
-                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection,
-                                                    mSceneObjects.mPointLight.mPosWs, mCamera);
+                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, lightPosWs, mCamera);
                 renderObject->render(renderPass);
             }
         }

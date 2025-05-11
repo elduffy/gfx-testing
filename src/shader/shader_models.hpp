@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <gooch.frag.hpp>
 #include <vector>
 
 #define SHADER_ALIGN alignas(16)
@@ -72,23 +73,41 @@ namespace gfx_testing::shader {
 
     static_assert(sizeof(LambertParams) % 16 == 0);
 
+    struct vec3_16 {
+        SHADER_ALIGN glm::vec3 v;
+    };
+    static_assert(sizeof(vec3_16) == 16);
+    static_assert(offsetof(vec3_16, v) == 0);
+
     struct ObjectLighting {
-        SHADER_ALIGN glm::vec3 mLightPosMS;
+        static constexpr size_t MAX_NUM_LIGHTS = 8;
         SHADER_ALIGN glm::vec3 mCameraPosMS;
+        SHADER_ALIGN uint32_t mNumLights;
+        SHADER_ALIGN std::array<vec3_16, MAX_NUM_LIGHTS> mLightPosMS;
 
-        static ObjectLighting create(glm::mat4 const &modelMatrix, glm::vec3 const &lightPosWs,
+        static ObjectLighting create(glm::mat4 const &modelMatrix, std::vector<glm::vec3> const &lightPosWs,
                                      glm::vec3 const &cameraPosWs) {
-
+            if (lightPosWs.size() > MAX_NUM_LIGHTS) {
+                throw std::runtime_error("Too many lights");
+            }
             auto const worldToModelTransform = glm::inverse(modelMatrix);
-            return {
-                    .mLightPosMS = worldToModelTransform * glm::vec4(lightPosWs, 1),
+            ObjectLighting lighting{
+                    .mNumLights = boost::safe_numerics::checked::cast<uint32_t>(lightPosWs.size()),
                     .mCameraPosMS = worldToModelTransform * glm::vec4(cameraPosWs, 1),
             };
+            for (size_t i = 0; i < lightPosWs.size(); ++i) {
+                lighting.mLightPosMS[i].v = worldToModelTransform * glm::vec4(lightPosWs.at(i), 1);
+            }
+            return lighting;
         }
     };
 
-    static_assert(sizeof(ObjectLighting) % 16 == 0);
-
+    static_assert(spirv_header_gen::generated::gooch_frag::TYPE_ObjectLighting.mMembers[0].mOffset ==
+                  offsetof(ObjectLighting, mCameraPosMS));
+    static_assert(spirv_header_gen::generated::gooch_frag::TYPE_ObjectLighting.mMembers[2].mOffset ==
+                  offsetof(ObjectLighting, mNumLights));
+    static_assert(spirv_header_gen::generated::gooch_frag::TYPE_ObjectLighting.mMembers[3].mOffset ==
+                  offsetof(ObjectLighting, mLightPosMS));
 
     class IndexList {
         template<typename index_t>

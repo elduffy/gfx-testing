@@ -1,6 +1,7 @@
 #include <game.hpp>
 #include <render/render_object.hpp>
 #include <utility>
+#include <vector>
 
 namespace gfx_testing::render {
     template<typename index_t>
@@ -196,7 +197,7 @@ namespace gfx_testing::render {
 
     void RenderObject::pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
                                              SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &projection,
-                                             glm::vec3 const &lightPosWs, Camera const &camera) const {
+                                             std::vector<glm::vec3> const &lightPosWs, Camera const &camera) const {
         if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
             glm::mat4 mvpTransform;
             if (mPipelineName == pipeline::PipelineName::Skybox) {

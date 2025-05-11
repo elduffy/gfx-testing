@@ -39,7 +39,7 @@ namespace gfx_testing::render {
         DebugAxes mDebugAxes;
 
     public:
-        PointLight mPointLight;
+        std::vector<PointLight> mPointLights;
 
     private:
         std::vector<std::vector<RenderObject const *>> mRenderObjectsByPipeline{pipeline::ALL_PIPELINES.size()};
