@@ -16,6 +16,7 @@ include(cmake/fetch-imgui.cmake)
 include(cmake/fetch-clipp.cmake)
 include(cmake/fetch-nlohmann_json.cmake)
 include(cmake/fetch-inja.cmake)
+include(cmake/fetch-fastgltf.cmake)
 
 find_package(SDL3 REQUIRED)
 
@@ -73,6 +74,7 @@ target_link_libraries(gfx_testing_lib PUBLIC
         Boost::safe_numerics
         Boost::scope
         glm::glm
+        fastgltf::fastgltf
 )
 add_dependencies(gfx_testing_lib build_shaders)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
