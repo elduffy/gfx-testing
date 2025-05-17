@@ -1,3 +1,4 @@
+#include <absl/log/check.h>
 #include <array>
 #include <pipeline/pipelines.hpp>
 #include <shader/shader_models.hpp>
@@ -61,9 +62,7 @@ namespace gfx_testing::pipeline {
                         },
         };
         auto *pipeline = SDL_CreateGPUGraphicsPipeline(context.mDevice, &graphicsPipelineInfo);
-        if (pipeline == nullptr) {
-            throw std::runtime_error("Failed to create graphics pipeline");
-        }
+        CHECK_NE(pipeline, nullptr) << "Failed to create graphics pipeline: " << SDL_GetError();
         return pipeline;
     }
 

@@ -102,9 +102,7 @@ namespace gfx_testing::util {
         size_t nextOutputIndex = 0;
         for (auto const &shape: shapes) {
             for (size_t faceIdx = 0; faceIdx < shape.mesh.num_face_vertices.size(); faceIdx++) {
-                if (shape.mesh.num_face_vertices[faceIdx] != 3) {
-                    throw std::runtime_error("Face vertex count not supported");
-                }
+                CHECK_EQ(shape.mesh.num_face_vertices[faceIdx], 3) << "Face vertex count not supported";
 
                 for (size_t vIdx = 0; vIdx < 3; vIdx++) {
                     auto const &index = shape.mesh.indices.at(3 * faceIdx + vIdx);
@@ -144,12 +142,8 @@ namespace gfx_testing::util {
 
         tinyobj::ObjReader reader;
 
-        if (!reader.ParseFromFile(path.string(), reader_config)) {
-            if (!reader.Error().empty()) {
-                std::cerr << reader.Error() << std::endl;
-            }
-            throw std::runtime_error("Failed to load obj file");
-        }
+        CHECK(reader.ParseFromFile(path.string(), reader_config))
+                << "Failed to load obj file " << path << ": " << reader.Error();
         if (!reader.Warning().empty()) {
             std::cerr << reader.Warning() << std::endl;
         }
@@ -161,13 +155,10 @@ namespace gfx_testing::util {
         SDL_Log("Successfully loaded obj file %s with %zu shapes, %zu materials", path.c_str(), shapes.size(),
                 materials.size());
 
-        if (attrib.vertices.size() % 3 != 0) {
-            throw std::runtime_error("Vertex count is not a multiple of 3");
-        }
-        if (attrib.vertices.size() != attrib.colors.size()) {
-            throw std::runtime_error(std::format("Vertex count {} is not the same as color count {}.",
-                                                 attrib.vertices.size(), attrib.colors.size()));
-        }
+        CHECK_EQ(attrib.vertices.size() % 3, 0) << "Vertex count is not a multiple of 3";
+        CHECK_EQ(attrib.vertices.size(), attrib.colors.size())
+                << "Vertex count " << attrib.vertices.size() << " is not the same as color count "
+                << attrib.colors.size();
 
         switch (normalTreatment) {
             case NormalTreatment::AVERAGE:

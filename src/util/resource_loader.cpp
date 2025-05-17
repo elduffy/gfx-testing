@@ -18,9 +18,8 @@ namespace gfx_testing::util {
             throw std::runtime_error("Could not determine shader stage for file.");
         }
 
-        if (!(SDL_GetGPUShaderFormats(mSdlContext.mDevice) & SDL_GPU_SHADERFORMAT_SPIRV)) {
-            throw std::runtime_error("Only supporting SPIRV formats for now");
-        }
+        CHECK(SDL_GetGPUShaderFormats(mSdlContext.mDevice) & SDL_GPU_SHADERFORMAT_SPIRV)
+                << "Only supporting SPIRV formats for now";
 
         std::string compiledFilename = shaderSourcePath.filename().string();
         boost::replace_last(compiledFilename, ".hlsl", ".spv");

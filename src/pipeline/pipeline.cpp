@@ -3,6 +3,7 @@
 //
 
 #include <SDL3/SDL_gpu.h>
+#include <absl/log/check.h>
 #include <algorithm>
 #include <pipeline/pipeline.hpp>
 #include <sdl.hpp>
@@ -19,9 +20,7 @@ namespace gfx_testing::pipeline {
                 sdl::SdlGpuBuffer::create(context, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, dataSize));
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
-        if (commandBuffer == nullptr) {
-            throw std::runtime_error("Failed to acquire GPU command buffer");
-        }
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);

@@ -1,3 +1,4 @@
+#include <absl/log/check.h>
 #include <boost/algorithm/string/replace.hpp>
 #include <sdl.hpp>
 #include <stdexcept>
@@ -7,31 +8,19 @@ namespace gfx_testing::sdl {
 
     SdlContext::SdlContext(const bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes) :
         mWindow(nullptr), mDevice(nullptr) {
-        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
-            SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
-            throw std::runtime_error("Failed to initialize SDL");
-        }
+        CHECK(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) << "Failed to initialize SDL: " << SDL_GetError();
         SDL_Log("SDL initialized.");
 
         mWindow = SDL_CreateWindow("gfx-testing", INITIAL_EXTENT.mWidth, INITIAL_EXTENT.mHeight, SDL_WINDOW_RESIZABLE);
-        if (mWindow == nullptr) {
-            SDL_Log("SDL_CreateWindow failed: %s", SDL_GetError());
-            throw std::runtime_error("Failed to create SDL window");
-        }
+        CHECK_NE(mWindow, nullptr) << "SDL_CreateWindow failed: " << SDL_GetError();
         SDL_Log("Window created.");
 
         mDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
                                       gfxDebug, nullptr);
-        if (mDevice == nullptr) {
-            SDL_Log("Failed to create GPU device: %s", SDL_GetError());
-            throw std::runtime_error("Failed to create GPU device");
-        }
+        CHECK_NE(mDevice, nullptr) << "SDL_CreateGPUDevice failed: " << SDL_GetError();
         SDL_Log("GPU Device created.");
 
-        if (!SDL_ClaimWindowForGPUDevice(mDevice, mWindow)) {
-            SDL_Log("Failed to claim window: %s", SDL_GetError());
-            throw std::runtime_error("Failed to claim window");
-        }
+        CHECK(SDL_ClaimWindowForGPUDevice(mDevice, mWindow)) << "Failed to claim window: " << SDL_GetError();
 
         updateSwapchainParameters(presentModes);
     }
@@ -108,9 +97,7 @@ namespace gfx_testing::sdl {
                 .num_uniform_buffers = uniformBuffers,
         };
         SDL_GPUShader *shader = SDL_CreateGPUShader(context.mDevice, &shaderCreateInfo);
-        if (shader == nullptr) {
-            throw std::runtime_error("Could not create shader.");
-        }
+        CHECK_NE(shader, nullptr) << "SDL_CreateGPUShader failed: " << SDL_GetError();
         return {context, shader};
     }
 } // namespace gfx_testing::sdl

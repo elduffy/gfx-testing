@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <ostream>
 
 #include "../../../SDL_image/Xcode/iOS/SDL3.framework/Headers/SDL_gpu.h"
 #include "glm/geometric.hpp"
@@ -23,6 +24,10 @@ namespace gfx_testing::util {
 
         friend bool operator==(const Extent2D &lhs, const Extent2D &rhs) {
             return lhs.mWidth == rhs.mWidth && lhs.mHeight == rhs.mHeight;
+        }
+
+        friend std::ostream &operator<<(std::ostream &os, const Extent2D &obj) {
+            return os << "mWidth: " << obj.mWidth << " mHeight: " << obj.mHeight;
         }
 
         [[nodiscard]] glm::vec2 asVec2() const { return {mWidth, mHeight}; }

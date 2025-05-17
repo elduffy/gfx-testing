@@ -1,3 +1,4 @@
+#include <absl/log/check.h>
 #include <array>
 #include <boost/scope/scope_exit.hpp>
 #include <cmath>
@@ -125,16 +126,14 @@ namespace gfx_testing::render {
 
     void Scene::draw() const {
         SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(mGameContext.mSdlContext.mDevice);
-        if (commandBuffer == nullptr) {
-            throw std::runtime_error("Failed to acquire command buffer");
-        }
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         SDL_GPUTexture *swapchainTexture = nullptr;
-        if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow, &swapchainTexture,
-                                                   nullptr, nullptr)) {
-            throw std::runtime_error("Failed to acquire swapchain texture");
-        }
+        CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow, &swapchainTexture,
+                                                    nullptr, nullptr))
+                << "Failed to acquire swapchain texture: " << SDL_GetError();
+
         mGameContext.maybeLimitFps();
 
         if (swapchainTexture == nullptr) {

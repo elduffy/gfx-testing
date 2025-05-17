@@ -1,3 +1,4 @@
+#include <absl/log/check.h>
 #include <boost/safe_numerics/checked_default.hpp>
 #include <util/cube_map.hpp>
 
@@ -5,18 +6,17 @@ namespace gfx_testing::util {
     CubeMap::CubeMap(std::vector<sdl::SdlSurface> surfaces) :
         mSurfaces(std::move(surfaces)), mExtent(mSurfaces.front().getExtent()) {
         for (auto const &surface: mSurfaces) {
-            if (surface.getExtent() != mExtent) {
-                throw std::runtime_error("Cube map extent mismatch");
-            }
+            CHECK(surface.getExtent() == mExtent)
+                    << "Cube map extent mismatch: " << surface.getExtent() << " != " << mExtent;
         }
     }
 
     void transferTextureData(sdl::SdlContext const &context, std::vector<sdl::SdlSurface> const &surfaces,
                              sdl::SdlGpuTexture const &texture) {
         {
-            assert(surfaces.size() == 6);
+            CHECK_EQ(surfaces.size(), 6);
             const auto *surface = surfaces.front().mSurface;
-            assert(surface->pitch == surface->w * 4);
+            CHECK_EQ(surface->pitch, surface->w * 4);
         }
         auto const extent = surfaces.front().getExtent();
         auto const bytesPerLayer = extent.mWidth * extent.mHeight * 4;

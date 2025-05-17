@@ -1,3 +1,4 @@
+#include <absl/log/check.h>
 #include <game.hpp>
 #include <render/render_object.hpp>
 #include <utility>
@@ -36,9 +37,7 @@ namespace gfx_testing::render {
         }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
-        if (commandBuffer == nullptr) {
-            throw std::runtime_error("Failed to acquire GPU command buffer");
-        }
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
 
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
@@ -89,9 +88,7 @@ namespace gfx_testing::render {
         }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
-        if (commandBuffer == nullptr) {
-            throw std::runtime_error("Failed to acquire GPU command buffer");
-        }
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
         SDL_GPUTextureTransferInfo const source = {
@@ -125,18 +122,15 @@ namespace gfx_testing::render {
         };
         sdl::SdlGpuTexture tex = {gameContext.mSdlContext,
                                   SDL_CreateGPUTexture(gameContext.mSdlContext.mDevice, &createInfo)};
-        if (*tex == nullptr) {
-            throw std::runtime_error("Failed to create GPU texture");
-        }
+        CHECK_NE(*tex, nullptr) << "Failed to create GPU texture: " << SDL_GetError();
         return {TextureAndSampler{.mTexture = std::move(tex), .mSampler = gameContext.mSamplers.mAnisotropicWrap}};
     }
 
     RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
                                pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform) :
         RenderObject(gameContext, meshData, pipelineName, nullptr, initialTransform) {
-        if (pipelineName == pipeline::PipelineName::Textured) {
-            throw std::runtime_error("Use constructor with texture data for the Textured pipeline");
-        }
+        CHECK(pipelineName != pipeline::PipelineName::Textured)
+                << "Use constructor with texture data for the Textured pipeline";
     }
 
     RenderObject::RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,

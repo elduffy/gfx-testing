@@ -17,10 +17,9 @@ namespace gfx_testing::util {
 
         explicit ShaderCode(std::filesystem::path const &compiledFilePath, SDL_GPUShaderStage stage) :
             mSize(0), mCode(static_cast<uint8_t *>(SDL_LoadFile(compiledFilePath.c_str(), &mSize))), mStage(stage) {
-            if (mCode == nullptr) {
-                throw std::runtime_error(std::format("Could not load SPIRV shader from {}: {}",
-                                                     compiledFilePath.c_str(), SDL_GetError()));
-            }
+            CHECK_NE(mCode, nullptr) << "Could not load SPIRV shader from " << compiledFilePath.c_str() << ": "
+                                     << SDL_GetError();
+
             SDL_Log("Loaded SPIRV shader from %s of size %zu", compiledFilePath.c_str(), mSize);
         }
 

@@ -1,3 +1,4 @@
+#include <absl/log/check.h>
 #include <format>
 #include <map>
 #include <util/cube_map.hpp>
@@ -9,9 +10,7 @@
 namespace gfx_testing::util {
     sdl::SdlSurface loadImage(const std::string &path) {
         auto *surface = IMG_Load(path.c_str());
-        if (!surface) {
-            throw std::runtime_error("Failed to load image: " + path);
-        }
+        CHECK(surface) << "Failed to load image: " << path;
         if (constexpr auto DESIRED_FORMAT = SDL_PIXELFORMAT_ABGR8888; surface->format != DESIRED_FORMAT) {
             auto *converted = SDL_ConvertSurface(surface, DESIRED_FORMAT);
             SDL_DestroySurface(surface);
@@ -21,9 +20,7 @@ namespace gfx_testing::util {
     }
 
     CubeMap loadCubeMap(std::filesystem::path const &dir) {
-        if (!is_directory(dir)) {
-            throw std::runtime_error("Path is not a directory");
-        }
+        CHECK(is_directory(dir)) << "Path is not a directory: " << dir;
 
         // The files are defined in a left-handed system (Y+ up, Z+ forward) that differs from our standard.
         // Load them as is, then swizzle X/Y in the shader.
@@ -42,10 +39,9 @@ namespace gfx_testing::util {
             }
         }
         for (size_t face = 0; face < 6; face++) {
-            if (auto const &surface = result[face]; *surface == nullptr) {
-                throw std::runtime_error(std::format("Cubmap {} is missing surface {}", dir.c_str(),
-                                                     toString(static_cast<SDL_GPUCubeMapFace>(face))));
-            }
+            auto const &surface = result[face];
+            CHECK(*surface != nullptr) << "Cubemap " << dir << " is missing surface "
+                                       << toString(static_cast<SDL_GPUCubeMapFace>(face));
         }
         return CubeMap{std::move(result)};
     }

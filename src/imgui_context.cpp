@@ -1,4 +1,5 @@
 #include <SDL3/SDL_log.h>
+#include <absl/log/check.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
 #include <imgui.h>
@@ -20,10 +21,7 @@ namespace gfx_testing::imgui {
                 .Device = sdlContext.mDevice,
                 .ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(sdlContext.mDevice, sdlContext.mWindow),
         };
-        if (!ImGui_ImplSDLGPU3_Init(&init_info)) {
-            throw std::runtime_error("Failed to initialize ImGui");
-        }
-
+        CHECK(ImGui_ImplSDLGPU3_Init(&init_info)) << "Failed to initialize ImGui";
         SDL_Log("Setup ImGui");
     }
 

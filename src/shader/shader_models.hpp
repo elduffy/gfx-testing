@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <absl/log/check.h>
 #include <array>
 #include <boost/safe_numerics/checked_default.hpp>
 #include <glm/mat4x4.hpp>
@@ -87,9 +88,7 @@ namespace gfx_testing::shader {
 
         static ObjectLighting create(glm::mat4 const &modelMatrix, std::vector<glm::vec3> const &lightPosWs,
                                      glm::vec3 const &cameraPosWs) {
-            if (lightPosWs.size() > MAX_NUM_LIGHTS) {
-                throw std::runtime_error("Too many lights");
-            }
+            CHECK_LE(lightPosWs.size(), MAX_NUM_LIGHTS) << "Too many lights";
             auto const worldToModelTransform = glm::inverse(modelMatrix);
             ObjectLighting lighting{
                     .mNumLights = boost::safe_numerics::checked::cast<uint32_t>(lightPosWs.size()),
@@ -131,16 +130,12 @@ namespace gfx_testing::shader {
         index_t const *as() const;
 
         uint16_t const *asUint16() const {
-            if (mElementSize != SDL_GPU_INDEXELEMENTSIZE_16BIT) {
-                throw std::runtime_error("Attempt to access 32-bit indices as 16-bit");
-            }
+            CHECK(mElementSize == SDL_GPU_INDEXELEMENTSIZE_16BIT) << "Attempt to access 32-bit indices as 16-bit";
             return reinterpret_cast<uint16_t const *>(mBuffer.get());
         }
 
         uint32_t const *asUint32() const {
-            if (mElementSize != SDL_GPU_INDEXELEMENTSIZE_32BIT) {
-                throw std::runtime_error("Attempt to access 16-bit indices as 32-bit");
-            }
+            CHECK(mElementSize == SDL_GPU_INDEXELEMENTSIZE_32BIT) << "Attempt to access 16-bit indices as 32-bit";
             return reinterpret_cast<uint32_t const *>(mBuffer.get());
         }
 
@@ -240,9 +235,7 @@ namespace gfx_testing::shader {
     struct MeshDataBuilder {
 
         MeshData build() {
-            if (mIndices16.empty() && mIndices32.empty()) {
-                throw std::runtime_error("MeshDataBuilder: no indices set");
-            }
+            CHECK(!mIndices16.empty() || !mIndices32.empty()) << "MeshDataBuilder: no indices set";
             if (mIndices32.size() > 0) {
                 return {
                         .mVertices = std::move(mVertices),
