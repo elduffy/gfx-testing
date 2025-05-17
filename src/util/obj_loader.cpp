@@ -38,9 +38,6 @@ namespace gfx_testing::util {
         }
 
         for (auto const &shape: shapes) {
-            SDL_Log("Shape '%s' has %zu indices", shape.name.c_str(), shape.mesh.indices.size());
-            // meshData.mIndices.reserve(meshData.mIndices.size() + shape.mesh.indices.size());
-
             for (auto const &index: shape.mesh.indices) {
                 assert(index.vertex_index >= 0);
                 meshData.addIndex(index.vertex_index);
@@ -61,8 +58,6 @@ namespace gfx_testing::util {
             vertexData.mNormal /= normalList.size();
             vertexData.mNormal = glm::normalize(vertexData.mNormal);
         }
-
-        // SDL_Log("Mesh data with averaged normals %s", meshData.toString().c_str());
         return meshData.build();
     }
 
@@ -127,14 +122,10 @@ namespace gfx_testing::util {
                 }
             }
         }
-
-        // SDL_Log("Mesh data with split normals %s", meshData.toString().c_str());
         return meshData.build();
     }
 
     shader::MeshData loadObjFile(const std::filesystem::path &path, NormalTreatment normalTreatment) {
-        SDL_Log("Loading obj file %s", path.c_str());
-
         tinyobj::ObjReaderConfig reader_config;
         reader_config.mtl_search_path = path.parent_path();
         reader_config.triangulate = true;

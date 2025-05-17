@@ -62,14 +62,10 @@ namespace gfx_testing::imgui {
         ImGui_ImplSDLGPU3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
-        auto const wasOpen = mOpenWindow;
         if constexpr (SHOW_DEMO) {
             ImGui::ShowDemoWindow(&mOpenWindow);
         }
         showDebugWindow();
-        if (wasOpen && !mOpenWindow) {
-            SDL_Log("Should close window");
-        }
         ImGui::Render();
 
         auto *drawData = ImGui::GetDrawData();

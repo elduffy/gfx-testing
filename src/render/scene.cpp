@@ -64,8 +64,7 @@ namespace gfx_testing::render {
         pointLights.reserve(NUM_POINT_LIGHTS);
         for (auto i = 0; i < NUM_POINT_LIGHTS; ++i) {
             auto const phase = (2 * glm::pi<float>() * static_cast<float>(i)) / NUM_POINT_LIGHTS;
-            const auto &l = pointLights.emplace_back(gameContext, glm::length(INITIAL_LIGHT_POSITION), phase);
-            SDL_Log("PointLight #%i at %f %f %f", i, l.mPosWs.x, l.mPosWs.y, l.mPosWs.z);
+            pointLights.emplace_back(gameContext, glm::length(INITIAL_LIGHT_POSITION), phase);
         }
         return pointLights;
     }
