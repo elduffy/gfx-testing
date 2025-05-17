@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 include(FetchContent)
 
 include(cmake/fetch-tinyobjloader.cmake)
-set(BOOST_INCLUDE_LIBRARIES algorithm safe_numerics scope)
+set(BOOST_INCLUDE_LIBRARIES algorithm assert safe_numerics scope)
 set(BOOST_ENABLE_CMAKE ON)
 set(INJA_USE_EMBEDDED_JSON OFF)
 include(cmake/fetch-boost.cmake)
@@ -71,6 +71,7 @@ target_link_libraries(gfx_testing_lib PUBLIC
         SDL3::SDL3
         SDL3_image::SDL3_image
         Boost::algorithm
+        Boost::assert
         Boost::safe_numerics
         Boost::scope
         glm::glm

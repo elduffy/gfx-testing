@@ -3,7 +3,6 @@
 #include <imgui_context.hpp>
 #include <render/scene.hpp>
 #include <sdl.hpp>
-#include <util/texture_loader.hpp>
 #include <util/util.hpp>
 
 void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
