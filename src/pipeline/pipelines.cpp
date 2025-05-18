@@ -18,8 +18,8 @@ namespace gfx_testing::pipeline {
     }
 
     SDL_GPUGraphicsPipeline *createPipeline(sdl::SdlContext const &context, SDL_GPUShader *vertexShader,
-                                            SDL_GPUShader *fragmentShader, SDL_GPUPrimitiveType primitiveType,
-                                            bool isBackground) {
+                                            SDL_GPUShader *fragmentShader,
+                                            PipelineDefinition const &pipelineDefinition) {
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
                 .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
@@ -41,8 +41,12 @@ namespace gfx_testing::pipeline {
                                 .vertex_attributes = &shader::VertexData::VERTEX_ATTRIBUTES[0],
                                 .num_vertex_attributes = shader::VertexData::VERTEX_ATTRIBUTES.size(),
                         },
-                .primitive_type = primitiveType,
-                .rasterizer_state = {.cull_mode = SDL_GPU_CULLMODE_BACK},
+                .primitive_type = pipelineDefinition.mPrimitiveType,
+                .rasterizer_state =
+                        {
+                                .fill_mode = pipelineDefinition.mFillMode,
+                                .cull_mode = SDL_GPU_CULLMODE_BACK,
+                        },
                 .multisample_state =
                         {
                                 .sample_count = MSAA_SAMPLE_COUNT,
@@ -51,7 +55,7 @@ namespace gfx_testing::pipeline {
                         {
                                 .compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL,
                                 .enable_depth_test = true,
-                                .enable_depth_write = !isBackground,
+                                .enable_depth_write = !pipelineDefinition.mIsBackground,
                         },
                 .target_info =
                         {
@@ -97,9 +101,8 @@ namespace gfx_testing::pipeline {
             auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
             mPipelines.emplace_back(
                     pipelineDefinition,
-                    sdl::SdlGfxPipeline{sdlContext, createPipeline(sdlContext, vertexShader, fragmentShader,
-                                                                   pipelineDefinition.mPrimitiveType,
-                                                                   pipelineDefinition.isBackground)});
+                    sdl::SdlGfxPipeline{sdlContext,
+                                        createPipeline(sdlContext, vertexShader, fragmentShader, pipelineDefinition)});
             SDL_Log("Created graphics pipeline %s", getName(pipelineDefinition.mName));
         }
     }

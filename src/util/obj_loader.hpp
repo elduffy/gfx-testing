@@ -6,5 +6,6 @@
 
 namespace gfx_testing::util {
 
-    shader::MeshData loadObjFile(std::filesystem::path const &path, NormalTreatment normalTreatment);
+    shader::MeshData loadObjFile(std::filesystem::path const &path, NormalTreatment normalTreatment,
+                                 TexCoordTreatment texCoordTreatment);
 } // namespace gfx_testing::util

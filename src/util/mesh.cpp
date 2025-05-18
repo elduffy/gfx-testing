@@ -1,3 +1,6 @@
+#include <numeric>
+#include <set>
+#include <unordered_set>
 #include <util/mesh.hpp>
 
 
@@ -63,21 +66,50 @@ namespace gfx_testing::util {
         return iter->second;
     }
 
-    shader::MeshData Mesh::getMeshData(NormalTreatment normalTreatment) const {
+    shader::MeshData Mesh::getMeshData(NormalTreatment normalTreatment, TexCoordTreatment texCoordTreatment) const {
+
+        const VertexOps vertexOps(normalTreatment == NormalTreatment::AVERAGE,
+                                  texCoordTreatment == TexCoordTreatment::DISCARD);
+        std::unordered_map<Vertex, size_t, VertexOps, VertexOps> vertexToUniqueIndex(1, vertexOps, vertexOps);
         shader::MeshDataBuilder builder;
 
+        size_t uniqueIndex = 0;
         for (size_t i = 0; i < mVertexData.size(); ++i) {
-            auto const &vertexData = mVertexData[i];
-            auto &outputVertex = builder.mVertices.emplace_back();
-            outputVertex.mPosition = vertexData.mPosition;
-            outputVertex.mUv = vertexData.mUv;
-            outputVertex.mNormal = normalizeMaybeZero(vertexData.mNormal);
-            outputVertex.mColor = vertexData.mColor;
-            builder.addIndex(boost::safe_numerics::checked::cast<uint32_t>(i));
+            auto const &v = mVertexData[i];
+            if (!vertexToUniqueIndex.contains(v)) {
+                vertexToUniqueIndex[v] = uniqueIndex++;
+                auto &outputVertex = builder.mVertices.emplace_back();
+                outputVertex.mPosition = v.mPosition;
+                if (texCoordTreatment == TexCoordTreatment::DISCARD) {
+                    outputVertex.mUv = {0, 0};
+                } else {
+                    outputVertex.mUv = v.mUv;
+                }
+                outputVertex.mNormal = normalizeMaybeZero(v.mNormal);
+                outputVertex.mColor = v.mColor;
+            }
+        }
+
+        for (size_t i = 0; i < mVertexData.size(); ++i) {
+            auto const &v = mVertexData[i];
+            auto const outIndex = vertexToUniqueIndex.at(v);
+            builder.addIndex(boost::safe_numerics::checked::cast<uint32_t>(outIndex));
         }
 
         if (normalTreatment == NormalTreatment::AVERAGE) {
-            averageNormals(builder);
+            // averageNormals(builder);
+            for (size_t outIdx = 0; outIdx < builder.mVertices.size(); ++outIdx) {
+                auto const &outVertex = builder.mVertices[outIdx];
+
+                std::unordered_set<glm::vec3> distinctNormals;
+                for (auto const &inIdx: mVerticesByPosition.at(outVertex.mPosition)) {
+                    distinctNormals.insert(normalizeMaybeZero(mVertexData.at(inIdx).mNormal));
+                }
+                glm::vec3 resultNormal = std::accumulate(distinctNormals.begin(), distinctNormals.end(), glm::vec3(0));
+                resultNormal /= static_cast<float>(distinctNormals.size());
+                resultNormal = normalizeMaybeZero(resultNormal);
+                builder.mVertices.at(outIdx).mNormal = resultNormal;
+            }
         }
         return builder.build();
     }

@@ -81,10 +81,11 @@ namespace gfx_testing::pipeline {
         ShaderDefinition mVertexShader;
         ShaderDefinition mFragmentShader;
         SDL_GPUPrimitiveType mPrimitiveType{SDL_GPU_PRIMITIVETYPE_TRIANGLELIST};
+        SDL_GPUFillMode mFillMode{SDL_GPU_FILLMODE_FILL};
         /**
          * Treat the rendered objects as infinitely distant. E.g. for skybox
          */
-        bool isBackground = false;
+        bool mIsBackground = false;
     };
 
     // Shader definitions
@@ -157,7 +158,7 @@ namespace gfx_testing::pipeline {
             .mName = PipelineName::Skybox,
             .mVertexShader = SHADER_SKYBOX_VERTEX,
             .mFragmentShader = SHADER_SKYBOX_FRAGMENT,
-            .isBackground = true,
+            .mIsBackground = true,
     };
     static constexpr std::array ALL_PIPELINES{PIPELINE_SIMPLE_COLOR, PIPELINE_GOOCH,   PIPELINE_TEXTURED,
                                               PIPELINE_LINES,        PIPELINE_LAMBERT, PIPELINE_SKYBOX};

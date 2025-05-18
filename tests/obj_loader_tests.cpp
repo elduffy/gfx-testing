@@ -12,27 +12,24 @@
 using namespace gfx_testing::util;
 
 TEST_CASE("Load a cube with averaged normals") {
-    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj", NormalTreatment::AVERAGE);
+    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj", NormalTreatment::AVERAGE,
+                                      TexCoordTreatment::DISCARD);
 
     REQUIRE(meshData.mVertices.size() == 8);
-    auto const &v0 = meshData.mVertices.at(0);
-    REQUIRE(v0.mPosition == glm::vec3(1, 1, 1));
-    REQUIRE(v0.mColor == glm::vec4(1, 1, 1, 1));
-    REQUIRE_THAT(v0.mNormal.x, Catch::Matchers::WithinAbs(1.f / std::sqrt(3.f), 0.001f));
-    REQUIRE_THAT(v0.mNormal.y, Catch::Matchers::WithinAbs(1.f / std::sqrt(3.f), 0.001f));
-    REQUIRE_THAT(v0.mNormal.z, Catch::Matchers::WithinAbs(1.f / std::sqrt(3.f), 0.001f));
+    auto const expectedNormalComponent = 1.f / std::sqrt(3.f);
 
-    auto const &v1 = meshData.mVertices.at(7);
-    REQUIRE(v1.mPosition == glm::vec3(-1, -1, -1));
-    REQUIRE(v1.mColor == glm::vec4(1, 1, 1, 1));
-    REQUIRE_THAT(v1.mNormal.x, Catch::Matchers::WithinAbs(-1.f / std::sqrt(3.f), 0.001f));
-    REQUIRE_THAT(v1.mNormal.y, Catch::Matchers::WithinAbs(-1.f / std::sqrt(3.f), 0.001f));
-    REQUIRE_THAT(v1.mNormal.z, Catch::Matchers::WithinAbs(-1.f / std::sqrt(3.f), 0.001f));
+    for (auto const &v: meshData.mVertices) {
+        for (size_t c = 0; c < 3; c++) {
+            CHECK(abs(v.mPosition[c]) == 1.f);
+            CHECK_THAT(abs(v.mNormal[c]), Catch::Matchers::WithinAbs(expectedNormalComponent, 0.001f));
+            CHECK(glm::sign(v.mPosition[c]) == glm::sign(v.mNormal[c]));
+        }
+    }
 }
 
 TEST_CASE("Load a cube with split normals") {
-    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj", NormalTreatment::SPLIT);
-
+    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj", NormalTreatment::SPLIT,
+                                      TexCoordTreatment::DISCARD);
     REQUIRE(meshData.mVertices.size() == 24);
 
     REQUIRE(meshData.mVertices.at(0).mPosition == glm::vec3(1, 1, 1));

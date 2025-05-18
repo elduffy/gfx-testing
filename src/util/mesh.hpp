@@ -12,12 +12,23 @@ namespace gfx_testing::util {
 
     enum class NormalTreatment {
         /**
-         * Keeps the same number of vertices and averages the normals for each face together.
-         * Not suitable for texture mapping.
+         * For each distinct vertex position, averages the corresponding normals.
          */
         AVERAGE,
         /**
-         * Creates new vertices as needed to hold normals/UVs for all faces
+         * Each vertex retains its normals.
+         */
+        SPLIT,
+    };
+
+    enum class TexCoordTreatment {
+        /**
+         * Discard texture coordinates. In the resulting MeshData they will be (0,0).
+         * Allows for fewer vertices in some cases.
+         */
+        DISCARD,
+        /**
+         * Each vertex retains its texture coordinates.
          */
         SPLIT,
     };
@@ -34,6 +45,32 @@ namespace gfx_testing::util {
             glm::vec4 mColor{0};
         };
 
+        struct VertexOps {
+            explicit VertexOps(bool ignoreNormals, bool ignoreTexCoords) :
+                mIgnoreNormals(ignoreNormals), mIgnoreTexCoords(ignoreTexCoords) {}
+
+            size_t operator()(const Vertex &obj) const {
+                std::size_t seed = 0x31B8814C;
+                seed ^= (seed << 6) + (seed >> 2) + 0x732CB696 + std::hash<glm::vec3>()(obj.mPosition);
+                if (!mIgnoreTexCoords) {
+                    seed ^= (seed << 6) + (seed >> 2) + 0x1FF41DF2 + std::hash<glm::vec2>()(obj.mUv);
+                }
+                if (!mIgnoreNormals) {
+                    seed ^= (seed << 6) + (seed >> 2) + 0x03303582 + std::hash<glm::vec3>()(obj.mNormal);
+                }
+                seed ^= (seed << 6) + (seed >> 2) + 0x47695477 + std::hash<glm::vec4>()(obj.mColor);
+                return seed;
+            }
+
+            bool operator()(const Vertex &lhs, const Vertex &rhs) const {
+                return lhs.mPosition == rhs.mPosition && lhs.mColor == rhs.mColor &&
+                       (mIgnoreTexCoords || lhs.mUv == rhs.mUv) && (mIgnoreNormals || lhs.mNormal == rhs.mNormal);
+            }
+
+            bool mIgnoreNormals;
+            bool mIgnoreTexCoords;
+        };
+
     public:
         NO_COPY(Mesh);
         Mesh() = default;
@@ -46,11 +83,10 @@ namespace gfx_testing::util {
 
         std::vector<size_t> getIndicesForPosition(glm::vec3 const &pos) const;
 
-        shader::MeshData getMeshData(NormalTreatment normalTreatment) const;
+        shader::MeshData getMeshData(NormalTreatment normalTreatment, TexCoordTreatment texCoordTreatment) const;
 
     private:
         void averageNormals(shader::MeshDataBuilder &builder) const;
-
 
         std::vector<Vertex> mVertexData;
         std::vector<Triangle> mTriangles;
