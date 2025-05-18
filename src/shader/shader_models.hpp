@@ -7,6 +7,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <gooch.frag.hpp>
+#include <ostream>
 #include <vector>
 
 #define SHADER_ALIGN alignas(16)
@@ -23,9 +24,16 @@ namespace gfx_testing::shader {
             ss << "pos = {" << mPosition.x << ", " << mPosition.y << ", " << mPosition.z << "}, ";
             ss << "uv = {" << mUv.x << ", " << mUv.y << "}, ";
             ss << "norm = {" << mNormal.x << ", " << mNormal.y << ", " << mNormal.z << "}, ";
-            ss << "col = {" << mColor.x << ", " << mColor.y << ", " << mColor.z << "}";
+            ss << "col = {" << mColor.x << ", " << mColor.y << ", " << mColor.z << ", " << mColor.w << "}";
             return ss.str();
         }
+
+        friend bool operator==(const VertexData &lhs, const VertexData &rhs) {
+            return lhs.mPosition == rhs.mPosition && lhs.mUv == rhs.mUv && lhs.mNormal == rhs.mNormal &&
+                   lhs.mColor == rhs.mColor;
+        }
+
+        friend std::ostream &operator<<(std::ostream &os, const VertexData &obj) { return os << obj.toString(); }
 
         static constexpr std::array VERTEX_ATTRIBUTES{
                 SDL_GPUVertexAttribute{
@@ -139,6 +147,14 @@ namespace gfx_testing::shader {
             return reinterpret_cast<uint32_t const *>(mBuffer.get());
         }
 
+        template<typename index_t>
+        std::vector<index_t> asVector() const {
+            std::vector<index_t> result;
+            auto const *p = as<index_t>();
+            std::copy_n(p, mCount, std::back_inserter(result));
+            return result;
+        }
+
         size_t elementSize() const {
             switch (mElementSize) {
                 case SDL_GPU_INDEXELEMENTSIZE_16BIT:
@@ -172,9 +188,6 @@ namespace gfx_testing::shader {
                     }
                     break;
                 }
-            }
-            for (size_t i = 0; i < mCount; ++i) {
-                ss << ", ";
             }
             ss << "]";
             return ss.str();
