@@ -43,9 +43,8 @@ namespace gfx_testing::util {
 
         [[nodiscard]] ShaderCode loadShaderCode(std::string const &filename) const;
 
-        [[nodiscard]] shader::MeshData
-        loadObjModel(std::string const &filename, NormalTreatment normalTreatment = NormalTreatment::SPLIT,
-                     TexCoordTreatment texCoordTreatment = TexCoordTreatment::SPLIT) const;
+        [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename,
+                                                    AttribTreatment attribTreatment = {}) const;
 
         [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
 

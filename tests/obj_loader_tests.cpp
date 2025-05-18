@@ -12,8 +12,8 @@
 using namespace gfx_testing::util;
 
 TEST_CASE("Load a cube with averaged normals") {
-    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj", NormalTreatment::AVERAGE,
-                                      TexCoordTreatment::DISCARD);
+    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj",
+                                      {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
 
     REQUIRE(meshData.mVertices.size() == 8);
     auto const expectedNormalComponent = 1.f / std::sqrt(3.f);
@@ -28,8 +28,8 @@ TEST_CASE("Load a cube with averaged normals") {
 }
 
 TEST_CASE("Load a cube with split normals") {
-    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj", NormalTreatment::SPLIT,
-                                      TexCoordTreatment::DISCARD);
+    auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj",
+                                      {NormalTreatment::SPLIT, TexCoordTreatment::DISCARD});
     REQUIRE(meshData.mVertices.size() == 24);
 
     REQUIRE(meshData.mVertices.at(0).mPosition == glm::vec3(1, 1, 1));

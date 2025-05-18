@@ -15,7 +15,7 @@ namespace gfx_testing::render {
         mPosWs(getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, pathRadius, phase)),
         mPathRadius(pathRadius), mPhase(phase),
         mRenderObject(gameContext,
-                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", util::NormalTreatment::AVERAGE),
+                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", {util::NormalTreatment::AVERAGE}),
                       pipeline::PipelineName::SimpleColor, translate(glm::mat4(1.0f), mPosWs)) {}
 
     void PointLight::update() {

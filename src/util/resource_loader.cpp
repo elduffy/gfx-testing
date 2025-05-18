@@ -28,9 +28,8 @@ namespace gfx_testing::util {
         return ShaderCode(compiledFilePath, stage);
     }
 
-    shader::MeshData ResourceLoader::loadObjModel(std::string const &filename, NormalTreatment normalTreatment,
-                                                  TexCoordTreatment texCoordTreatment) const {
-        return loadObjFile(mProjectRoot / "content/models/" / filename, normalTreatment, texCoordTreatment);
+    shader::MeshData ResourceLoader::loadObjModel(std::string const &filename, AttribTreatment attribTreatment) const {
+        return loadObjFile(mProjectRoot / "content/models/" / filename, attribTreatment);
     }
 
     sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {

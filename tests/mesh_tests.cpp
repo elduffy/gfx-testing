@@ -43,7 +43,7 @@ TEST_CASE("Build a triangle") {
     mesh.setColor(1, C2);
     mesh.setColor(2, C3);
     for (auto const normalTreatment: {NormalTreatment::AVERAGE, NormalTreatment::SPLIT}) {
-        auto const meshData = mesh.getMeshData(normalTreatment, TexCoordTreatment::SPLIT);
+        auto const meshData = mesh.getMeshData({.mNormal = normalTreatment});
         CHECK(meshData.mVertices.at(0) == makeVertexData(V1, {0, 0}, {0, 0, 0}, C1));
         CHECK(meshData.mVertices.at(1) == makeVertexData(V2, {0, 0}, {0, 0, 0}, C2));
         CHECK(meshData.mVertices.at(2) == makeVertexData(V3, {0, 0}, {0, 0, 0}, C3));
@@ -55,7 +55,7 @@ TEST_CASE("Build a triangle") {
     for (auto const normalTreatment: {NormalTreatment::AVERAGE, NormalTreatment::SPLIT}) {
         const auto N2 = glm::normalize(glm::vec3{1, 1, 1});
         const auto N3 = glm::normalize(glm::vec3{.5, .5, .5});
-        auto const meshData = mesh.getMeshData(normalTreatment, TexCoordTreatment::SPLIT);
+        auto const meshData = mesh.getMeshData({.mNormal = normalTreatment});
         CHECK_THAT(meshData.mVertices.at(0), WithinAbs(makeVertexData(V1, {0, 0}, {0, 0, 0}, C1), EPSILON));
         CHECK_THAT(meshData.mVertices.at(1), WithinAbs(makeVertexData(V2, {0, 1}, N2, C2), EPSILON));
         CHECK_THAT(meshData.mVertices.at(2), WithinAbs(makeVertexData(V3, {.5, .5}, N3, C3), EPSILON));
@@ -90,7 +90,7 @@ TEST_CASE("Build a quad") {
     CHECK_THAT(mesh.getIndicesForPosition(V4), Catch::Matchers::UnorderedEquals(std::vector<size_t>{5}));
 
     for (auto const normalTreatment: {NormalTreatment::AVERAGE, NormalTreatment::SPLIT}) {
-        auto const meshData = mesh.getMeshData(normalTreatment, TexCoordTreatment::SPLIT);
+        auto const meshData = mesh.getMeshData({.mNormal = normalTreatment});
         REQUIRE(meshData.mVertices.size() == 4);
         for (auto const &v: meshData.mVertices) {
             CHECK(v.mUv == glm::vec2(0));
@@ -105,7 +105,7 @@ TEST_CASE("Build a quad") {
     mesh.setVertexNormal(4, {3, 4, 0});
 
     {
-        auto const meshData = mesh.getMeshData(NormalTreatment::AVERAGE, TexCoordTreatment::SPLIT);
+        auto const meshData = mesh.getMeshData({.mNormal = NormalTreatment::AVERAGE});
         REQUIRE(meshData.mVertices.size() == 4);
         CHECK_THAT(meshData.mVertices[0].mNormal, WithinAbs(glm::normalize(glm::vec3{0.5, 0.5, 0}), EPSILON));
         // CHECK_THAT(meshData.mVertices[3].mNormal, WithinAbs(glm::normalize(glm::vec3{0.5, 0.5, 0}), EPSILON));
@@ -132,7 +132,7 @@ TEST_CASE("Build a quad") {
     }
 
     {
-        auto const meshData = mesh.getMeshData(NormalTreatment::SPLIT, TexCoordTreatment::SPLIT);
+        auto const meshData = mesh.getMeshData({});
         REQUIRE(meshData.mVertices.size() == 6);
         CHECK(meshData.mVertices[0].mNormal == glm::vec3{1, 0, 0});
         CHECK(meshData.mVertices[3].mNormal == glm::vec3{0, 1, 0});

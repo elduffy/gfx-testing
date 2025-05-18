@@ -12,25 +12,30 @@ namespace gfx_testing::util {
 
     enum class NormalTreatment {
         /**
-         * For each distinct vertex position, averages the corresponding normals.
-         */
-        AVERAGE,
-        /**
          * Each vertex retains its normals.
          */
         SPLIT,
+        /**
+         * For each distinct vertex position, averages the corresponding normals.
+         */
+        AVERAGE,
     };
 
     enum class TexCoordTreatment {
+        /**
+         * Each vertex retains its texture coordinates.
+         */
+        SPLIT,
         /**
          * Discard texture coordinates. In the resulting MeshData they will be (0,0).
          * Allows for fewer vertices in some cases.
          */
         DISCARD,
-        /**
-         * Each vertex retains its texture coordinates.
-         */
-        SPLIT,
+    };
+
+    struct AttribTreatment {
+        NormalTreatment mNormal{NormalTreatment::SPLIT};
+        TexCoordTreatment mTexCoord{TexCoordTreatment::SPLIT};
     };
 
     struct Triangle {
@@ -46,16 +51,15 @@ namespace gfx_testing::util {
         };
 
         struct VertexOps {
-            explicit VertexOps(bool ignoreNormals, bool ignoreTexCoords) :
-                mIgnoreNormals(ignoreNormals), mIgnoreTexCoords(ignoreTexCoords) {}
+            explicit VertexOps(AttribTreatment attribTreatment) : mAttribTreatment(attribTreatment) {}
 
             size_t operator()(const Vertex &obj) const {
                 std::size_t seed = 0x31B8814C;
                 seed ^= (seed << 6) + (seed >> 2) + 0x732CB696 + std::hash<glm::vec3>()(obj.mPosition);
-                if (!mIgnoreTexCoords) {
+                if (mAttribTreatment.mTexCoord != TexCoordTreatment::DISCARD) {
                     seed ^= (seed << 6) + (seed >> 2) + 0x1FF41DF2 + std::hash<glm::vec2>()(obj.mUv);
                 }
-                if (!mIgnoreNormals) {
+                if (mAttribTreatment.mNormal != NormalTreatment::AVERAGE) {
                     seed ^= (seed << 6) + (seed >> 2) + 0x03303582 + std::hash<glm::vec3>()(obj.mNormal);
                 }
                 seed ^= (seed << 6) + (seed >> 2) + 0x47695477 + std::hash<glm::vec4>()(obj.mColor);
@@ -64,11 +68,11 @@ namespace gfx_testing::util {
 
             bool operator()(const Vertex &lhs, const Vertex &rhs) const {
                 return lhs.mPosition == rhs.mPosition && lhs.mColor == rhs.mColor &&
-                       (mIgnoreTexCoords || lhs.mUv == rhs.mUv) && (mIgnoreNormals || lhs.mNormal == rhs.mNormal);
+                       (mAttribTreatment.mTexCoord == TexCoordTreatment::DISCARD || lhs.mUv == rhs.mUv) &&
+                       (mAttribTreatment.mNormal == NormalTreatment::AVERAGE || lhs.mNormal == rhs.mNormal);
             }
 
-            bool mIgnoreNormals;
-            bool mIgnoreTexCoords;
+            AttribTreatment mAttribTreatment;
         };
 
     public:
@@ -83,7 +87,7 @@ namespace gfx_testing::util {
 
         std::vector<size_t> getIndicesForPosition(glm::vec3 const &pos) const;
 
-        shader::MeshData getMeshData(NormalTreatment normalTreatment, TexCoordTreatment texCoordTreatment) const;
+        shader::MeshData getMeshData(AttribTreatment attribTreatment) const;
 
     private:
         void averageNormals(shader::MeshDataBuilder &builder) const;

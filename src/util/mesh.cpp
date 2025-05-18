@@ -66,10 +66,9 @@ namespace gfx_testing::util {
         return iter->second;
     }
 
-    shader::MeshData Mesh::getMeshData(NormalTreatment normalTreatment, TexCoordTreatment texCoordTreatment) const {
+    shader::MeshData Mesh::getMeshData(AttribTreatment attribTreatment) const {
 
-        const VertexOps vertexOps(normalTreatment == NormalTreatment::AVERAGE,
-                                  texCoordTreatment == TexCoordTreatment::DISCARD);
+        const VertexOps vertexOps(attribTreatment);
         std::unordered_map<Vertex, size_t, VertexOps, VertexOps> vertexToUniqueIndex(1, vertexOps, vertexOps);
         shader::MeshDataBuilder builder;
 
@@ -80,7 +79,7 @@ namespace gfx_testing::util {
                 vertexToUniqueIndex[v] = uniqueIndex++;
                 auto &outputVertex = builder.mVertices.emplace_back();
                 outputVertex.mPosition = v.mPosition;
-                if (texCoordTreatment == TexCoordTreatment::DISCARD) {
+                if (attribTreatment.mTexCoord == TexCoordTreatment::DISCARD) {
                     outputVertex.mUv = {0, 0};
                 } else {
                     outputVertex.mUv = v.mUv;
@@ -96,7 +95,7 @@ namespace gfx_testing::util {
             builder.addIndex(boost::safe_numerics::checked::cast<uint32_t>(outIndex));
         }
 
-        if (normalTreatment == NormalTreatment::AVERAGE) {
+        if (attribTreatment.mNormal == NormalTreatment::AVERAGE) {
             // averageNormals(builder);
             for (size_t outIdx = 0; outIdx < builder.mVertices.size(); ++outIdx) {
                 auto const &outVertex = builder.mVertices[outIdx];

@@ -60,8 +60,7 @@ namespace gfx_testing::util {
         }
     }
 
-    shader::MeshData loadObjFile(const std::filesystem::path &path, NormalTreatment normalTreatment,
-                                 TexCoordTreatment texCoordTreatment) {
+    shader::MeshData loadObjFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
         tinyobj::ObjReaderConfig reader_config;
         reader_config.mtl_search_path = path.parent_path();
         reader_config.triangulate = true;
@@ -89,6 +88,6 @@ namespace gfx_testing::util {
 
         Mesh mesh;
         addToMesh(reader, mesh);
-        return mesh.getMeshData(normalTreatment, texCoordTreatment);
+        return mesh.getMeshData(attribTreatment);
     }
 } // namespace gfx_testing::util

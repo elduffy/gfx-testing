@@ -13,6 +13,10 @@
 namespace gfx_testing::render {
 
     static constexpr glm::vec3 INITIAL_CAMERA_POSITION(5, 5, 5);
+    static constexpr util::AttribTreatment UNTEXTURED_ATTRIB_TREATMENT{
+            .mNormal = util::NormalTreatment::SPLIT,
+            .mTexCoord = util::TexCoordTreatment::DISCARD,
+    };
 
     SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
         const SDL_GPUTextureCreateInfo createInfo = {
@@ -72,16 +76,12 @@ namespace gfx_testing::render {
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
         mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", util::NormalTreatment::SPLIT,
-                                                              util::TexCoordTreatment::DISCARD),
+                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", UNTEXTURED_ATTRIB_TREATMENT),
                      pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
-        mLandscape(gameContext,
-                   gameContext.mResourceLoader.loadObjModel("cube.obj", util::NormalTreatment::SPLIT,
-                                                            util::TexCoordTreatment::DISCARD),
+        mLandscape(gameContext, gameContext.mResourceLoader.loadObjModel("cube.obj", UNTEXTURED_ATTRIB_TREATMENT),
                    pipeline::PipelineName::Lambert,
                    glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE)),
-        mTextureObject(gameContext,
-                       gameContext.mResourceLoader.loadObjModel("viking-room.obj", util::NormalTreatment::SPLIT),
+        mTextureObject(gameContext, gameContext.mResourceLoader.loadObjModel("viking-room.obj"),
                        gameContext.mResourceLoader.loadTexture("viking-room.png"),
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
