@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 #include <fastgltf/core.hpp>
+#include <fastgltf/glm_element_traits.hpp>
 #include <fastgltf/tools.hpp>
-#include <glm/fwd.hpp>
 #include <util/gltf_loader.hpp>
 
 namespace gfx_testing::util {
@@ -23,58 +23,29 @@ namespace gfx_testing::util {
         return accessorOpt.value().get();
     }
 
-    shader::MeshData loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
-        fastgltf::Parser parser;
-        auto data = fastgltf::GltfDataBuffer::FromPath(path);
-        CHECK(data.error() == fastgltf::Error::None) << "Failed to load GLTF file " << path;
+    void processPrimitive(Mesh &mesh, fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
+                          std::string_view objectName) {
 
-        auto asset = parser.loadGltf(data.get(), path.parent_path(), fastgltf::Options::None);
-        CHECK(asset.error() == fastgltf::Error::None) << "Failed to parse GLTF file " << path;
-
-        fastgltf::Primitive *primitive = nullptr;
-        for (auto &mesh: asset->meshes) {
-            CHECK_EQ(mesh.primitives.size(), 1)
-                    << "Expected 1 primitive for mesh " << mesh.name << ", got " << mesh.primitives.size();
-            primitive = &mesh.primitives.front();
-            CHECK(primitive->type == fastgltf::PrimitiveType::Triangles)
-                    << "Unsupported primitive type for mesh " << mesh.name << ": "
-                    << static_cast<uint8_t>(primitive->type);
-            CHECK(primitive->indicesAccessor.has_value()) << "Mesh " << mesh.name << " has no indices accessor";
-
-            SDL_Log("Mesh '%s' has attributes %s", mesh.name.c_str(),
-                    joinToString(primitive->attributes, ", ", [](auto const &att) { return att.name; }).c_str());
-        }
-        CHECK_NE(primitive, nullptr) << "No primitives found in gltf file " << path;
-
-        const auto &positionAccessor = getAccessorOrThrow(asset.get(), *primitive, "POSITION");
-        const auto &colorAccessorOpt = getAccessor(asset.get(), *primitive, "COLOR_0");
-        const auto &uvAccessorOpt = getAccessor(asset.get(), *primitive, "TEXCOORD_0");
-        const auto &normalAccessor = getAccessorOrThrow(asset.get(), *primitive, "NORMAL");
-
-        Mesh mesh;
+        const auto &positionAccessor = getAccessorOrThrow(asset, primitive, "POSITION");
+        const auto &colorAccessorOpt = getAccessor(asset, primitive, "COLOR_0");
+        const auto &uvAccessorOpt = getAccessor(asset, primitive, "TEXCOORD_0");
+        const auto &normalAccessor = getAccessorOrThrow(asset, primitive, "NORMAL");
 
         std::vector<shader::VertexData> triangleBuffer;
         triangleBuffer.reserve(3);
 
-        auto const &indexAccessor = asset->accessors[primitive->indicesAccessor.value()];
-        fastgltf::iterateAccessor<uint32_t>(asset.get(), indexAccessor, [&](auto const &index) {
-            auto const position =
-                    fastgltf::getAccessorElement<fastgltf::math::fvec3>(asset.get(), positionAccessor, index);
-            auto const normal = fastgltf::getAccessorElement<fastgltf::math::fvec3>(asset.get(), normalAccessor, index);
+        auto const &indexAccessor = asset.accessors[primitive.indicesAccessor.value()];
+        fastgltf::iterateAccessor<uint32_t>(asset, indexAccessor, [&](auto const &index) {
             auto &vertexData = triangleBuffer.emplace_back();
-            vertexData.mPosition = {position.x(), position.y(), position.z()};
-            vertexData.mNormal = {normal.x(), normal.y(), normal.z()};
+            vertexData.mPosition = fastgltf::getAccessorElement<glm::vec3>(asset, positionAccessor, index);
+            vertexData.mNormal = fastgltf::getAccessorElement<glm::vec3>(asset, normalAccessor, index);
             if (uvAccessorOpt.has_value()) {
-                auto const uv =
-                        fastgltf::getAccessorElement<fastgltf::math::fvec2>(asset.get(), uvAccessorOpt.value(), index);
-                vertexData.mUv = {uv.x(), uv.y()};
+                vertexData.mUv = fastgltf::getAccessorElement<glm::vec2>(asset, uvAccessorOpt.value(), index);
             } else {
                 vertexData.mUv = glm::vec2(0);
             }
             if (colorAccessorOpt.has_value()) {
-                auto const color = fastgltf::getAccessorElement<fastgltf::math::fvec4>(asset.get(),
-                                                                                       colorAccessorOpt.value(), index);
-                vertexData.mColor = {color.x(), color.y(), color.z(), color.w()};
+                vertexData.mColor = fastgltf::getAccessorElement<glm::vec4>(asset, colorAccessorOpt.value(), index);
             } else {
                 vertexData.mColor = glm::vec4(1);
             }
@@ -91,9 +62,36 @@ namespace gfx_testing::util {
             }
         });
 
-        CHECK(triangleBuffer.empty()) << "Vertices left over processing file " << path;
+        CHECK(triangleBuffer.empty()) << "Vertices left over processing " << objectName;
+    }
 
+    shader::MeshData loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
+        fastgltf::Parser parser;
+        auto data = fastgltf::GltfDataBuffer::FromPath(path);
+        CHECK(data.error() == fastgltf::Error::None) << "Failed to load GLTF file " << path;
 
-        return mesh.getMeshData(attribTreatment);
+        auto asset = parser.loadGltf(data.get(), path.parent_path(), fastgltf::Options::None);
+        CHECK(asset.error() == fastgltf::Error::None) << "Failed to parse GLTF file " << path;
+
+        fastgltf::Primitive *primitive = nullptr;
+        Mesh meshOut;
+
+        for (auto &mesh: asset->meshes) {
+            CHECK_EQ(mesh.primitives.size(), 1)
+                    << "Expected 1 primitive for mesh " << mesh.name << ", got " << mesh.primitives.size();
+            primitive = &mesh.primitives.front();
+            CHECK(primitive->type == fastgltf::PrimitiveType::Triangles)
+                    << "Unsupported primitive type for mesh " << mesh.name << ": "
+                    << static_cast<uint8_t>(primitive->type);
+            CHECK(primitive->indicesAccessor.has_value()) << "Mesh " << mesh.name << " has no indices accessor";
+
+            SDL_Log("Mesh '%s' has attributes %s", mesh.name.c_str(),
+                    joinToString(primitive->attributes, ", ", [](auto const &att) { return att.name; }).c_str());
+            CHECK_NE(primitive, nullptr) << "No primitives found in gltf file " << path;
+
+            processPrimitive(meshOut, asset.get(), *primitive, mesh.name);
+        }
+
+        return meshOut.getMeshData(attribTreatment);
     }
 } // namespace gfx_testing::util
