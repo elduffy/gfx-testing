@@ -1,4 +1,5 @@
 #include <boost/algorithm/string/replace.hpp>
+#include <util/gltf_loader.hpp>
 #include <util/obj_loader.hpp>
 #include <util/resource_loader.hpp>
 #include <util/texture_loader.hpp>
@@ -30,6 +31,10 @@ namespace gfx_testing::util {
 
     shader::MeshData ResourceLoader::loadObjModel(std::string const &filename, AttribTreatment attribTreatment) const {
         return loadObjFile(mProjectRoot / "content/models/" / filename, attribTreatment);
+    }
+
+    shader::MeshData ResourceLoader::loadGltfModel(std::string const &filename, AttribTreatment attribTreatment) const {
+        return loadGltfFile(mProjectRoot / "content/models/" / filename, attribTreatment);
     }
 
     sdl::SdlSurface ResourceLoader::loadTexture(std::string const &filename) const {

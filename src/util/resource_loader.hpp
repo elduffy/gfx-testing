@@ -46,6 +46,9 @@ namespace gfx_testing::util {
         [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename,
                                                     AttribTreatment attribTreatment = {}) const;
 
+        [[nodiscard]] shader::MeshData loadGltfModel(std::string const &filename,
+                                                     AttribTreatment attribTreatment = {}) const;
+
         [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
 
         [[nodiscard]] CubeMap loadCubeMap(std::string const &dirname) const;

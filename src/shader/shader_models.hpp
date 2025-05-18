@@ -8,7 +8,9 @@
 #include <glm/vec4.hpp>
 #include <gooch.frag.hpp>
 #include <ostream>
+#include <sstream>
 #include <vector>
+
 
 #define SHADER_ALIGN alignas(16)
 
@@ -248,6 +250,7 @@ namespace gfx_testing::shader {
     struct MeshDataBuilder {
 
         MeshData build() {
+            CHECK(!mVertices.empty()) << "MeshDataBuilder: no vertices set";
             CHECK(!mIndices16.empty() || !mIndices32.empty()) << "MeshDataBuilder: no indices set";
             if (mIndices32.size() > 0) {
                 return {

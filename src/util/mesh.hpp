@@ -47,7 +47,7 @@ namespace gfx_testing::util {
             glm::vec3 mPosition{0};
             glm::vec2 mUv{0};
             glm::vec3 mNormal{0};
-            glm::vec4 mColor{0};
+            glm::vec4 mColor{1};
         };
 
         struct VertexOps {

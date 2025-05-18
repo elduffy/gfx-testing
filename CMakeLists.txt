@@ -60,6 +60,7 @@ add_library(gfx_testing_lib
         src/sdl.cpp
         src/util/cube_map.cpp
         src/util/fps_capper.cpp
+        src/util/gltf_loader.cpp
         src/util/mesh.cpp
         src/util/obj_loader.cpp
         src/util/resource_loader.cpp
@@ -91,6 +92,7 @@ add_subdirectory(app/renderer)
 add_executable(tests
         tests/obj_loader_tests.cpp
         tests/mesh_tests.cpp
+        tests/gltf_loader_tests.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain gfx_testing_lib)
 target_include_directories(tests SYSTEM PRIVATE src/)

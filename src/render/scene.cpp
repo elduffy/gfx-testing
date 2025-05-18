@@ -78,7 +78,7 @@ namespace gfx_testing::render {
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", UNTEXTURED_ATTRIB_TREATMENT),
                      pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
-        mLandscape(gameContext, gameContext.mResourceLoader.loadObjModel("cube.obj", UNTEXTURED_ATTRIB_TREATMENT),
+        mLandscape(gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
                    pipeline::PipelineName::Lambert,
                    glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE)),
         mTextureObject(gameContext, gameContext.mResourceLoader.loadObjModel("viking-room.obj"),

@@ -55,4 +55,19 @@ namespace gfx_testing::util {
                 return "unknown";
         }
     }
+
+    template<typename InputContainer, typename Transform>
+    std::string joinToString(InputContainer const &input, std::string_view separator, Transform const &t) {
+        std::stringstream ss;
+        bool first = true;
+        for (auto const &elem: input) {
+            if (!first) {
+                ss << separator;
+            } else {
+                first = false;
+            }
+            ss << t(elem);
+        }
+        return ss.str();
+    }
 } // namespace gfx_testing::util
