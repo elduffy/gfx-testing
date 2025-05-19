@@ -108,13 +108,10 @@ TEST_CASE("Build a quad") {
         auto const meshData = mesh.getMeshData({.mNormal = NormalTreatment::AVERAGE});
         REQUIRE(meshData.mVertices.size() == 4);
         CHECK_THAT(meshData.mVertices[0].mNormal, WithinAbs(glm::normalize(glm::vec3{0.5, 0.5, 0}), EPSILON));
-        // CHECK_THAT(meshData.mVertices[3].mNormal, WithinAbs(glm::normalize(glm::vec3{0.5, 0.5, 0}), EPSILON));
 
         auto const expectedNorm =
                 glm::normalize((glm::normalize(glm::vec3{1, 2, 0}) + glm::normalize(glm::vec3{3, 4, 0})) * 0.5f);
-        std::cout << meshData.mVertices[2].mNormal;
         CHECK_THAT(meshData.mVertices[2].mNormal, WithinAbs(expectedNorm, EPSILON));
-        // CHECK_THAT(meshData.mVertices[4].mNormal, WithinAbs(expectedNorm, EPSILON));
 
         CHECK(meshData.mIndices.asVector<uint16_t>() == std::vector<uint16_t>{0, 1, 2, 0, 2, 3});
         CHECK(meshData.mVertices[0].mColor == C1);
@@ -125,10 +122,6 @@ TEST_CASE("Build a quad") {
         CHECK(meshData.mVertices[2].mPosition == V3);
         CHECK(meshData.mVertices[3].mColor == C4);
         CHECK(meshData.mVertices[3].mPosition == V4);
-        // CHECK(meshData.mVertices[4].mColor == C3);
-        // CHECK(meshData.mVertices[4].mPosition == V3);
-        // CHECK(meshData.mVertices[5].mColor == C4);
-        // CHECK(meshData.mVertices[5].mPosition == V4);
     }
 
     {

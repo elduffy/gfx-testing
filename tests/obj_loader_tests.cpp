@@ -11,7 +11,7 @@
 
 using namespace gfx_testing::util;
 
-TEST_CASE("Load a cube with averaged normals") {
+TEST_CASE("OBJ Load a cube with averaged normals") {
     auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj",
                                       {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
 
@@ -30,7 +30,7 @@ TEST_CASE("Load a cube with averaged normals") {
     REQUIRE(indexVector.size() == 36);
 }
 
-TEST_CASE("Load a cube with split normals") {
+TEST_CASE("OBJ Load a cube with split normals") {
     auto const meshData = loadObjFile(getProjectRoot() / "content/models/cube.obj",
                                       {NormalTreatment::SPLIT, TexCoordTreatment::DISCARD});
     REQUIRE(meshData.mVertices.size() == 24);

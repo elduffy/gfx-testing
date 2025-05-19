@@ -76,7 +76,7 @@ namespace gfx_testing::render {
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
         mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadObjModel("basic-shapes.obj", UNTEXTURED_ATTRIB_TREATMENT),
+                     gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
                      pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
         mLandscape(gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
                    pipeline::PipelineName::Lambert,
