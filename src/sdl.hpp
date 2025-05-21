@@ -169,10 +169,10 @@ namespace gfx_testing::sdl {
 
     class SdlGpuSampler {
     public:
-        NO_COPY_NO_MOVE(SdlGpuSampler);
+        NO_COPY(SdlGpuSampler);
 
         SdlGpuSampler(SdlContext const &context, SDL_GPUSampler *sampler);
-
+        SdlGpuSampler(SdlGpuSampler &&other) noexcept;
         ~SdlGpuSampler();
 
         SDL_GPUSampler *operator*() const { return mSampler; }

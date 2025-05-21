@@ -2,8 +2,7 @@
 #include <render/samplers.hpp>
 
 namespace gfx_testing::render {
-
-    constexpr SDL_GPUSamplerCreateInfo ANISOTROPIC_WRAP{
+    static constexpr SDL_GPUSamplerCreateInfo ANISOTROPIC_WRAP{
             .min_filter = SDL_GPU_FILTER_LINEAR,
             .mag_filter = SDL_GPU_FILTER_LINEAR,
             .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
@@ -15,5 +14,15 @@ namespace gfx_testing::render {
     };
 
     Samplers::Samplers(sdl::SdlContext const &context) :
-        mAnisotropicWrap(context, SDL_CreateGPUSampler(context.mDevice, &ANISOTROPIC_WRAP)) {}
+        mContext(context), mAnisotropicWrap{getOrCreateSampler(ANISOTROPIC_WRAP)} {}
+
+    sdl::SdlGpuSampler const &Samplers::getOrCreateSampler(SDL_GPUSamplerCreateInfo const &info) {
+        auto const &iter = mCache.find(info);
+        if (iter == mCache.end()) {
+            auto *sampler = SDL_CreateGPUSampler(mContext.mDevice, &info);
+            auto const &inserted = mCache.emplace(info, sdl::SdlGpuSampler{mContext, sampler});
+            return inserted.first->second;
+        }
+        return iter->second;
+    }
 } // namespace gfx_testing::render

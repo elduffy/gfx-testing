@@ -188,5 +188,9 @@ namespace gfx_testing::sdl {
     SdlGpuSampler::SdlGpuSampler(SdlContext const &context, SDL_GPUSampler *sampler) :
         mContext(context), mSampler(sampler) {}
 
+    SdlGpuSampler::SdlGpuSampler(SdlGpuSampler &&other) noexcept : mContext(other.mContext), mSampler(other.mSampler) {
+        other.mSampler = nullptr;
+    }
+
     SdlGpuSampler::~SdlGpuSampler() { SDL_ReleaseGPUSampler(mContext.mDevice, mSampler); }
 } // namespace gfx_testing::sdl
