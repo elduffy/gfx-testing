@@ -6,6 +6,7 @@
 #include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <shader/mesh.hpp>
 #include <util/util.hpp>
 
 namespace gfx_testing::util {
