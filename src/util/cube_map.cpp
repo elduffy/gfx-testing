@@ -78,6 +78,7 @@ namespace gfx_testing::util {
         }
         sdl::SdlGpuTexture result{context, texture};
         transferTextureData(context, mSurfaces, result);
+        result.mUploaded = true; // TODO clean this up
         return result;
     }
 

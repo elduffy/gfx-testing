@@ -6,6 +6,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
 #include <render/scene.hpp>
+#include <sdl_factories.hpp>
 #include <tiny_obj_loader.h>
 #include <util/util.hpp>
 
@@ -73,6 +74,17 @@ namespace gfx_testing::render {
         return pointLights;
     }
 
+    shader::ShaderObject buildVikingRoom(game::GameContext const &gameContext) {
+        // TODO: load texture through the gltf loader instead
+        auto shaderObject = gameContext.mResourceLoader.loadGltfModel("viking-room.glb");
+        const auto surface = gameContext.mResourceLoader.loadSurface("viking-room.png");
+        auto texture = sdl::createGpuTexture(gameContext.mSdlContext, surface.getExtent());
+        texture.upload(surface);
+        shaderObject.mRenderResources.mTextures.emplace_back(std::move(texture),
+                                                             gameContext.mSamplers.mAnisotropicWrap);
+        return shaderObject;
+    }
+
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
         mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
@@ -81,8 +93,7 @@ namespace gfx_testing::render {
         mLandscape(gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
                    pipeline::PipelineName::Lambert,
                    glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE)),
-        mTextureObject(gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
-                       gameContext.mResourceLoader.loadTexture("viking-room.png"),
+        mTextureObject(gameContext, buildVikingRoom(gameContext), pipeline::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
         for (auto const *objPtr:

@@ -1,8 +1,8 @@
 #pragma once
 #include <filesystem>
-#include <shader/shader_models.hpp>
+#include <shader/object.hpp>
 #include <util/mesh.hpp>
 
 namespace gfx_testing::util {
-    shader::MeshData loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment);
+    shader::ShaderObject loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment);
 }

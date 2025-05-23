@@ -65,11 +65,11 @@ namespace gfx_testing::render {
         }
     }
 
-    shader::MeshData buildMesh() {
+    shader::ShaderObject buildMesh() {
         shader::MeshDataBuilder builder;
         createLines(builder);
         // TODO: arrows, +, -
-        return builder.build();
+        return {builder.build(), {}};
     }
 
     DebugAxes::DebugAxes(game::GameContext const &gameContext) :

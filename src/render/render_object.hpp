@@ -1,32 +1,16 @@
 #pragma once
 #include <render/camera.hpp>
 #include <sdl.hpp>
-#include <shader/shader_models.hpp>
+#include <shader/object.hpp>
 
 namespace gfx_testing::render {
-    struct TextureAndSampler {
-        sdl::SdlGpuTexture mTexture;
-        sdl::SdlGpuSampler const &mSampler;
-    };
 
     class RenderObject {
     public:
-        RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
+        RenderObject(game::GameContext const &gameContext, shader::ShaderObject shaderObject,
                      pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform);
 
-        RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
-                     sdl::SdlSurface const &textureData, const glm::mat4 &initialTransform);
 
-        RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
-                     pipeline::PipelineName pipelineName, sdl::SdlGpuTexture texture,
-                     const glm::mat4 &initialTransform);
-
-    private:
-        RenderObject(game::GameContext const &gameContext, shader::MeshData const &meshData,
-                     pipeline::PipelineName pipelineName, sdl::SdlSurface const *textureDataOpt,
-                     const glm::mat4 &initialTransform);
-
-    public:
         void render(SDL_GPURenderPass *) const;
 
         pipeline::PipelineName getPipelineName() const { return mPipelineName; }
@@ -41,7 +25,8 @@ namespace gfx_testing::render {
         sdl::SdlGpuBuffer mVertexBuffer;
         sdl::SdlGpuBuffer mIndexBuffer;
         pipeline::PipelineName mPipelineName;
-        std::optional<TextureAndSampler> mTextureOpt = std::nullopt;
+        shader::RenderResources mRenderResources;
         uint32_t mIndexCount;
+        std::vector<SDL_GPUTextureSamplerBinding> mTextureBindings;
     };
 } // namespace gfx_testing::render

@@ -8,6 +8,7 @@
 #include <ostream>
 #include <shader/vertex.hpp>
 #include <sstream>
+#include <util/util.hpp>
 #include <vector>
 
 
@@ -23,11 +24,15 @@ namespace gfx_testing::shader {
         }
 
     public:
+        NO_COPY(IndexList);
+
         explicit IndexList(std::vector<uint16_t> const &indices) :
             mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_16BIT) {}
 
         explicit IndexList(std::vector<uint32_t> const &indices) :
             mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_32BIT) {}
+
+        IndexList(IndexList &&) = default;
 
         size_t count() const { return mCount; }
 
@@ -109,6 +114,13 @@ namespace gfx_testing::shader {
     }
 
     struct MeshData {
+        NO_COPY(MeshData);
+
+        MeshData(std::vector<VertexData> vertices, IndexList indices) :
+            mVertices(std::move(vertices)), mIndices(std::move(indices)) {}
+
+        MeshData(MeshData &&) = default;
+
         [[nodiscard]] uint32_t getVertexBufferSize() const {
             return boost::safe_numerics::checked::cast<uint32_t>(mVertices.size() * sizeof(VertexData));
         }
@@ -138,8 +150,8 @@ namespace gfx_testing::shader {
             return ss.str();
         }
 
-        std::vector<VertexData> const mVertices;
-        IndexList const mIndices;
+        std::vector<VertexData> mVertices;
+        IndexList mIndices;
     };
 
     struct MeshDataBuilder {
@@ -148,15 +160,9 @@ namespace gfx_testing::shader {
             CHECK(!mVertices.empty()) << "MeshDataBuilder: no vertices set";
             CHECK(!mIndices16.empty() || !mIndices32.empty()) << "MeshDataBuilder: no indices set";
             if (mIndices32.size() > 0) {
-                return {
-                        .mVertices = std::move(mVertices),
-                        .mIndices = IndexList(mIndices32),
-                };
+                return {std::move(mVertices), IndexList(mIndices32)};
             }
-            return {
-                    .mVertices = std::move(mVertices),
-                    .mIndices = IndexList(mIndices16),
-            };
+            return {std::move(mVertices), IndexList(mIndices16)};
         }
 
         void addIndex(int32_t index) {

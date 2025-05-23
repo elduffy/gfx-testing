@@ -58,6 +58,7 @@ add_library(gfx_testing_lib
         src/render/scene.cpp
         src/render/sky_box.cpp
         src/sdl.cpp
+        src/sdl_factories.cpp
         src/util/cube_map.cpp
         src/util/fps_capper.cpp
         src/util/gltf_loader.cpp

@@ -2,11 +2,10 @@
 
 #include <SDL3/SDL.h>
 #include <filesystem>
-#include <format>
 #include <sdl.hpp>
-#include <shader/shader_models.hpp>
+#include <shader/object.hpp>
 #include <util/cube_map.hpp>
-#include <util/obj_loader.hpp>
+#include <util/mesh.hpp>
 #include <util/util.hpp>
 
 namespace gfx_testing::util {
@@ -43,13 +42,13 @@ namespace gfx_testing::util {
 
         [[nodiscard]] ShaderCode loadShaderCode(std::string const &filename) const;
 
-        [[nodiscard]] shader::MeshData loadObjModel(std::string const &filename,
-                                                    AttribTreatment attribTreatment = {}) const;
+        [[nodiscard]] shader::ShaderObject loadObjModel(std::string const &filename,
+                                                        AttribTreatment attribTreatment = {}) const;
 
-        [[nodiscard]] shader::MeshData loadGltfModel(std::string const &filename,
-                                                     AttribTreatment attribTreatment = {}) const;
+        [[nodiscard]] shader::ShaderObject loadGltfModel(std::string const &filename,
+                                                         AttribTreatment attribTreatment = {}) const;
 
-        [[nodiscard]] sdl::SdlSurface loadTexture(std::string const &filename) const;
+        [[nodiscard]] sdl::SdlSurface loadSurface(std::string const &filename) const;
 
         [[nodiscard]] CubeMap loadCubeMap(std::string const &dirname) const;
 

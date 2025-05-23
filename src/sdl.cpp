@@ -132,8 +132,10 @@ namespace gfx_testing::sdl {
     SdlGpuTexture::SdlGpuTexture(SdlContext const &context, SDL_GPUTexture *texture) :
         mContext(context), mTexture(texture) {}
 
-    SdlGpuTexture::SdlGpuTexture(SdlGpuTexture &&other) noexcept : mContext(other.mContext), mTexture(other.mTexture) {
+    SdlGpuTexture::SdlGpuTexture(SdlGpuTexture &&other) noexcept :
+        mContext(other.mContext), mTexture(other.mTexture), mUploaded(other.mUploaded) {
         other.mTexture = nullptr;
+        other.mUploaded = false;
     }
 
     SdlGpuTexture::~SdlGpuTexture() { SDL_ReleaseGPUTexture(mContext.mDevice, mTexture); }
@@ -141,6 +143,7 @@ namespace gfx_testing::sdl {
     void SdlGpuTexture::reset(SDL_GPUTexture *newTexture) {
         SDL_ReleaseGPUTexture(mContext.mDevice, mTexture);
         mTexture = newTexture;
+        mUploaded = false;
     }
 
     SdlTransferBuffer SdlTransferBuffer::create(SdlContext const &context, SDL_GPUTransferBufferUsage usage,
@@ -150,6 +153,40 @@ namespace gfx_testing::sdl {
                 .size = size,
         };
         return {context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
+    }
+
+    void SdlGpuTexture::upload(SdlSurface const &surface) {
+        const auto [width, height] = surface.getExtent();
+        const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
+                .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+                .size = width * height * 4,
+        };
+        const SdlTransferBuffer transferBuffer{
+                mContext, SDL_CreateGPUTransferBuffer(mContext.mDevice, &transferBufferCreateInfo)};
+        // Upload pixel data
+        {
+            const auto mappedBuffer = transferBuffer.map(false);
+            auto *imageData = mappedBuffer.get<uint8_t>();
+            SDL_memcpy(imageData, (*surface)->pixels, width * height * 4);
+        }
+
+        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(mContext.mDevice);
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
+        auto scopedSubmit = scopedSubmitCommandBuffer(commandBuffer);
+        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+        SDL_GPUTextureTransferInfo const source = {
+                .transfer_buffer = *transferBuffer,
+                .offset = 0,
+        };
+        SDL_GPUTextureRegion const dest = {
+                .texture = mTexture,
+                .w = width,
+                .h = height,
+                .d = 1,
+        };
+        SDL_UploadToGPUTexture(copyPass, &source, &dest, false);
+        SDL_EndGPUCopyPass(copyPass);
+        mUploaded = true;
     }
 } // namespace gfx_testing::sdl
 

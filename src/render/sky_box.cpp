@@ -45,8 +45,16 @@ namespace gfx_testing::render {
         return builder.build();
     }
 
+    shader::ShaderObject createShaderObject(game::GameContext const &gameContext, util::CubeMap const &cubeMap) {
+        auto texture = cubeMap.createTexture(gameContext.mSdlContext);
+        shader::RenderResources renderResources;
+        renderResources.mTextures.emplace_back(cubeMap.createTexture(gameContext.mSdlContext),
+                                               gameContext.mSamplers.mAnisotropicWrap);
+        return {createMeshData(), (std::move(renderResources))};
+    }
+
+
     SkyBox::SkyBox(game::GameContext &gameContext, util::CubeMap const &cubeMap) :
-        mGameContext(gameContext),
-        mRenderObject(gameContext, createMeshData(), pipeline::PipelineName::Skybox,
-                      cubeMap.createTexture(mGameContext.mSdlContext), glm::identity<glm::mat4>()) {}
+        mGameContext(gameContext), mRenderObject(gameContext, createShaderObject(mGameContext, cubeMap),
+                                                 pipeline::PipelineName::Skybox, glm::identity<glm::mat4>()) {}
 } // namespace gfx_testing::render

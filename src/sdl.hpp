@@ -90,6 +90,29 @@ namespace gfx_testing::sdl {
         SDL_GPUBuffer *mBuffer = nullptr;
     };
 
+    class SdlSurface {
+    public:
+        NO_COPY(SdlSurface);
+
+        SdlSurface() = default;
+        explicit SdlSurface(SDL_Surface *surface);
+        SdlSurface(SdlSurface &&other) noexcept;
+        ~SdlSurface();
+
+        SDL_Surface *operator*() const { return mSurface; }
+        SdlSurface &operator=(SdlSurface &&other) noexcept;
+
+        util::Extent2D getExtent() const {
+            assert(mSurface);
+            return {
+                    .mWidth = boost::safe_numerics::checked::cast<uint32_t>(mSurface->w),
+                    .mHeight = boost::safe_numerics::checked::cast<uint32_t>(mSurface->h),
+            };
+        }
+
+        SDL_Surface *mSurface = nullptr;
+    };
+
     class SdlGpuTexture {
     public:
         NO_COPY(SdlGpuTexture);
@@ -104,8 +127,11 @@ namespace gfx_testing::sdl {
 
         void reset(SDL_GPUTexture *newTexture);
 
+        void upload(SdlSurface const &surface);
+
         SdlContext const &mContext;
         SDL_GPUTexture *mTexture = nullptr;
+        bool mUploaded = false;
     };
 
     class SdlMappedTransferBuffer {
@@ -142,29 +168,6 @@ namespace gfx_testing::sdl {
 
         SdlContext const &mContext;
         SDL_GPUTransferBuffer *mBuffer = nullptr;
-    };
-
-    class SdlSurface {
-    public:
-        NO_COPY(SdlSurface);
-
-        SdlSurface() = default;
-        explicit SdlSurface(SDL_Surface *surface);
-        SdlSurface(SdlSurface &&other) noexcept;
-        ~SdlSurface();
-
-        SDL_Surface *operator*() const { return mSurface; }
-        SdlSurface &operator=(SdlSurface &&other) noexcept;
-
-        util::Extent2D getExtent() const {
-            assert(mSurface);
-            return {
-                    .mWidth = boost::safe_numerics::checked::cast<uint32_t>(mSurface->w),
-                    .mHeight = boost::safe_numerics::checked::cast<uint32_t>(mSurface->h),
-            };
-        }
-
-        SDL_Surface *mSurface = nullptr;
     };
 
     class SdlGpuSampler {

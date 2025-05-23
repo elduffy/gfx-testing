@@ -3,6 +3,7 @@
 #include <fastgltf/core.hpp>
 #include <fastgltf/glm_element_traits.hpp>
 #include <fastgltf/tools.hpp>
+#include <shader/object.hpp>
 #include <util/gltf_loader.hpp>
 
 namespace gfx_testing::util {
@@ -93,7 +94,7 @@ namespace gfx_testing::util {
         CHECK(triangleBuffer.empty()) << "Vertices left over processing " << objectName;
     }
 
-    shader::MeshData loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
+    shader::ShaderObject loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
         fastgltf::Parser parser;
         auto data = fastgltf::GltfDataBuffer::FromPath(path);
         CHECK(data.error() == fastgltf::Error::None) << "Failed to load GLTF file " << path;
@@ -136,6 +137,6 @@ namespace gfx_testing::util {
             processPrimitive(meshOut, asset, primitive, transform, mesh.name);
         }
 
-        return meshOut.getMeshData(attribTreatment);
+        return shader::ShaderObject{meshOut.getMeshData(attribTreatment), shader::RenderResources{/*TODO*/}};
     }
 } // namespace gfx_testing::util
