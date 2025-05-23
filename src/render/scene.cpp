@@ -77,9 +77,10 @@ namespace gfx_testing::render {
     shader::ShaderObject buildVikingRoom(game::GameContext const &gameContext) {
         // TODO: load texture through the gltf loader instead
         auto shaderObject = gameContext.mResourceLoader.loadGltfModel("viking-room.glb");
-        const auto surface = gameContext.mResourceLoader.loadSurface("viking-room.png");
-        auto texture = sdl::createGpuTexture(gameContext.mSdlContext, surface.getExtent());
-        texture.upload(surface);
+        std::vector<sdl::SdlSurface> surfaces;
+        surfaces.emplace_back(gameContext.mResourceLoader.loadSurface("viking-room.png"));
+        auto texture = sdl::createGpuTexture(gameContext.mSdlContext, surfaces.front().getExtent());
+        texture.upload(surfaces);
         shaderObject.mRenderResources.mTextures.emplace_back(std::move(texture),
                                                              gameContext.mSamplers.mAnisotropicWrap);
         return shaderObject;

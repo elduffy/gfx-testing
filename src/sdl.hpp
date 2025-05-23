@@ -127,7 +127,8 @@ namespace gfx_testing::sdl {
 
         void reset(SDL_GPUTexture *newTexture);
 
-        void upload(SdlSurface const &surface);
+        // Upload the pixel data for surfaces, one surface per layer.
+        void upload(std::vector<SdlSurface> const &surfaces);
 
         SdlContext const &mContext;
         SDL_GPUTexture *mTexture = nullptr;

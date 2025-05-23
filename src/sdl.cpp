@@ -155,36 +155,56 @@ namespace gfx_testing::sdl {
         return {context, SDL_CreateGPUTransferBuffer(context.mDevice, &transferBufferCreateInfo)};
     }
 
-    void SdlGpuTexture::upload(SdlSurface const &surface) {
-        const auto [width, height] = surface.getExtent();
+    void SdlGpuTexture::upload(std::vector<SdlSurface> const &surfaces) {
+        auto const extent = surfaces.front().getExtent();
+        auto const bytesPerLayer = extent.mWidth * extent.mHeight * 4;
+        auto const numLayers = boost::safe_numerics::checked::cast<uint32_t>(surfaces.size());
+        for (auto const &surface: surfaces) {
+            auto surfaceExtent = surface.getExtent();
+            CHECK_EQ(surfaceExtent, extent)
+                    << "All surfaces for a texture must have the same dimensions: " << surfaceExtent
+                    << " != " << extent;
+            CHECK_EQ((*surface)->pitch, extent.mWidth * 4) << "SdlGpuTexture::upload expects 4 bytes per pixel";
+        }
+
         const SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {
                 .usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                .size = width * height * 4,
+                .size = bytesPerLayer * numLayers,
         };
         const SdlTransferBuffer transferBuffer{
                 mContext, SDL_CreateGPUTransferBuffer(mContext.mDevice, &transferBufferCreateInfo)};
         // Upload pixel data
         {
             const auto mappedBuffer = transferBuffer.map(false);
-            auto *imageData = mappedBuffer.get<uint8_t>();
-            SDL_memcpy(imageData, (*surface)->pixels, width * height * 4);
+            for (uint32_t layer = 0; layer < surfaces.size(); layer++) {
+                const auto *source = surfaces[layer].mSurface->pixels;
+                auto *dest = mappedBuffer.get<uint8_t>(bytesPerLayer * layer);
+                SDL_memcpy(dest, source, bytesPerLayer);
+            }
         }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(mContext.mDevice);
-        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
-        auto scopedSubmit = scopedSubmitCommandBuffer(commandBuffer);
+        if (commandBuffer == nullptr) {
+            throw std::runtime_error("Failed to acquire GPU command buffer");
+        }
+        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-        SDL_GPUTextureTransferInfo const source = {
+        SDL_GPUTextureTransferInfo source = {
                 .transfer_buffer = *transferBuffer,
-                .offset = 0,
+                .pixels_per_row = extent.mWidth,
+                .rows_per_layer = extent.mHeight,
         };
-        SDL_GPUTextureRegion const dest = {
-                .texture = mTexture,
-                .w = width,
-                .h = height,
+        SDL_GPUTextureRegion dest = {
+                .w = extent.mWidth,
+                .h = extent.mHeight,
                 .d = 1,
         };
-        SDL_UploadToGPUTexture(copyPass, &source, &dest, false);
+        for (uint32_t layer = 0; layer < numLayers; ++layer) {
+            source.offset = layer * bytesPerLayer;
+            dest.texture = mTexture;
+            dest.layer = layer;
+            SDL_UploadToGPUTexture(copyPass, &source, &dest, false);
+        }
         SDL_EndGPUCopyPass(copyPass);
         mUploaded = true;
     }
