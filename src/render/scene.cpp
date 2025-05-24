@@ -5,6 +5,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
+#include <render/samplers.hpp>
 #include <render/scene.hpp>
 #include <sdl_factories.hpp>
 #include <tiny_obj_loader.h>
@@ -79,10 +80,8 @@ namespace gfx_testing::render {
         auto shaderObject = gameContext.mResourceLoader.loadGltfModel("viking-room.glb");
         std::vector<sdl::SdlSurface> surfaces;
         surfaces.emplace_back(gameContext.mResourceLoader.loadSurface("viking-room.png"));
-        auto texture = sdl::createGpuTexture(gameContext.mSdlContext, surfaces.front().getExtent());
-        texture.upload(surfaces);
-        shaderObject.mRenderResources.mTextures.emplace_back(std::move(texture),
-                                                             gameContext.mSamplers.mAnisotropicWrap);
+        shaderObject.mImages.emplace_back(SDL_GPU_TEXTURETYPE_2D, std::move(surfaces),
+                                          Samplers::ANISOTROPIC_WRAP_CREATE_INFO);
         return shaderObject;
     }
 

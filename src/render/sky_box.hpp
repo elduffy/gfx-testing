@@ -5,9 +5,8 @@
 namespace gfx_testing::render {
     class SkyBox {
     public:
-        SkyBox(game::GameContext &gameContext, util::CubeMap const &cubeMap);
+        SkyBox(game::GameContext &gameContext, util::CubeMap cubeMap);
 
-        game::GameContext &mGameContext;
         RenderObject mRenderObject;
     };
 } // namespace gfx_testing::render

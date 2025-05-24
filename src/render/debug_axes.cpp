@@ -72,6 +72,6 @@ namespace gfx_testing::render {
         return {builder.build(), {}};
     }
 
-    DebugAxes::DebugAxes(game::GameContext const &gameContext) :
+    DebugAxes::DebugAxes(game::GameContext &gameContext) :
         mRenderObject(gameContext, buildMesh(), pipeline::PipelineName::Lines, glm::identity<glm::mat4>()) {}
 } // namespace gfx_testing::render

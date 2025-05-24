@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <optional>
 #include <ostream>
 
 #include "../../../SDL_image/Xcode/iOS/SDL3.framework/Headers/SDL_gpu.h"
@@ -17,6 +18,9 @@
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot();
+
+    template<typename T>
+    using optref = std::optional<std::reference_wrapper<T>>;
 
     struct Extent2D {
         uint32_t mWidth;

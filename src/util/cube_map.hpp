@@ -9,8 +9,9 @@ namespace gfx_testing::util {
     public:
         NO_COPY(CubeMap);
         explicit CubeMap(std::vector<sdl::SdlSurface> surfaces);
+        CubeMap(CubeMap &&) = default;
 
-        sdl::SdlGpuTexture createTexture(sdl::SdlContext const &context) const;
+        // sdl::SdlGpuTexture createTexture(sdl::SdlContext const &context) const;
 
         std::vector<sdl::SdlSurface> mSurfaces;
         Extent2D const mExtent;

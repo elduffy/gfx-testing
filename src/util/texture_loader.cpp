@@ -8,15 +8,31 @@
 #include "boost/algorithm/string/split.hpp"
 
 namespace gfx_testing::util {
-    sdl::SdlSurface loadImage(const std::string &path) {
-        auto *surface = IMG_Load(path.c_str());
-        CHECK(surface) << "Failed to load image: " << path;
+    sdl::SdlSurface convertFormat(SDL_Surface *surface) {
         if (constexpr auto DESIRED_FORMAT = SDL_PIXELFORMAT_ABGR8888; surface->format != DESIRED_FORMAT) {
             auto *converted = SDL_ConvertSurface(surface, DESIRED_FORMAT);
             SDL_DestroySurface(surface);
             surface = converted;
         }
         return sdl::SdlSurface{surface};
+    }
+
+    sdl::SdlSurface loadImage(const std::string &path) {
+        auto *surface = IMG_Load(path.c_str());
+        CHECK_NE(surface, nullptr) << "Failed to load image at " << path << ": " << SDL_GetError();
+        return convertFormat(surface);
+    }
+
+    sdl::SdlSurface loadImage(void const *mem, size_t size, char const *type) {
+        auto *stream = SDL_IOFromConstMem(mem, size);
+        SDL_Surface *surface = nullptr;
+        if (type == nullptr) {
+            surface = IMG_Load_IO(stream, true);
+        } else {
+            surface = IMG_LoadTyped_IO(stream, true, type);
+        }
+        CHECK_NE(surface, nullptr) << "Failed to load image from stream: " << SDL_GetError();
+        return convertFormat(surface);
     }
 
     CubeMap loadCubeMap(std::filesystem::path const &dir) {

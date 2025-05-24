@@ -7,7 +7,7 @@ namespace gfx_testing::render {
 
     class RenderObject {
     public:
-        RenderObject(game::GameContext const &gameContext, shader::ShaderObject shaderObject,
+        RenderObject(game::GameContext &gameContext, shader::ShaderObject shaderObject,
                      pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform);
 
 
@@ -22,11 +22,8 @@ namespace gfx_testing::render {
         glm::mat4 mTransform;
 
     private:
-        sdl::SdlGpuBuffer mVertexBuffer;
-        sdl::SdlGpuBuffer mIndexBuffer;
         pipeline::PipelineName mPipelineName;
-        shader::RenderResources mRenderResources;
+        shader::GpuShaderObject mGpuShaderObject;
         uint32_t mIndexCount;
-        std::vector<SDL_GPUTextureSamplerBinding> mTextureBindings;
     };
 } // namespace gfx_testing::render

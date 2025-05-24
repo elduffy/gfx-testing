@@ -4,5 +4,6 @@
 
 namespace gfx_testing::sdl {
 
-    SdlGpuTexture createGpuTexture(SdlContext const &sdlContext, util::Extent2D extent);
+    SdlGpuTexture createGpuTexture(SdlContext const &sdlContext, util::Extent2D extent, SDL_GPUTextureType type,
+                                   uint32_t layerCount);
 }

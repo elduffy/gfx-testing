@@ -68,6 +68,7 @@ add_library(gfx_testing_lib
         src/util/stopwatch.cpp
         src/util/texture_loader.cpp
         src/util/util.cpp
+        src/shader/object.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui

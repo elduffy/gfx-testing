@@ -88,6 +88,6 @@ namespace gfx_testing::util {
 
         Mesh mesh;
         addToMesh(reader, mesh);
-        return shader::ShaderObject{mesh.getMeshData(attribTreatment), shader::RenderResources{}};
+        return shader::ShaderObject{mesh.getMeshData(attribTreatment), {}};
     }
 } // namespace gfx_testing::util

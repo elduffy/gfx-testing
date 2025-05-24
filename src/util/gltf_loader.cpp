@@ -5,13 +5,18 @@
 #include <fastgltf/tools.hpp>
 #include <shader/object.hpp>
 #include <util/gltf_loader.hpp>
+#include <util/texture_loader.hpp>
 
 namespace gfx_testing::util {
     // Arbitrary limit, could probably be increased
     static constexpr auto MAX_COLOR_ATTRIBUTES = 2;
 
-    std::optional<std::reference_wrapper<const fastgltf::Accessor>>
-    getAccessor(fastgltf::Asset const &asset, fastgltf::Primitive const &primitive, std::string_view attributeName) {
+    struct MaterialAttributes {
+        size_t mTexcoordIndex;
+    };
+
+    optref<const fastgltf::Accessor> getAccessor(fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
+                                                 std::string_view attributeName) {
         const auto *iter = primitive.findAttribute(attributeName);
         if (iter == primitive.attributes.end()) {
             return std::nullopt;
@@ -32,8 +37,74 @@ namespace gfx_testing::util {
         return result;
     }
 
-    void processPrimitive(Mesh &mesh, fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
-                          fastgltf::math::fmat4x4 const &transform, std::string_view objectName) {
+    sdl::SdlSurface loadBufferViewImage(fastgltf::Asset const &asset,
+                                        fastgltf::sources::BufferView const &bufferViewSource) {
+        auto const &bufferView = asset.bufferViews.at(bufferViewSource.bufferViewIndex);
+        auto const &buffer = asset.buffers.at(bufferView.bufferIndex);
+        CHECK(!std::holds_alternative<fastgltf::sources::BufferView>(buffer.data))
+                << "Image buffer " << buffer.name << " unexpectedly has BufferView source";
+        SDL_Log("Image buffer '%s' with type %hhu has alternative %lu", buffer.name.c_str(),
+                static_cast<uint8_t>(bufferViewSource.mimeType), buffer.data.index());
+        if (std::holds_alternative<fastgltf::sources::Array>(buffer.data)) {
+            auto const &arr = std::get<fastgltf::sources::Array>(buffer.data);
+            return loadImage(arr.bytes.data() + bufferView.byteOffset, bufferView.byteLength);
+        }
+
+        CHECK(false) << "Image buffer " << buffer.name << " has unsupported alternative " << buffer.data.index();
+    }
+
+    sdl::SdlSurface loadImageData(fastgltf::Asset const &asset, fastgltf::Image const &image) {
+        SDL_Log("Image %s has alternative %zu", image.name.c_str(), image.data.index());
+        if (std::holds_alternative<fastgltf::sources::BufferView>(image.data)) {
+            auto const &bufferView = std::get<fastgltf::sources::BufferView>(image.data);
+            return loadBufferViewImage(asset, bufferView);
+        }
+        CHECK(false) << "Image data alternative not supported: " << image.data.index();
+    }
+
+    SDL_GPUSamplerAddressMode getAddressMode(fastgltf::Wrap wrap) {
+        switch (wrap) {
+            case fastgltf::Wrap::ClampToEdge:
+                return SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+            case fastgltf::Wrap::MirroredRepeat:
+                return SDL_GPU_SAMPLERADDRESSMODE_MIRRORED_REPEAT;
+            case fastgltf::Wrap::Repeat:
+                return SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+        }
+        throw std::runtime_error("Unrecognized wrap mode");
+    }
+
+    SDL_GPUFilter getFilter(fastgltf::Optional<fastgltf::Filter> const &filter) {
+        if (!filter.has_value()) {
+            return SDL_GPU_FILTER_LINEAR;
+        }
+        switch (filter.value()) {
+            case fastgltf::Filter::Nearest:
+            case fastgltf::Filter::NearestMipMapNearest:
+            case fastgltf::Filter::LinearMipMapNearest:
+                return SDL_GPU_FILTER_NEAREST;
+            case fastgltf::Filter::Linear:
+            case fastgltf::Filter::NearestMipMapLinear:
+            case fastgltf::Filter::LinearMipMapLinear:
+                return SDL_GPU_FILTER_LINEAR;
+        }
+    }
+
+    SDL_GPUSamplerCreateInfo getSamplerCreateInfo(fastgltf::Sampler const &sampler) {
+        return SDL_GPUSamplerCreateInfo{
+                .min_filter = getFilter(sampler.minFilter),
+                .mag_filter = getFilter(sampler.magFilter),
+                .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
+                .address_mode_u = getAddressMode(sampler.wrapS),
+                .address_mode_v = getAddressMode(sampler.wrapT),
+                .max_anisotropy = 4,
+                .enable_anisotropy = true,
+        };
+    }
+
+    void addToMesh(Mesh &mesh, fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
+                   fastgltf::math::fmat4x4 const &transform,
+                   std::optional<MaterialAttributes> const &materialAttributes, std::string_view objectName) {
 
         const auto &positionAccessor = getAccessorOrThrow(asset, primitive, "POSITION");
 
@@ -47,8 +118,17 @@ namespace gfx_testing::util {
             }
         }
 
-        const auto uvAccessorOpt = getAccessor(asset, primitive, "TEXCOORD_0");
         const auto &normalAccessor = getAccessorOrThrow(asset, primitive, "NORMAL");
+
+        optref<const fastgltf::Accessor> texCoordAccessor{};
+        if (materialAttributes.has_value()) {
+            // Textures referenced in the gltf will use this
+            texCoordAccessor.emplace(getAccessorOrThrow(
+                    asset, primitive, std::format("TEXCOORD_{}", materialAttributes.value().mTexcoordIndex)));
+        } else {
+            // If no texture in gltf, still try to look up texcoords so that external textures can be applied.
+            texCoordAccessor = getAccessor(asset, primitive, "TEXCOORD_0");
+        }
 
         std::vector<shader::VertexData> triangleBuffer;
         triangleBuffer.reserve(3);
@@ -67,8 +147,8 @@ namespace gfx_testing::util {
             vertexData.mNormal =
                     glm::normalize(glm::vec3{transformedNorm.x(), transformedNorm.y(), transformedNorm.z()});
 
-            if (uvAccessorOpt.has_value()) {
-                vertexData.mUv = fastgltf::getAccessorElement<glm::vec2>(asset, uvAccessorOpt.value(), index);
+            if (texCoordAccessor.has_value()) {
+                vertexData.mUv = fastgltf::getAccessorElement<glm::vec2>(asset, texCoordAccessor.value(), index);
             } else {
                 vertexData.mUv = glm::vec2(0);
             }
@@ -92,6 +172,33 @@ namespace gfx_testing::util {
         });
 
         CHECK(triangleBuffer.empty()) << "Vertices left over processing " << objectName;
+    }
+
+    std::optional<MaterialAttributes> addMaterial(std::vector<shader::ImageData> &imagesOut,
+                                                  fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
+                                                  std::string_view objectName) {
+        if (!primitive.materialIndex.has_value()) {
+            return std::nullopt;
+        }
+        auto const &material = asset.materials.at(primitive.materialIndex.value());
+        if (!material.pbrData.baseColorTexture.has_value()) {
+            return std::nullopt;
+        }
+        auto const &textureInfo = material.pbrData.baseColorTexture.value();
+        CHECK_EQ(textureInfo.transform, nullptr) << "No support for KHR_texture_transform right now";
+        auto const &texture = asset.textures.at(textureInfo.textureIndex);
+        CHECK(texture.imageIndex.has_value())
+                << "No image index for texture " << texture.name << " of mesh " << objectName;
+
+        auto const &image = asset.images.at(texture.imageIndex.value());
+        std::vector<sdl::SdlSurface> surfaces;
+        surfaces.emplace_back(loadImageData(asset, image));
+        auto &imageOut = imagesOut.emplace_back(SDL_GPU_TEXTURETYPE_2D, std::move(surfaces));
+        if (texture.samplerIndex.has_value()) {
+            imageOut.mSamplerCreateInfo.emplace(getSamplerCreateInfo(asset.samplers.at(texture.samplerIndex.value())));
+        }
+
+        return MaterialAttributes{.mTexcoordIndex = textureInfo.texCoordIndex};
     }
 
     shader::ShaderObject loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
@@ -120,6 +227,7 @@ namespace gfx_testing::util {
                              });
 
         Mesh meshOut;
+        std::vector<shader::ImageData> imagesOut;
         for (auto const &[meshIndex, transform]: meshIndices) {
             auto const &mesh = asset.meshes[meshIndex];
             CHECK_EQ(mesh.primitives.size(), 1)
@@ -134,9 +242,10 @@ namespace gfx_testing::util {
             SDL_Log("Mesh '%s' has attributes %s", mesh.name.c_str(),
                     joinToString(primitive.attributes, ", ", [](auto const &att) { return att.name; }).c_str());
 
-            processPrimitive(meshOut, asset, primitive, transform, mesh.name);
+            auto const materialAttributes = addMaterial(imagesOut, asset, primitive, mesh.name);
+            addToMesh(meshOut, asset, primitive, transform, materialAttributes, mesh.name);
         }
 
-        return shader::ShaderObject{meshOut.getMeshData(attribTreatment), shader::RenderResources{/*TODO*/}};
+        return shader::ShaderObject{meshOut.getMeshData(attribTreatment), std::move(imagesOut)};
     }
 } // namespace gfx_testing::util
