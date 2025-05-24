@@ -43,8 +43,8 @@ namespace gfx_testing::util {
         auto const &buffer = asset.buffers.at(bufferView.bufferIndex);
         CHECK(!std::holds_alternative<fastgltf::sources::BufferView>(buffer.data))
                 << "Image buffer " << buffer.name << " unexpectedly has BufferView source";
-        SDL_Log("Image buffer '%s' with type %hhu has alternative %lu", buffer.name.c_str(),
-                static_cast<uint8_t>(bufferViewSource.mimeType), buffer.data.index());
+        // SDL_Log("Image buffer '%s' with type %hhu has alternative %lu", buffer.name.c_str(),
+        //         static_cast<uint8_t>(bufferViewSource.mimeType), buffer.data.index());
         if (std::holds_alternative<fastgltf::sources::Array>(buffer.data)) {
             auto const &arr = std::get<fastgltf::sources::Array>(buffer.data);
             return loadImage(arr.bytes.data() + bufferView.byteOffset, bufferView.byteLength);
@@ -54,7 +54,7 @@ namespace gfx_testing::util {
     }
 
     sdl::SdlSurface loadImageData(fastgltf::Asset const &asset, fastgltf::Image const &image) {
-        SDL_Log("Image %s has alternative %zu", image.name.c_str(), image.data.index());
+        // SDL_Log("Image %s has alternative %zu", image.name.c_str(), image.data.index());
         if (std::holds_alternative<fastgltf::sources::BufferView>(image.data)) {
             auto const &bufferView = std::get<fastgltf::sources::BufferView>(image.data);
             return loadBufferViewImage(asset, bufferView);
@@ -212,7 +212,7 @@ namespace gfx_testing::util {
 
         CHECK(asset.defaultScene.has_value()) << "No default scene in GLTF file " << path;
         auto const sceneNode = asset.defaultScene.value();
-        SDL_Log("GLTF '%s' using scene %lu: '%s'", path.c_str(), sceneNode, asset.scenes.at(sceneNode).name.c_str());
+        // SDL_Log("GLTF '%s' using scene %lu: '%s'", path.c_str(), sceneNode, asset.scenes.at(sceneNode).name.c_str());
 
         // Get the meshes to process along with their transforms
         using mesh_index_t = std::pair<size_t, fastgltf::math::fmat4x4>;
