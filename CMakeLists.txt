@@ -6,12 +6,11 @@ set(CMAKE_CXX_STANDARD 20)
 include(FetchContent)
 
 include(cmake/fetch-tinyobjloader.cmake)
-set(INJA_USE_EMBEDDED_JSON OFF)
-include(cmake/fetch-glm.cmake)
 include(cmake/fetch-catch2.cmake)
 include(cmake/fetch-imgui.cmake)
 include(cmake/fetch-clipp.cmake)
 include(cmake/fetch-nlohmann_json.cmake)
+set(INJA_USE_EMBEDDED_JSON OFF)
 include(cmake/fetch-inja.cmake)
 include(cmake/fetch-fastgltf.cmake)
 
@@ -23,6 +22,7 @@ add_subdirectory(app/spirv_header_gen)
 set(BOOST_INCLUDE_LIBRARIES algorithm safe_numerics scope)
 set(BOOST_ENABLE_CMAKE ON)
 add_subdirectory(deps/boost)
+add_subdirectory(deps/glm)
 
 add_custom_target(build_shaders
         COMMAND bash content/shaders/build-shaders.sh

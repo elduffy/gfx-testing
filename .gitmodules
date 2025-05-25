@@ -9,3 +9,9 @@
 	url = git@github.com:boostorg/boost.git
 	shallow = true
 	branch = boost-1.88.0
+
+[submodule "glm"]
+	path = deps/glm
+	url = git@github.com:g-truc/glm.git
+	shallow = true
+	branch = 1.0.1
