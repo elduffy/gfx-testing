@@ -3,15 +3,18 @@
 	url = git@github.com:abseil/abseil-cpp.git
 	shallow = true
 	branch = bc257a88f7c1939f24e0379f14a3589e926c950c
+	ignore = dirty
 
 [submodule "boost"]
 	path = deps/boost
 	url = git@github.com:boostorg/boost.git
 	shallow = true
 	branch = boost-1.88.0
+	ignore = dirty # Significantly speeds up `git status`, etc
 
 [submodule "glm"]
 	path = deps/glm
 	url = git@github.com:g-truc/glm.git
 	shallow = true
 	branch = 1.0.1
+	ignore = dirty
