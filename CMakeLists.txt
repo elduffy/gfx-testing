@@ -17,12 +17,12 @@ include(cmake/fetch-fastgltf.cmake)
 find_package(SDL3 REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
-add_subdirectory(deps/abseil-cpp)
+add_subdirectory(deps/abseil-cpp EXCLUDE_FROM_ALL)
 add_subdirectory(app/spirv_header_gen)
 set(BOOST_INCLUDE_LIBRARIES algorithm safe_numerics scope)
 set(BOOST_ENABLE_CMAKE ON)
-add_subdirectory(deps/boost)
-add_subdirectory(deps/glm)
+add_subdirectory(deps/boost EXCLUDE_FROM_ALL)
+add_subdirectory(deps/glm EXCLUDE_FROM_ALL)
 
 add_custom_target(build_shaders
         COMMAND bash content/shaders/build-shaders.sh
@@ -63,12 +63,12 @@ add_library(gfx_testing_lib
         src/render/sky_box.cpp
         src/sdl.cpp
         src/sdl_factories.cpp
+        src/shader/object.cpp
         src/util/cube_map.cpp
         src/util/fps_capper.cpp
         src/util/mesh.cpp
         src/util/stopwatch.cpp
         src/util/util.cpp
-        src/shader/object.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui
