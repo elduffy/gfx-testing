@@ -5,9 +5,12 @@
 namespace gfx_testing::render {
     class PointLight {
     public:
-        explicit PointLight(game::GameContext &gameContext, float pathRadius, float phase);
+        explicit PointLight(game::GameContext &gameContext, shader::ShaderObject const &shaderObject, float pathRadius,
+                            float phase);
 
         void update();
+
+        static shader::ShaderObject loadShaderObject(util::ResourceLoader const &resourceLoader);
 
         game::GameContext &mGameContext;
         glm::vec3 mPosWs;

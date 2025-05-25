@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace gfx_testing::render {
-    RenderObject::RenderObject(game::GameContext &gameContext, shader::ShaderObject shaderObject,
+    RenderObject::RenderObject(game::GameContext &gameContext, shader::ShaderObject const &shaderObject,
                                pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform) :
         mTransform(initialTransform), mPipelineName(pipelineName),
         mGpuShaderObject(shaderObject.upload(gameContext.mSdlContext, gameContext.mSamplers)),

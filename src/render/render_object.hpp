@@ -7,9 +7,8 @@ namespace gfx_testing::render {
 
     class RenderObject {
     public:
-        RenderObject(game::GameContext &gameContext, shader::ShaderObject shaderObject,
+        RenderObject(game::GameContext &gameContext, shader::ShaderObject const &shaderObject,
                      pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform);
-
 
         void render(SDL_GPURenderPass *) const;
 

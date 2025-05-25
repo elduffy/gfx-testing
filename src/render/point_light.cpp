@@ -10,13 +10,17 @@ namespace gfx_testing::render {
         return {pathRadius * cos(theta), pathRadius * sin(theta), AMPLITUDE * cos(2 * theta)};
     }
 
-    PointLight::PointLight(game::GameContext &gameContext, float pathRadius, float phase) :
+    shader::ShaderObject PointLight::loadShaderObject(util::ResourceLoader const &resourceLoader) {
+        return resourceLoader.loadObjModel("uv-sphere.obj", {util::NormalTreatment::AVERAGE});
+    }
+
+    PointLight::PointLight(game::GameContext &gameContext, shader::ShaderObject const &shaderObject, float pathRadius,
+                           float phase) :
         mGameContext(gameContext),
         mPosWs(getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, pathRadius, phase)),
         mPathRadius(pathRadius), mPhase(phase),
-        mRenderObject(gameContext,
-                      gameContext.mResourceLoader.loadObjModel("uv-sphere.obj", {util::NormalTreatment::AVERAGE}),
-                      pipeline::PipelineName::SimpleColor, translate(glm::mat4(1.0f), mPosWs)) {}
+        mRenderObject(gameContext, shaderObject, pipeline::PipelineName::SimpleColor,
+                      translate(glm::mat4(1.0f), mPosWs)) {}
 
     void PointLight::update() {
         mPosWs = getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, mPathRadius, mPhase);

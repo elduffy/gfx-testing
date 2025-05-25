@@ -66,11 +66,12 @@ namespace gfx_testing::render {
 
     std::vector<PointLight> initPointLights(game::GameContext &gameContext) {
         constexpr auto NUM_POINT_LIGHTS = 3;
+        auto const shaderObject = PointLight::loadShaderObject(gameContext.mResourceLoader);
         std::vector<PointLight> pointLights;
         pointLights.reserve(NUM_POINT_LIGHTS);
         for (auto i = 0; i < NUM_POINT_LIGHTS; ++i) {
             auto const phase = (2 * glm::pi<float>() * static_cast<float>(i)) / NUM_POINT_LIGHTS;
-            pointLights.emplace_back(gameContext, glm::length(INITIAL_LIGHT_POSITION), phase);
+            pointLights.emplace_back(gameContext, shaderObject, glm::length(INITIAL_LIGHT_POSITION), phase);
         }
         return pointLights;
     }
