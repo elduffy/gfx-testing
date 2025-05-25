@@ -8,6 +8,8 @@
 
 namespace gfx_testing::game {
     struct GameSettings {
+        // Optional FPS to target.
+        // std::nullopt causes vsync to be used.
         std::optional<float> mTargetFps = std::nullopt;
     };
 

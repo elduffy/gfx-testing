@@ -3,6 +3,7 @@
 #include <imgui_context.hpp>
 #include <render/scene.hpp>
 #include <sdl.hpp>
+#include <util/debug.hpp>
 #include <util/util.hpp>
 
 void handleEvent(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
@@ -56,9 +57,7 @@ void handleUpdate(gfx_testing::game::GameContext &, gfx_testing::render::Scene &
 }
 
 int main() {
-    constexpr auto DEBUG_MODE = true;
-
-    constexpr gfx_testing::game::GameSettings gameSettings{.mTargetFps = 120.f};
+    constexpr gfx_testing::game::GameSettings gameSettings{.mTargetFps = {120}};
     std::vector<SDL_GPUPresentMode> presentModes;
     if constexpr (gameSettings.mTargetFps.has_value()) {
         presentModes.push_back(SDL_GPU_PRESENTMODE_MAILBOX);
@@ -66,7 +65,7 @@ int main() {
     }
     presentModes.push_back(SDL_GPU_PRESENTMODE_VSYNC);
 
-    const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, presentModes};
+    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, presentModes};
     const gfx_testing::io::ResourceLoader resourceLoader{sdlContext};
 
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader, gameSettings);
