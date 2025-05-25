@@ -1,5 +1,5 @@
 [submodule "abseil-cpp"]
-	path = abseil-cpp
+	path = deps/abseil-cpp
 	url = git@github.com:abseil/abseil-cpp.git
 	shallow = true
 	branch = bc257a88f7c1939f24e0379f14a3589e926c950c

@@ -21,7 +21,7 @@ include(cmake/fetch-fastgltf.cmake)
 find_package(SDL3 REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
-add_subdirectory(abseil-cpp)
+add_subdirectory(deps/abseil-cpp)
 add_subdirectory(app/spirv_header_gen)
 
 add_custom_target(build_shaders
