@@ -1,6 +1,6 @@
+#include <io/obj_loader.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <render/point_light.hpp>
-#include <util/obj_loader.hpp>
 
 namespace gfx_testing::render {
     glm::vec3 getPosition(uint64_t time, float pathRadius, float phase) {
@@ -10,7 +10,7 @@ namespace gfx_testing::render {
         return {pathRadius * cos(theta), pathRadius * sin(theta), AMPLITUDE * cos(2 * theta)};
     }
 
-    shader::ShaderObject PointLight::loadShaderObject(util::ResourceLoader const &resourceLoader) {
+    shader::ShaderObject PointLight::loadShaderObject(io::ResourceLoader const &resourceLoader) {
         return resourceLoader.loadObjModel("uv-sphere.obj", {util::NormalTreatment::AVERAGE});
     }
 

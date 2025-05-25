@@ -1,7 +1,7 @@
 
+#include <io/obj_loader.hpp>
 #include <iostream>
 #include <map>
-#include <util/obj_loader.hpp>
 #include <util/util.hpp>
 
 #undef CHECK // Use the Catch2 CHECK in this file
@@ -9,11 +9,12 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-using namespace gfx_testing::util;
+using namespace gfx_testing::io;
 
 TEST_CASE("OBJ Load a cube with averaged normals") {
-    auto const [meshData, images] = loadObjFile(getProjectRoot() / "content/models/cube.obj",
-                                                {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
+    auto const [meshData, images] =
+            loadObjFile(gfx_testing::util::getProjectRoot() / "content/models/cube.obj",
+                        {gfx_testing::util::NormalTreatment::AVERAGE, gfx_testing::util::TexCoordTreatment::DISCARD});
 
     REQUIRE(meshData.mVertices.size() == 8);
     REQUIRE(images.empty());
@@ -32,8 +33,9 @@ TEST_CASE("OBJ Load a cube with averaged normals") {
 }
 
 TEST_CASE("OBJ Load a cube with split normals") {
-    auto const [meshData, images] = loadObjFile(getProjectRoot() / "content/models/cube.obj",
-                                                {NormalTreatment::SPLIT, TexCoordTreatment::DISCARD});
+    auto const [meshData, images] =
+            loadObjFile(gfx_testing::util::getProjectRoot() / "content/models/cube.obj",
+                        {gfx_testing::util::NormalTreatment::SPLIT, gfx_testing::util::TexCoordTreatment::DISCARD});
     REQUIRE(meshData.mVertices.size() == 24);
     REQUIRE(images.empty());
 

@@ -8,7 +8,7 @@
 #include <util/mesh.hpp>
 #include <util/util.hpp>
 
-namespace gfx_testing::util {
+namespace gfx_testing::io {
 
     class ShaderCode {
     public:
@@ -43,17 +43,17 @@ namespace gfx_testing::util {
         [[nodiscard]] ShaderCode loadShaderCode(std::string const &filename) const;
 
         [[nodiscard]] shader::ShaderObject loadObjModel(std::string const &filename,
-                                                        AttribTreatment attribTreatment = {}) const;
+                                                        util::AttribTreatment attribTreatment = {}) const;
 
         [[nodiscard]] shader::ShaderObject loadGltfModel(std::string const &filename,
-                                                         AttribTreatment attribTreatment = {}) const;
+                                                         util::AttribTreatment attribTreatment = {}) const;
 
         [[nodiscard]] sdl::SdlSurface loadSurface(std::string const &filename) const;
 
-        [[nodiscard]] CubeMap loadCubeMap(std::string const &dirname) const;
+        [[nodiscard]] util::CubeMap loadCubeMap(std::string const &dirname) const;
 
     private:
         sdl::SdlContext const &mSdlContext;
-        std::filesystem::path mProjectRoot = getProjectRoot();
+        std::filesystem::path mProjectRoot = util::getProjectRoot();
     };
-} // namespace gfx_testing::util
+} // namespace gfx_testing::io

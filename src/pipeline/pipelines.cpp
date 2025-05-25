@@ -70,8 +70,8 @@ namespace gfx_testing::pipeline {
         return pipeline;
     }
 
-    std::map<ShaderDefinition, util::ShaderCode> loadShaderCode(util::ResourceLoader const &resourceLoader) {
-        std::map<ShaderDefinition, util::ShaderCode> shaderCodes;
+    std::map<ShaderDefinition, io::ShaderCode> loadShaderCode(io::ResourceLoader const &resourceLoader) {
+        std::map<ShaderDefinition, io::ShaderCode> shaderCodes;
         for (auto const &shaderDef: ALL_SHADERS) {
             shaderCodes.emplace(shaderDef, resourceLoader.loadShaderCode(shaderDef.mFilename));
         }
@@ -79,7 +79,7 @@ namespace gfx_testing::pipeline {
     }
 
     std::map<ShaderDefinition, sdl::SdlShader> createShaders(sdl::SdlContext const &context,
-                                                             std::map<ShaderDefinition, util::ShaderCode> const &code) {
+                                                             std::map<ShaderDefinition, io::ShaderCode> const &code) {
         std::map<ShaderDefinition, sdl::SdlShader> shaders;
         for (auto const &[shaderDef, shaderCode]: code) {
             shaders.emplace(shaderDef,
@@ -91,7 +91,7 @@ namespace gfx_testing::pipeline {
     }
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
-                         std::map<ShaderDefinition, util::ShaderCode> const &shaderCode) :
+                         std::map<ShaderDefinition, io::ShaderCode> const &shaderCode) :
         Pipelines(sdlContext, createShaders(sdlContext, shaderCode)) {}
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext, std::map<ShaderDefinition, sdl::SdlShader> const &shaders) {
@@ -107,6 +107,6 @@ namespace gfx_testing::pipeline {
         }
     }
 
-    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader) :
+    Pipelines::Pipelines(sdl::SdlContext const &sdlContext, io::ResourceLoader const &resourceLoader) :
         Pipelines(sdlContext, loadShaderCode(resourceLoader)) {}
 } // namespace gfx_testing::pipeline

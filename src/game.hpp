@@ -13,7 +13,7 @@ namespace gfx_testing::game {
 
     class GameContext {
     public:
-        GameContext(sdl::SdlContext const &sdlContext, util::ResourceLoader const &resourceLoader,
+        GameContext(sdl::SdlContext const &sdlContext, io::ResourceLoader const &resourceLoader,
                     GameSettings const &settings);
 
         template<typename EventFn, typename UpdateFn>
@@ -53,7 +53,7 @@ namespace gfx_testing::game {
 
     public:
         sdl::SdlContext const &mSdlContext;
-        util::ResourceLoader const &mResourceLoader;
+        io::ResourceLoader const &mResourceLoader;
         pipeline::Pipelines mPipelines;
         render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};

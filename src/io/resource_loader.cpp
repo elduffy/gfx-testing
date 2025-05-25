@@ -1,10 +1,10 @@
 #include <boost/algorithm/string/replace.hpp>
-#include <util/gltf_loader.hpp>
-#include <util/obj_loader.hpp>
-#include <util/resource_loader.hpp>
-#include <util/texture_loader.hpp>
+#include <io/gltf_loader.hpp>
+#include <io/obj_loader.hpp>
+#include <io/resource_loader.hpp>
+#include <io/texture_loader.hpp>
 
-namespace gfx_testing::util {
+namespace gfx_testing::io {
 
     ResourceLoader::ResourceLoader(sdl::SdlContext const &sdlContext) : mSdlContext(sdlContext) {}
 
@@ -30,12 +30,12 @@ namespace gfx_testing::util {
     }
 
     shader::ShaderObject ResourceLoader::loadObjModel(std::string const &filename,
-                                                      AttribTreatment attribTreatment) const {
+                                                      util::AttribTreatment attribTreatment) const {
         return loadObjFile(mProjectRoot / "content/models/" / filename, attribTreatment);
     }
 
     shader::ShaderObject ResourceLoader::loadGltfModel(std::string const &filename,
-                                                       AttribTreatment attribTreatment) const {
+                                                       util::AttribTreatment attribTreatment) const {
         return loadGltfFile(mProjectRoot / "content/models/" / filename, attribTreatment);
     }
 
@@ -43,7 +43,7 @@ namespace gfx_testing::util {
         return loadImage(mProjectRoot / "content/textures/" / filename);
     }
 
-    CubeMap ResourceLoader::loadCubeMap(std::string const &dirname) const {
-        return util::loadCubeMap(mProjectRoot / "content/cubemaps/" / dirname);
+    util::CubeMap ResourceLoader::loadCubeMap(std::string const &dirname) const {
+        return io::loadCubeMap(mProjectRoot / "content/cubemaps/" / dirname);
     }
-} // namespace gfx_testing::util
+} // namespace gfx_testing::io

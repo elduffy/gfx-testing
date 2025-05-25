@@ -1,13 +1,13 @@
 #include <absl/log/check.h>
 #include <format>
+#include <io/texture_loader.hpp>
 #include <map>
 #include <util/cube_map.hpp>
-#include <util/texture_loader.hpp>
 
 #include "SDL3_image/SDL_image.h"
 #include "boost/algorithm/string/split.hpp"
 
-namespace gfx_testing::util {
+namespace gfx_testing::io {
     sdl::SdlSurface convertFormat(SDL_Surface *surface) {
         if (constexpr auto DESIRED_FORMAT = SDL_PIXELFORMAT_ABGR8888; surface->format != DESIRED_FORMAT) {
             auto *converted = SDL_ConvertSurface(surface, DESIRED_FORMAT);
@@ -35,7 +35,7 @@ namespace gfx_testing::util {
         return convertFormat(surface);
     }
 
-    CubeMap loadCubeMap(std::filesystem::path const &dir) {
+    util::CubeMap loadCubeMap(std::filesystem::path const &dir) {
         CHECK(is_directory(dir)) << "Path is not a directory: " << dir;
 
         // The files are defined in a left-handed system (Y+ up, Z+ forward) that differs from our standard.
@@ -57,8 +57,8 @@ namespace gfx_testing::util {
         for (size_t face = 0; face < 6; face++) {
             auto const &surface = result[face];
             CHECK(*surface != nullptr) << "Cubemap " << dir << " is missing surface "
-                                       << toString(static_cast<SDL_GPUCubeMapFace>(face));
+                                       << util::toString(static_cast<SDL_GPUCubeMapFace>(face));
         }
-        return CubeMap{std::move(result)};
+        return util::CubeMap{std::move(result)};
     }
-} // namespace gfx_testing::util
+} // namespace gfx_testing::io

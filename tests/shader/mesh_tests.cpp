@@ -2,7 +2,7 @@
 #include <glm/gtx/io.hpp>
 #include <util/mesh.hpp>
 
-#include "matchers.hpp"
+#include "../matchers.hpp"
 #undef CHECK // Use the Catch2 CHECK in this file
 #include <catch2/catch_all.hpp>
 #include <iostream>

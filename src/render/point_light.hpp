@@ -10,7 +10,7 @@ namespace gfx_testing::render {
 
         void update();
 
-        static shader::ShaderObject loadShaderObject(util::ResourceLoader const &resourceLoader);
+        static shader::ShaderObject loadShaderObject(io::ResourceLoader const &resourceLoader);
 
         game::GameContext &mGameContext;
         glm::vec3 mPosWs;

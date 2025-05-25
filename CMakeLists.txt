@@ -46,6 +46,10 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 add_library(gfx_testing_lib
         src/game.cpp
         src/imgui_context.cpp
+        src/io/gltf_loader.cpp
+        src/io/obj_loader.cpp
+        src/io/resource_loader.cpp
+        src/io/texture_loader.cpp
         src/pipeline/pipeline.cpp
         src/pipeline/pipeline_definition.hpp
         src/pipeline/pipeline.hpp
@@ -61,12 +65,8 @@ add_library(gfx_testing_lib
         src/sdl_factories.cpp
         src/util/cube_map.cpp
         src/util/fps_capper.cpp
-        src/util/gltf_loader.cpp
         src/util/mesh.cpp
-        src/util/obj_loader.cpp
-        src/util/resource_loader.cpp
         src/util/stopwatch.cpp
-        src/util/texture_loader.cpp
         src/util/util.cpp
         src/shader/object.cpp
 )
@@ -92,9 +92,9 @@ add_subdirectory(app/renderer)
 
 # tests
 add_executable(tests
-        tests/obj_loader_tests.cpp
-        tests/mesh_tests.cpp
-        tests/gltf_loader_tests.cpp
+        tests/io/gltf_loader_tests.cpp
+        tests/io/obj_loader_tests.cpp
+        tests/shader/mesh_tests.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain gfx_testing_lib)
 target_include_directories(tests SYSTEM PRIVATE src/)

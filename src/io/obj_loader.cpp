@@ -2,14 +2,14 @@
 #include <SDL3/SDL_log.h>
 #include <filesystem>
 #include <format>
+#include <io/obj_loader.hpp>
 #include <iostream>
 #include <shader/shader_models.hpp>
 #include <tiny_obj_loader.h>
-#include <util/obj_loader.hpp>
 
-namespace gfx_testing::util {
+namespace gfx_testing::io {
 
-    void addToMesh(tinyobj::ObjReader const &reader, Mesh &mesh) {
+    void addToMesh(tinyobj::ObjReader const &reader, util::Mesh &mesh) {
         auto const &attrib = reader.GetAttrib();
 
         for (auto const &shapes = reader.GetShapes(); auto const &shape: shapes) {
@@ -60,7 +60,7 @@ namespace gfx_testing::util {
         }
     }
 
-    shader::ShaderObject loadObjFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
+    shader::ShaderObject loadObjFile(const std::filesystem::path &path, util::AttribTreatment attribTreatment) {
         tinyobj::ObjReaderConfig reader_config;
         reader_config.mtl_search_path = path.parent_path();
         reader_config.triangulate = true;
@@ -86,8 +86,8 @@ namespace gfx_testing::util {
                 << "Vertex count " << attrib.vertices.size() << " is not the same as color count "
                 << attrib.colors.size();
 
-        Mesh mesh;
+        util::Mesh mesh;
         addToMesh(reader, mesh);
         return shader::ShaderObject{mesh.getMeshData(attribTreatment), {}};
     }
-} // namespace gfx_testing::util
+} // namespace gfx_testing::io

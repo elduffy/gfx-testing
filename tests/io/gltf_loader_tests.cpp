@@ -1,17 +1,17 @@
 
-#include <util/gltf_loader.hpp>
+#include <io/gltf_loader.hpp>
 #undef CHECK // Use the Catch2 CHECK in this file
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "util.hpp"
+#include "../util.hpp"
 
 using namespace gfx_testing::util;
 
 TEST_CASE("GLTF Load a cube with averaged normals") {
-    auto const [meshData, images] = loadGltfFile(getProjectRoot() / "content/models/cube.glb",
-                                                 {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
+    auto const [meshData, images] = gfx_testing::io::loadGltfFile(
+            getProjectRoot() / "content/models/cube.glb", {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
 
     REQUIRE(meshData.mVertices.size() == 8);
     REQUIRE(images.empty());
@@ -30,8 +30,8 @@ TEST_CASE("GLTF Load a cube with averaged normals") {
 }
 
 TEST_CASE("GLTF Load a cube with split normals") {
-    auto const [meshData, images] = loadGltfFile(getProjectRoot() / "content/models/cube.glb",
-                                                 {NormalTreatment::SPLIT, TexCoordTreatment::DISCARD});
+    auto const [meshData, images] = gfx_testing::io::loadGltfFile(getProjectRoot() / "content/models/cube.glb",
+                                                                  {NormalTreatment::SPLIT, TexCoordTreatment::DISCARD});
     REQUIRE(meshData.mVertices.size() == 24);
     REQUIRE(images.empty());
 
@@ -54,8 +54,8 @@ TEST_CASE("GLTF Load a cube with split normals") {
 }
 
 TEST_CASE("GLTF Load a textured cube with averaged normals") {
-    auto const [meshData, images] = loadGltfFile(getProjectRoot() / "content/models/tex-cube.glb",
-                                                 {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
+    auto const [meshData, images] = gfx_testing::io::loadGltfFile(
+            getProjectRoot() / "content/models/tex-cube.glb", {NormalTreatment::AVERAGE, TexCoordTreatment::DISCARD});
 
     CHECK(meshData.mVertices.size() == 8);
     CHECK(meshData.mIndices.count() == 36);

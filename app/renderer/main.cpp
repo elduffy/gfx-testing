@@ -67,7 +67,7 @@ int main() {
     presentModes.push_back(SDL_GPU_PRESENTMODE_VSYNC);
 
     const gfx_testing::sdl::SdlContext sdlContext{DEBUG_MODE, presentModes};
-    const gfx_testing::util::ResourceLoader resourceLoader{sdlContext};
+    const gfx_testing::io::ResourceLoader resourceLoader{sdlContext};
 
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader, gameSettings);
     gfx_testing::imgui::ImGuiContext imGuiContext{sdlContext};

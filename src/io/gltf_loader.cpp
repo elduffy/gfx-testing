@@ -1,13 +1,14 @@
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 #include <fastgltf/core.hpp>
-#include <fastgltf/glm_element_traits.hpp>
 #include <fastgltf/tools.hpp>
+#include <io/gltf_loader.hpp>
+#include <io/texture_loader.hpp>
 #include <shader/object.hpp>
-#include <util/gltf_loader.hpp>
-#include <util/texture_loader.hpp>
+// ReSharper disable once CppUnusedIncludeDirective
+#include <fastgltf/glm_element_traits.hpp>
 
-namespace gfx_testing::util {
+namespace gfx_testing::io {
     // Arbitrary limit, could probably be increased
     static constexpr auto MAX_COLOR_ATTRIBUTES = 2;
 
@@ -15,8 +16,8 @@ namespace gfx_testing::util {
         size_t mTexcoordIndex;
     };
 
-    optref<const fastgltf::Accessor> getAccessor(fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
-                                                 std::string_view attributeName) {
+    util::optref<const fastgltf::Accessor>
+    getAccessor(fastgltf::Asset const &asset, fastgltf::Primitive const &primitive, std::string_view attributeName) {
         const auto *iter = primitive.findAttribute(attributeName);
         if (iter == primitive.attributes.end()) {
             return std::nullopt;
@@ -102,7 +103,7 @@ namespace gfx_testing::util {
         };
     }
 
-    void addToMesh(Mesh &mesh, fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
+    void addToMesh(util::Mesh &mesh, fastgltf::Asset const &asset, fastgltf::Primitive const &primitive,
                    fastgltf::math::fmat4x4 const &transform,
                    std::optional<MaterialAttributes> const &materialAttributes, std::string_view objectName) {
 
@@ -120,7 +121,7 @@ namespace gfx_testing::util {
 
         const auto &normalAccessor = getAccessorOrThrow(asset, primitive, "NORMAL");
 
-        optref<const fastgltf::Accessor> texCoordAccessor{};
+        util::optref<const fastgltf::Accessor> texCoordAccessor{};
         if (materialAttributes.has_value()) {
             // Textures referenced in the gltf will use this
             texCoordAccessor.emplace(getAccessorOrThrow(
@@ -201,7 +202,7 @@ namespace gfx_testing::util {
         return MaterialAttributes{.mTexcoordIndex = textureInfo.texCoordIndex};
     }
 
-    shader::ShaderObject loadGltfFile(const std::filesystem::path &path, AttribTreatment attribTreatment) {
+    shader::ShaderObject loadGltfFile(const std::filesystem::path &path, util::AttribTreatment attribTreatment) {
         fastgltf::Parser parser;
         auto data = fastgltf::GltfDataBuffer::FromPath(path);
         CHECK(data.error() == fastgltf::Error::None) << "Failed to load GLTF file " << path;
@@ -226,7 +227,7 @@ namespace gfx_testing::util {
                                  meshIndices.emplace_back(node.meshIndex.value(), matrix);
                              });
 
-        Mesh meshOut;
+        util::Mesh meshOut;
         std::vector<shader::ImageData> imagesOut;
         for (auto const &[meshIndex, transform]: meshIndices) {
             auto const &mesh = asset.meshes[meshIndex];
@@ -240,7 +241,7 @@ namespace gfx_testing::util {
             CHECK(primitive.indicesAccessor.has_value()) << "Mesh " << mesh.name << " has no indices accessor";
 
             SDL_Log("Mesh '%s' has attributes %s", mesh.name.c_str(),
-                    joinToString(primitive.attributes, ", ", [](auto const &att) { return att.name; }).c_str());
+                    util::joinToString(primitive.attributes, ", ", [](auto const &att) { return att.name; }).c_str());
 
             auto const materialAttributes = addMaterial(imagesOut, asset, primitive, mesh.name);
             addToMesh(meshOut, asset, primitive, transform, materialAttributes, mesh.name);
@@ -248,4 +249,4 @@ namespace gfx_testing::util {
 
         return shader::ShaderObject{meshOut.getMeshData(attribTreatment), std::move(imagesOut)};
     }
-} // namespace gfx_testing::util
+} // namespace gfx_testing::io
