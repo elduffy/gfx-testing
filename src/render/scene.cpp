@@ -20,45 +20,6 @@ namespace gfx_testing::render {
             .mTexCoord = util::TexCoordTreatment::DISCARD,
     };
 
-    SDL_GPUTexture *createDepthTexture(sdl::SdlContext const &context, util::Extent2D extent) {
-        const SDL_GPUTextureCreateInfo createInfo = {
-                .type = SDL_GPU_TEXTURETYPE_2D,
-                .format = SDL_GPU_TEXTUREFORMAT_D16_UNORM,
-                .usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET,
-                .width = extent.mWidth,
-                .height = extent.mHeight,
-                .layer_count_or_depth = 1,
-                .num_levels = 1,
-                .sample_count = pipeline::MSAA_SAMPLE_COUNT,
-        };
-        return SDL_CreateGPUTexture(context.mDevice, &createInfo);
-    }
-
-    SDL_GPUTexture *createMultisampleTexture(sdl::SdlContext const &context, util::Extent2D extent) {
-        if constexpr (pipeline::MSAA_SAMPLE_COUNT == SDL_GPU_SAMPLECOUNT_1) {
-            return nullptr;
-        }
-        auto const format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow);
-        const SDL_GPUTextureCreateInfo createInfo = {
-                .type = SDL_GPU_TEXTURETYPE_2D,
-                .format = format,
-                .usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET,
-                .width = extent.mWidth,
-                .height = extent.mHeight,
-                .layer_count_or_depth = 1,
-                .num_levels = 1,
-                .sample_count = pipeline::MSAA_SAMPLE_COUNT,
-        };
-        return SDL_CreateGPUTexture(context.mDevice, &createInfo);
-    }
-
-    std::optional<sdl::SdlGpuTexture> optionalFromPointer(sdl::SdlContext const &context, SDL_GPUTexture *texture) {
-        if (texture == nullptr) {
-            return std::nullopt;
-        }
-        return {{context, texture}};
-    }
-
     glm::mat4x4 getProjection(const util::Extent2D extent) {
         auto const aspect = static_cast<float>(extent.mWidth) / static_cast<float>(extent.mHeight);
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
@@ -112,18 +73,15 @@ namespace gfx_testing::render {
     Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
         mGameContext(gameContext), mImGuiContext(imGuiContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
         mCamera(INITIAL_CAMERA_POSITION), mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
-        mDepthTexture(gameContext.mSdlContext,
-                      createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
-        mMultisampleTextureOpt(optionalFromPointer(
-                gameContext.mSdlContext,
-                createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT))) {}
+        mDepthTexture(createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
+        mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
 
     void Scene::onResize(const util::Extent2D extent) {
         mViewportExtent = extent;
         mProjection = getProjection(mViewportExtent);
-        mDepthTexture.reset(createDepthTexture(mGameContext.mSdlContext, extent));
+        mDepthTexture = createDepthTexture(mGameContext.mSdlContext, extent);
         if (mMultisampleTextureOpt.has_value()) {
-            mMultisampleTextureOpt.value().reset(createMultisampleTexture(mGameContext.mSdlContext, extent));
+            mMultisampleTextureOpt = createMultisampleTexture(mGameContext.mSdlContext, extent);
         }
     }
 

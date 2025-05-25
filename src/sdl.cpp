@@ -134,15 +134,26 @@ namespace gfx_testing::sdl {
 
     SdlGpuTexture::SdlGpuTexture(SdlGpuTexture &&other) noexcept :
         mContext(other.mContext), mTexture(other.mTexture), mUploaded(other.mUploaded) {
-        other.mTexture = nullptr;
-        other.mUploaded = false;
+        other.clear();
     }
 
     SdlGpuTexture::~SdlGpuTexture() { SDL_ReleaseGPUTexture(mContext.mDevice, mTexture); }
 
+    SdlGpuTexture &SdlGpuTexture::operator=(SdlGpuTexture &&other) noexcept {
+        CHECK(mContext == other.mContext) << "Assigning texture from another SDL context";
+        reset(other.mTexture);
+        other.clear();
+        return *this;
+    }
+
     void SdlGpuTexture::reset(SDL_GPUTexture *newTexture) {
         SDL_ReleaseGPUTexture(mContext.mDevice, mTexture);
         mTexture = newTexture;
+        mUploaded = false;
+    }
+
+    void SdlGpuTexture::clear() {
+        mTexture = nullptr;
         mUploaded = false;
     }
 

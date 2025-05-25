@@ -18,6 +18,10 @@ namespace gfx_testing::sdl {
 
         ~SdlContext();
 
+        friend bool operator==(const SdlContext &lhs, const SdlContext &rhs) {
+            return lhs.mWindow == rhs.mWindow && lhs.mDevice == rhs.mDevice;
+        }
+
     private:
         void updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes) const;
 
@@ -123,9 +127,12 @@ namespace gfx_testing::sdl {
 
         ~SdlGpuTexture();
 
-        SDL_GPUTexture *operator*() const { return mTexture; }
+        SdlGpuTexture &operator=(SdlGpuTexture &&) noexcept;
 
+        SDL_GPUTexture *operator*() const { return mTexture; }
         void reset(SDL_GPUTexture *newTexture);
+
+        void clear();
 
         // Upload the pixel data for surfaces, one surface per layer.
         void upload(std::vector<SdlSurface> const &surfaces);
