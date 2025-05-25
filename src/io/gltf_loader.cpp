@@ -220,14 +220,14 @@ namespace gfx_testing::io {
         // Get the meshes to process along with their transforms
         using mesh_index_t = std::pair<size_t, fastgltf::math::fmat4x4>;
         std::vector<mesh_index_t> meshIndices;
-        fastgltf::sceneIndex(asset, sceneNode, fastgltf::math::fmat4x4(),
-                             [&](fastgltf::Node const &node, auto const &matrix) {
-                                 if (!node.meshIndex.has_value()) {
-                                     SDL_Log("Skipping node '%s': no mesh", node.name.c_str());
-                                     return;
-                                 }
-                                 meshIndices.emplace_back(node.meshIndex.value(), matrix);
-                             });
+        fastgltf::iterateSceneNodes(asset, sceneNode, fastgltf::math::fmat4x4(),
+                                    [&](fastgltf::Node const &node, auto const &matrix) {
+                                        if (!node.meshIndex.has_value()) {
+                                            SDL_Log("Skipping node '%s': no mesh", node.name.c_str());
+                                            return;
+                                        }
+                                        meshIndices.emplace_back(node.meshIndex.value(), matrix);
+                                    });
 
         util::Mesh meshOut;
         std::vector<shader::ImageData> imagesOut;
