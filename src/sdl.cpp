@@ -36,7 +36,7 @@ namespace gfx_testing::sdl {
             case SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084:
                 return "SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084";
         }
-        throw std::runtime_error("Unknown GPU swapchain composition");
+        FAIL("Unknown GPU swapchain composition: {}", static_cast<uint32_t>(composition));
     }
 
     char const *getPresentModeName(SDL_GPUPresentMode presentMode) {
@@ -48,7 +48,7 @@ namespace gfx_testing::sdl {
             case SDL_GPU_PRESENTMODE_MAILBOX:
                 return "SDL_GPU_PRESENTMODE_MAILBOX";
         }
-        throw std::runtime_error("Unknown GPU present mode");
+        FAIL("Unknown GPU present mode: {}", static_cast<uint32_t>(presentMode));
     }
 
     void SdlContext::updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes) const {
@@ -184,9 +184,7 @@ namespace gfx_testing::sdl {
         }
 
         auto *commandBuffer = SDL_AcquireGPUCommandBuffer(mContext.mDevice);
-        if (commandBuffer == nullptr) {
-            throw std::runtime_error("Failed to acquire GPU command buffer");
-        }
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire GPU command buffer";
         auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
         auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
         SDL_GPUTextureTransferInfo source = {

@@ -4,7 +4,8 @@
 #include <map>
 #include <util/util.hpp>
 
-#undef CHECK // Use the Catch2 CHECK in this file
+#undef CHECK
+#undef FAIL
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>

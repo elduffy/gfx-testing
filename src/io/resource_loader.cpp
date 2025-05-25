@@ -16,7 +16,7 @@ namespace gfx_testing::io {
         } else if (SDL_strstr(shaderSourcePath.filename().c_str(), ".frag")) {
             stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
         } else {
-            throw std::runtime_error("Could not determine shader stage for file.");
+            FAIL("Could not determine shader stage for file '{}'", filename);
         }
 
         CHECK(SDL_GetGPUShaderFormats(mSdlContext.mDevice) & SDL_GPU_SHADERFORMAT_SPIRV)

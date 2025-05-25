@@ -64,7 +64,7 @@ namespace gfx_testing::shader {
                 case SDL_GPU_INDEXELEMENTSIZE_32BIT:
                     return sizeof(uint32_t);
                 default:
-                    throw std::runtime_error("Unexpected element size");
+                    FAIL("Unexpected element size {}", static_cast<uint32_t>(mElementSize));
             }
         }
 

@@ -51,7 +51,7 @@ namespace gfx_testing::io {
             return loadImage(arr.bytes.data() + bufferView.byteOffset, bufferView.byteLength);
         }
 
-        CHECK(false) << "Image buffer " << buffer.name << " has unsupported alternative " << buffer.data.index();
+        FAIL("Image buffer '{}' has unsupported alternative {}", buffer.name, buffer.data.index());
     }
 
     sdl::SdlSurface loadImageData(fastgltf::Asset const &asset, fastgltf::Image const &image) {
@@ -60,7 +60,8 @@ namespace gfx_testing::io {
             auto const &bufferView = std::get<fastgltf::sources::BufferView>(image.data);
             return loadBufferViewImage(asset, bufferView);
         }
-        CHECK(false) << "Image data alternative not supported: " << image.data.index();
+
+        FAIL("Image data alternative not supported {}", image.data.index());
     }
 
     SDL_GPUSamplerAddressMode getAddressMode(fastgltf::Wrap wrap) {
@@ -72,7 +73,7 @@ namespace gfx_testing::io {
             case fastgltf::Wrap::Repeat:
                 return SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
         }
-        throw std::runtime_error("Unrecognized wrap mode");
+        FAIL("Unrecognized wrap mode: {}", static_cast<uint16_t>(wrap));
     }
 
     SDL_GPUFilter getFilter(fastgltf::Optional<fastgltf::Filter> const &filter) {
@@ -89,6 +90,7 @@ namespace gfx_testing::io {
             case fastgltf::Filter::LinearMipMapLinear:
                 return SDL_GPU_FILTER_LINEAR;
         }
+        FAIL("Unrecognized filter mode");
     }
 
     SDL_GPUSamplerCreateInfo getSamplerCreateInfo(fastgltf::Sampler const &sampler) {

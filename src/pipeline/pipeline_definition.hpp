@@ -1,17 +1,14 @@
 #pragma once
 
+#include <basic_textured.frag.hpp>
+#include <default.vert.hpp>
+#include <gooch.frag.hpp>
+#include <lambert.frag.hpp>
 #include <optional>
 #include <skybox.frag.hpp>
 #include <skybox.vert.hpp>
-#include <stdexcept>
-
-#include "basic_textured.frag.hpp"
-#include "boost/safe_numerics/checked_integer.hpp"
-#include "default.vert.hpp"
-#include "gooch.frag.hpp"
-#include "lambert.frag.hpp"
-#include "vertex_color.frag.hpp"
-
+#include <util/util.hpp>
+#include <vertex_color.frag.hpp>
 
 namespace gfx_testing::pipeline {
 
@@ -41,7 +38,7 @@ namespace gfx_testing::pipeline {
             case PipelineName::Skybox:
                 return "Skybox";
         }
-        throw std::runtime_error("Unknown pipeline name");
+        FAIL("Unknown pipeline name '{}'", static_cast<uint32_t>(pipelineName));
     }
 
     struct ShaderBindings {

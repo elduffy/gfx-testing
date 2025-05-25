@@ -1,8 +1,10 @@
 #pragma once
 
+#include <absl/log/check.h>
 #include <filesystem>
 #include <optional>
 #include <ostream>
+#include <source_location>
 
 #include "../../../SDL_image/Xcode/iOS/SDL3.framework/Headers/SDL_gpu.h"
 #include "glm/geometric.hpp"
@@ -14,6 +16,17 @@
 #define NO_COPY_NO_MOVE(T)                                                                                             \
     NO_COPY(T);                                                                                                        \
     NO_MOVE(T)
+
+// ReSharper disable once CppUnnamedNamespaceInHeaderFile
+namespace {
+    template<typename... Args>
+    [[noreturn]] void failImpl(std::source_location const &location, std::format_string<Args...> message,
+                               Args &&...args) {
+        CHECK(false).AtLocation(location.file_name(), location.line())
+                << std::format(message, std::forward<Args>(args)...);
+    }
+} // namespace
+#define FAIL(...) failImpl(std::source_location::current(), __VA_ARGS__)
 
 
 namespace gfx_testing::util {
@@ -74,4 +87,26 @@ namespace gfx_testing::util {
         }
         return ss.str();
     }
+
+    // template<typename MsgFn>
+    // std::string failMessageString(MsgFn &&msgFn) {
+    //     std::stringstream ss;
+    //     msgFn(ss);
+    //     return ss.str();
+    // }
+
+    // template<typename... Args>
+    // [[noreturn]] void fail(std::format_string<Args...> message, Args &&...args) {
+    //     CHECK(false) << "util::fail: " << std::format(message, std::forward<Args>(args)...);
+    // }
+    //
+    // template<typename... Args>
+    // [[noreturn]] void fail(std::source_location const &location, std::format_string<Args...> message, Args &&...args)
+    // {
+    //     CHECK(false).AtLocation(location.file_name(), location.line())
+    //             << "util::fail: " << std::format(message, std::forward<Args>(args)...);
+    // }
+
 } // namespace gfx_testing::util
+
+// #define FAIL(...) ::gfx_testing::util::fail(std::source_location::current(), __VA_ARGS__)

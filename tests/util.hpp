@@ -5,6 +5,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <shader/mesh.hpp>
 
 namespace gfx_testing::test {
     std::unordered_set<glm::vec3> getUniqueVertexPositions(shader::MeshData const &meshData) {

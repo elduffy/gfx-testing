@@ -1,11 +1,13 @@
 
 #include <io/gltf_loader.hpp>
-#undef CHECK // Use the Catch2 CHECK in this file
+
+#include "../util.hpp"
+// Use the Catch2 CHECK/FAIL in this file
+#undef CHECK
+#undef FAIL
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
-
-#include "../util.hpp"
 
 using namespace gfx_testing::util;
 

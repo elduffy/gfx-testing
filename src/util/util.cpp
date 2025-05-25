@@ -9,7 +9,7 @@ namespace gfx_testing::util {
             }
             path = path.parent_path();
         }
-        throw std::runtime_error("Could not find project root directory.");
+        FAIL("Could not find project root directory starting at {}", std::filesystem::current_path().c_str());
     }
 
 
