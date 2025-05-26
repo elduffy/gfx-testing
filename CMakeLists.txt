@@ -10,7 +10,7 @@ include(cmake/fetch-catch2.cmake)
 include(cmake/fetch-imgui.cmake)
 include(cmake/fetch-clipp.cmake)
 include(cmake/fetch-nlohmann_json.cmake)
-set(INJA_USE_EMBEDDED_JSON OFF)
+set(INJA_USE_EMBEDDED_JSON OFF CACHE BOOL "Use fetched nlohmann_json")
 include(cmake/fetch-inja.cmake)
 include(cmake/fetch-fastgltf.cmake)
 
