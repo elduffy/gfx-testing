@@ -3,8 +3,13 @@
 #include <io/obj_loader.hpp>
 #include <io/resource_loader.hpp>
 #include <io/texture_loader.hpp>
+#include <util/debug.hpp>
 
 namespace gfx_testing::io {
+    std::filesystem::path getShaderDir(std::filesystem::path const &root) {
+        // TODO: this is hacky, but it works for the time being. Would be better to get an arg or env for this.
+        return root / (util::DEBUG_MODE ? "cmake-build-debug" : "cmake-build-release") / "shaders/compiled/spirv";
+    }
 
     ResourceLoader::ResourceLoader(sdl::SdlContext const &sdlContext) : mSdlContext(sdlContext) {}
 
@@ -24,8 +29,7 @@ namespace gfx_testing::io {
 
         std::string compiledFilename = shaderSourcePath.filename().string();
         boost::replace_last(compiledFilename, ".hlsl", ".spv");
-        const auto compiledFilePath =
-                shaderSourcePath.parent_path().parent_path() / "compiled/spirv" / compiledFilename;
+        const auto compiledFilePath = getShaderDir(mProjectRoot) / compiledFilename;
         return ShaderCode(compiledFilePath, stage);
     }
 

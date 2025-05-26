@@ -24,11 +24,40 @@ set(BOOST_ENABLE_CMAKE ON)
 add_subdirectory(deps/boost EXCLUDE_FROM_ALL)
 add_subdirectory(deps/glm EXCLUDE_FROM_ALL)
 
-add_custom_target(build_shaders
-        COMMAND bash content/shaders/build-shaders.sh
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/..
-        DEPENDS spirv_header_gen
-)
+# Shader compilation
+
+file(GLOB_RECURSE SHADER_SOURCES content/shaders/src/*.hlsl)
+file(GLOB_RECURSE SHADER_INCLUDES content/shaders/include/*.hlsl)
+set(SHADER_HPP_INCLUDE ${PROJECT_BINARY_DIR}/shaders/compiled/headers/)
+foreach (SHADER_SOURCE ${SHADER_SOURCES})
+    get_filename_component(SHADER_SOURCE_FILENAME ${SHADER_SOURCE} NAME)
+    string(REPLACE .hlsl "" OUTFILE_PREFIX ${SHADER_SOURCE_FILENAME})
+    set(SPV_OUT ${PROJECT_BINARY_DIR}/shaders/compiled/spirv/${OUTFILE_PREFIX}.spv)
+    set(JSON_OUT ${PROJECT_BINARY_DIR}/shaders/compiled/json/${OUTFILE_PREFIX}.json)
+    set(HPP_OUT ${SHADER_HPP_INCLUDE}/${OUTFILE_PREFIX}.hpp)
+    # HLSL -> SPV
+    add_custom_command(
+            OUTPUT ${SPV_OUT}
+            DEPENDS ${SHADER_SOURCE} ${SHADER_INCLUDES}
+            COMMAND shadercross ${SHADER_SOURCE} -o ${SPV_OUT} -I ${CMAKE_SOURCE_DIR}/content/shaders/include
+    )
+    list(APPEND SPV_OUTFILES ${SPV_OUT})
+    # SPV -> JSON metadata
+    add_custom_command(
+            OUTPUT ${JSON_OUT}
+            DEPENDS ${SPV_OUT}
+            COMMAND spirv-cross ${SPV_OUT} --reflect --output ${JSON_OUT}
+    )
+    list(APPEND JSON_OUTFILES ${JSON_OUT})
+    # JSON -> CPP headers
+    add_custom_command(
+            OUTPUT ${HPP_OUT}
+            DEPENDS spirv_header_gen ${JSON_OUT}
+            COMMAND spirv_header_gen ${JSON_OUT} -o ${HPP_OUT}
+    )
+    list(APPEND HPP_OUTFILES ${HPP_OUT})
+endforeach ()
+add_custom_target(build_shaders ALL DEPENDS ${SPV_OUTFILES} ${JSON_OUTFILES} ${HPP_OUTFILES})
 
 # imgui build
 add_library(imgui
@@ -87,7 +116,7 @@ target_link_libraries(gfx_testing_lib PUBLIC
 add_dependencies(gfx_testing_lib build_shaders)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC src/)
-target_include_directories(gfx_testing_lib SYSTEM PUBLIC content/shaders/compiled/headers)
+target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${SHADER_HPP_INCLUDE})
 
 add_subdirectory(app/renderer)
 
