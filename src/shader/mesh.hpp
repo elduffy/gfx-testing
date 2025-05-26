@@ -165,7 +165,7 @@ namespace gfx_testing::shader {
             return {std::move(mVertices), IndexList(mIndices16)};
         }
 
-        void addIndex(int32_t index) {
+        void addIndex(uint32_t index) {
             if (mIndices32.size() > 0) {
                 mIndices32.push_back(index);
             } else if (index <= std::numeric_limits<uint16_t>::max()) {

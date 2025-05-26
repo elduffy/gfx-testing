@@ -6,6 +6,7 @@
 #include <imgui_context.hpp>
 #include <render/camera.hpp>
 #include <render/debug_axes.hpp>
+#include <render/debug_normals.hpp>
 #include <render/point_light.hpp>
 #include <render/render_object.hpp>
 #include <render/sky_box.hpp>
@@ -37,6 +38,7 @@ namespace gfx_testing::render {
         RenderObject mLandscape;
         RenderObject mTextureObject;
         DebugAxes mDebugAxes;
+        DebugNormals mDebugNormals;
 
     public:
         std::vector<PointLight> mPointLights;

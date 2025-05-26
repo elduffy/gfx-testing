@@ -9,7 +9,7 @@ namespace gfx_testing::render {
                                pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform) :
         mTransform(initialTransform), mPipelineName(pipelineName),
         mGpuShaderObject(shaderObject.upload(gameContext.mSdlContext, gameContext.mSamplers)),
-        mIndexCount(shaderObject.mMeshData.mIndices.count()) {}
+        mVertexCount(shaderObject.mMeshData.mVertices.size()), mIndexCount(shaderObject.mMeshData.mIndices.count()) {}
 
     void RenderObject::render(SDL_GPURenderPass *renderPass) const {
         const SDL_GPUBufferBinding vertexBufferBinding = {

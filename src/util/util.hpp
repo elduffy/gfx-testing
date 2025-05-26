@@ -22,12 +22,12 @@ namespace {
     template<typename... Args>
     [[noreturn]] void failImpl(std::source_location const &location, std::format_string<Args...> message,
                                Args &&...args) {
-        CHECK(false).AtLocation(location.file_name(), location.line())
+        ABSL_LOG_INTERNAL_CHECK_IMPL(false, "FAIL() called:").AtLocation(location.file_name(), location.line())
                 << std::format(message, std::forward<Args>(args)...);
     }
 } // namespace
 #define FAIL(...) failImpl(std::source_location::current(), __VA_ARGS__)
-
+#define TODO(...) FAIL(__VA_ARGS__)
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot();

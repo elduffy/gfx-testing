@@ -14,6 +14,10 @@ namespace gfx_testing::render {
 
         pipeline::PipelineName getPipelineName() const { return mPipelineName; }
 
+        shader::GpuShaderObject const &getGpuShaderObject() const { return mGpuShaderObject; }
+
+        size_t getVertexCount() const { return mVertexCount; }
+
         void pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
                                    SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &projection,
                                    std::vector<glm::vec3> const &lightPosWs, Camera const &camera) const;
@@ -23,6 +27,7 @@ namespace gfx_testing::render {
     private:
         pipeline::PipelineName mPipelineName;
         shader::GpuShaderObject mGpuShaderObject;
+        size_t mVertexCount;
         uint32_t mIndexCount;
     };
 } // namespace gfx_testing::render

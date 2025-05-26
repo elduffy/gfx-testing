@@ -48,9 +48,10 @@ namespace gfx_testing::render {
         mTextureObject(gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
                        pipeline::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
-        for (auto const *objPtr:
-             {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPropObjects, &mLandscape, &mTextureObject}) {
+        mDebugAxes(gameContext), mDebugNormals(gameContext, mPropObjects, {}),
+        mPointLights(initPointLights(gameContext)) {
+        for (auto const *objPtr: {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPropObjects, &mLandscape,
+                                  &mTextureObject, &mDebugNormals.mRenderObject}) {
             mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
         }
         for (auto const &light: mPointLights) {
@@ -65,6 +66,8 @@ namespace gfx_testing::render {
         mPropObjects.mTransform =
                 rotate(mPropObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                        glm::vec3(0, 0, 1));
+        // Needs to come after the prop objects update
+        mDebugNormals.update();
         for (auto &light: mPointLights) {
             light.update();
         }

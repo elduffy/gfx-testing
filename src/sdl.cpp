@@ -224,6 +224,12 @@ namespace gfx_testing::sdl {
                                                      uint8_t *mappedMemory) :
         mContext(context), mBuffer(buffer), mMappedMemory(mappedMemory) {}
 
+    SdlMappedTransferBuffer::SdlMappedTransferBuffer(SdlMappedTransferBuffer &&other) noexcept :
+        mContext(other.mContext), mBuffer(other.mBuffer), mMappedMemory(other.mMappedMemory) {
+        other.mBuffer = nullptr;
+        other.mMappedMemory = nullptr;
+    }
+
     SdlMappedTransferBuffer::~SdlMappedTransferBuffer() { SDL_UnmapGPUTransferBuffer(mContext.mDevice, mBuffer); }
 
     SdlTransferBuffer::SdlTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer) :
@@ -259,4 +265,11 @@ namespace gfx_testing::sdl {
     }
 
     SdlGpuSampler::~SdlGpuSampler() { SDL_ReleaseGPUSampler(mContext.mDevice, mSampler); }
+} // namespace gfx_testing::sdl
+
+
+namespace gfx_testing::sdl {
+    SdlGpuFence::SdlGpuFence(SdlContext const &context, SDL_GPUFence *fence) : mContext(context), mFence(fence) {}
+
+    SdlGpuFence::~SdlGpuFence() { SDL_ReleaseGPUFence(mContext.mDevice, mFence); }
 } // namespace gfx_testing::sdl

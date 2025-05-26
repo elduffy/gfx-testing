@@ -56,6 +56,7 @@ add_library(gfx_testing_lib
         src/pipeline/pipelines.cpp
         src/render/camera.cpp
         src/render/debug_axes.cpp
+        src/render/debug_normals.cpp
         src/render/point_light.cpp
         src/render/render_object.cpp
         src/render/samplers.cpp

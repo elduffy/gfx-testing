@@ -144,10 +144,11 @@ namespace gfx_testing::sdl {
 
     class SdlMappedTransferBuffer {
     public:
-        NO_COPY_NO_MOVE(SdlMappedTransferBuffer);
+        NO_COPY(SdlMappedTransferBuffer);
 
         SdlMappedTransferBuffer(SdlContext const &context, SDL_GPUTransferBuffer *buffer, uint8_t *mappedMemory);
 
+        SdlMappedTransferBuffer(SdlMappedTransferBuffer &&) noexcept;
         ~SdlMappedTransferBuffer();
 
         template<typename T>
@@ -190,5 +191,22 @@ namespace gfx_testing::sdl {
 
         SdlContext const &mContext;
         SDL_GPUSampler *mSampler = nullptr;
+    };
+
+    class SdlGpuFence {
+    public:
+        NO_COPY(SdlGpuFence);
+
+        SdlGpuFence(SdlContext const &context, SDL_GPUFence *fence);
+        ~SdlGpuFence();
+
+        SDL_GPUFence *operator*() const { return mFence; }
+
+        void wait() const { SDL_WaitForGPUFences(mContext.mDevice, true, &mFence, 1); }
+
+        bool isSignaled() const { return SDL_QueryGPUFence(mContext.mDevice, mFence); }
+
+        SdlContext const &mContext;
+        SDL_GPUFence *mFence = nullptr;
     };
 } // namespace gfx_testing::sdl
