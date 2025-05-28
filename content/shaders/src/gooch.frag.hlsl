@@ -10,7 +10,7 @@ STORAGE_BUFFER_FRAG(GoochParams, 0)
 
 OBJECT_LIGHTING(ObjectLighting, 0);
 
-float4 main(DefaultOutput input) : SV_Target0
+float4 main(DefaultFragmentData input) : SV_Target0
 {
     // See Real Time Rendering 5.1
     float3 norm = normalize(input.normal);

@@ -6,8 +6,8 @@ UNIFORM_BUFFER_VERT(MvpTransform, 0)
     float4x4 mvp;
 };
 
-DefaultOutput main(DefaultInput input) {
-    DefaultOutput output;
+DefaultFragmentData main(DefaultVertexData input) {
+    DefaultFragmentData output;
     output.position = mul(mvp, float4(input.position, 1.0f));
     output.uv = input.uv;
     output.normal = input.normal;

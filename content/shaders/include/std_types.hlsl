@@ -1,5 +1,5 @@
 // Vertex data input used in the default vertex shader
-struct DefaultInput
+struct DefaultVertexData
 {
     float3 position : SV_Position;
     float2 uv : TEXCOORD0;
@@ -8,8 +8,8 @@ struct DefaultInput
 };
 
 // Output from default vertex shader.
-// Contains the data from DefaultInput extended for per-fragment lighting.
-struct DefaultOutput
+// Contains the data from DefaultVertexData extended for per-fragment lighting.
+struct DefaultFragmentData
 {
     float4 position : SV_Position;
     float2 uv : TEXCOORD0;
