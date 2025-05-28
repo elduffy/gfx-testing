@@ -2,8 +2,7 @@
 
 #include <io/resource_loader.hpp>
 #include <map>
-#include <pipeline/pipeline.hpp>
-#include <pipeline/pipeline_definition.hpp>
+#include <pipeline/gfx/pipeline.hpp>
 #include <sdl.hpp>
 
 namespace gfx_testing::pipeline {
@@ -11,16 +10,18 @@ namespace gfx_testing::pipeline {
 
 
     class Pipelines {
-        Pipelines(sdl::SdlContext const &sdlContext, std::map<ShaderDefinition, sdl::SdlShader> const &shaders);
+        Pipelines(sdl::SdlContext const &sdlContext, std::map<gfx::ShaderDefinition, sdl::SdlShader> const &shaders);
 
-        Pipelines(sdl::SdlContext const &sdlContext, std::map<ShaderDefinition, io::ShaderCode> const &shaderCode);
+        Pipelines(sdl::SdlContext const &sdlContext, std::map<gfx::ShaderDefinition, io::ShaderCode> const &shaderCode);
 
     public:
         Pipelines(sdl::SdlContext const &sdlContext, io::ResourceLoader const &resourceLoader);
 
-        Pipeline const &get(PipelineName pipelineName) const { return mPipelines.at(getIndex(pipelineName)); }
+        gfx::Pipeline const &get(gfx::PipelineName pipelineName) const {
+            return mGfxPipelines.at(getIndex(pipelineName));
+        }
 
     private:
-        std::vector<Pipeline> mPipelines;
+        std::vector<gfx::Pipeline> mGfxPipelines;
     };
 } // namespace gfx_testing::pipeline

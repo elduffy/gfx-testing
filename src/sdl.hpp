@@ -58,15 +58,15 @@ namespace gfx_testing::sdl {
         SDL_GPUShader *mShader = nullptr;
     };
 
-    class SdlGfxPipeline {
+    class SdlPipeline {
     public:
-        NO_COPY(SdlGfxPipeline);
+        NO_COPY(SdlPipeline);
 
-        SdlGfxPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline);
+        SdlPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline);
 
-        ~SdlGfxPipeline();
+        ~SdlPipeline();
 
-        SdlGfxPipeline(SdlGfxPipeline &&other) noexcept : mContext(other.mContext), mPipeline(other.mPipeline) {
+        SdlPipeline(SdlPipeline &&other) noexcept : mContext(other.mContext), mPipeline(other.mPipeline) {
             other.mPipeline = nullptr;
         }
 

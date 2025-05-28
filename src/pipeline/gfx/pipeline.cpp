@@ -5,13 +5,12 @@
 #include <SDL3/SDL_gpu.h>
 #include <absl/log/check.h>
 #include <algorithm>
-#include <pipeline/pipeline.hpp>
+#include <pipeline/gfx/pipeline.hpp>
+#include <pipeline/gfx/pipeline_definition.hpp>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
 
-#include "pipeline_definition.hpp"
-
-namespace gfx_testing::pipeline {
+namespace gfx_testing::pipeline::gfx {
 
     template<typename Params>
     void uploadParams(std::vector<sdl::SdlGpuBuffer> &bufferOut, sdl::SdlContext const &context, Params const &params) {
@@ -73,7 +72,7 @@ namespace gfx_testing::pipeline {
         return result;
     }
 
-    Pipeline::Pipeline(PipelineDefinition const &definition, sdl::SdlGfxPipeline sdlPipeline) :
+    Pipeline::Pipeline(PipelineDefinition const &definition, sdl::SdlPipeline sdlPipeline) :
         mDefinition(definition), mSdlPipeline(std::move(sdlPipeline)),
         mBuffers(allocateStorageBuffers(sdlPipeline.mContext, mDefinition)) {}
 
@@ -81,4 +80,4 @@ namespace gfx_testing::pipeline {
         SDL_BindGPUFragmentStorageBuffers(renderPass, 0, mBuffers.mStorageBufferPtrs.data(),
                                           mBuffers.mStorageBufferPtrs.size());
     }
-} // namespace gfx_testing::pipeline
+} // namespace gfx_testing::pipeline::gfx

@@ -53,6 +53,6 @@ namespace gfx_testing::render {
 
 
     SkyBox::SkyBox(game::GameContext &gameContext, util::CubeMap cubeMap) :
-        mRenderObject(gameContext, createShaderObject(std::move(cubeMap)), pipeline::PipelineName::Skybox,
+        mRenderObject(gameContext, createShaderObject(std::move(cubeMap)), pipeline::gfx::PipelineName::Skybox,
                       glm::identity<glm::mat4>()) {}
 } // namespace gfx_testing::render

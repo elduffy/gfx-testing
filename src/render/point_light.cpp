@@ -1,5 +1,5 @@
-#include <io/obj_loader.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <io/obj_loader.hpp>
 #include <render/point_light.hpp>
 
 namespace gfx_testing::render {
@@ -19,7 +19,7 @@ namespace gfx_testing::render {
         mGameContext(gameContext),
         mPosWs(getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, pathRadius, phase)),
         mPathRadius(pathRadius), mPhase(phase),
-        mRenderObject(gameContext, shaderObject, pipeline::PipelineName::SimpleColor,
+        mRenderObject(gameContext, shaderObject, pipeline::gfx::PipelineName::SimpleColor,
                       translate(glm::mat4(1.0f), mPosWs)) {}
 
     void PointLight::update() {

@@ -25,8 +25,8 @@ namespace gfx_testing::render {
     public:
         explicit SceneObjects(game::GameContext &gameContext);
 
-        std::vector<RenderObject const *> const &getRenderObjects(pipeline::PipelineName pipelineName) const {
-            return mRenderObjectsByPipeline.at(pipeline::getIndex(pipelineName));
+        std::vector<RenderObject const *> const &getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
+            return mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(pipelineName));
         }
 
         void update();
@@ -44,7 +44,7 @@ namespace gfx_testing::render {
         std::vector<PointLight> mPointLights;
 
     private:
-        std::vector<std::vector<RenderObject const *>> mRenderObjectsByPipeline{pipeline::ALL_PIPELINES.size()};
+        std::vector<std::vector<RenderObject const *>> mRenderObjectsByPipeline{pipeline::gfx::ALL_PIPELINES.size()};
     };
 
     class Scene {

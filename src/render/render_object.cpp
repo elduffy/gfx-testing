@@ -6,7 +6,7 @@
 
 namespace gfx_testing::render {
     RenderObject::RenderObject(game::GameContext &gameContext, shader::ShaderObject const &shaderObject,
-                               pipeline::PipelineName pipelineName, const glm::mat4 &initialTransform) :
+                               pipeline::gfx::PipelineName pipelineName, const glm::mat4 &initialTransform) :
         mTransform(initialTransform), mPipelineName(pipelineName),
         mGpuShaderObject(shaderObject.upload(gameContext.mSdlContext, gameContext.mSamplers)),
         mVertexCount(shaderObject.mMeshData.mVertices.size()), mIndexCount(shaderObject.mMeshData.mIndices.count()) {}
@@ -30,12 +30,12 @@ namespace gfx_testing::render {
         SDL_DrawGPUIndexedPrimitives(renderPass, mIndexCount, 1, 0, 0, 0);
     }
 
-    void RenderObject::pushPerObjectUniforms(pipeline::PipelineDefinition const &pipelineDefinition,
+    void RenderObject::pushPerObjectUniforms(pipeline::gfx::PipelineDefinition const &pipelineDefinition,
                                              SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &projection,
                                              std::vector<glm::vec3> const &lightPosWs, Camera const &camera) const {
         if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
             glm::mat4 mvpTransform;
-            if (mPipelineName == pipeline::PipelineName::Skybox) {
+            if (mPipelineName == pipeline::gfx::PipelineName::Skybox) {
                 auto view = camera.mView;
                 view[3] = {0, 0, 0, 1};
                 mvpTransform = projection * view * mTransform;

@@ -41,21 +41,21 @@ namespace gfx_testing::render {
         mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("field")),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
-                     pipeline::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
+                     pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
         mLandscape(gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
-                   pipeline::PipelineName::Lambert,
+                   pipeline::gfx::PipelineName::Lambert,
                    glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE)),
         mTextureObject(gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
-                       pipeline::PipelineName::Textured,
+                       pipeline::gfx::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mDebugNormals(gameContext, mPropObjects, {}),
         mPointLights(initPointLights(gameContext)) {
         for (auto const *objPtr: {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPropObjects, &mLandscape,
                                   &mTextureObject, &mDebugNormals.mRenderObject}) {
-            mRenderObjectsByPipeline.at(pipeline::getIndex(objPtr->getPipelineName())).push_back(objPtr);
+            mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(objPtr->getPipelineName())).push_back(objPtr);
         }
         for (auto const &light: mPointLights) {
-            mRenderObjectsByPipeline.at(pipeline::getIndex(light.mRenderObject.getPipelineName()))
+            mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(light.mRenderObject.getPipelineName()))
                     .push_back(&light.mRenderObject);
         }
     }
@@ -151,7 +151,7 @@ namespace gfx_testing::render {
         for (size_t i = 0; i < mSceneObjects.mPointLights.size(); i++) {
             lightPosWs[i] = mSceneObjects.mPointLights.at(i).mPosWs;
         }
-        for (auto const &pipelineDef: pipeline::ALL_PIPELINES) {
+        for (auto const &pipelineDef: pipeline::gfx::ALL_PIPELINES) {
             auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
 
             if (renderObjects.empty()) {

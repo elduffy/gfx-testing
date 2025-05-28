@@ -61,7 +61,7 @@ namespace gfx_testing::render {
     DebugNormals::DebugNormals(game::GameContext &gameContext, RenderObject &targetObject, Options const &options) :
         mSdlContext(gameContext.mSdlContext),
         mRenderObject(gameContext, createShaderObject(mSdlContext, targetObject, options),
-                      pipeline::PipelineName::Lines, targetObject.mTransform),
+                      pipeline::gfx::PipelineName::Lines, targetObject.mTransform),
         mTargetObject(targetObject) {}
 
     void DebugNormals::update() { mRenderObject.mTransform = mTargetObject.mTransform; }

@@ -1,9 +1,10 @@
 #pragma once
-#include <pipeline/pipeline_definition.hpp>
 #include <sdl.hpp>
+#include <util/util.hpp>
 
 
 namespace gfx_testing::pipeline {
+
     class PipelineBuffers {
     public:
         NO_COPY(PipelineBuffers);
@@ -23,20 +24,5 @@ namespace gfx_testing::pipeline {
 
     public:
         std::vector<SDL_GPUBuffer *> mStorageBufferPtrs;
-    };
-
-    class Pipeline {
-    public:
-        NO_COPY(Pipeline);
-
-        Pipeline(PipelineDefinition const &definition, sdl::SdlGfxPipeline sdlPipeline);
-
-        Pipeline(Pipeline &&other) = default;
-
-        void bindStorageBuffers(SDL_GPURenderPass *renderPass) const;
-
-        PipelineDefinition const &mDefinition;
-        sdl::SdlGfxPipeline mSdlPipeline;
-        PipelineBuffers mBuffers;
     };
 } // namespace gfx_testing::pipeline

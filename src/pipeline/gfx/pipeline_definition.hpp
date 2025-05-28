@@ -10,7 +10,7 @@
 #include <util/util.hpp>
 #include <vertex_color.frag.hpp>
 
-namespace gfx_testing::pipeline {
+namespace gfx_testing::pipeline::gfx {
 
     enum class PipelineName {
         SimpleColor,
@@ -159,4 +159,4 @@ namespace gfx_testing::pipeline {
     };
     static constexpr std::array ALL_PIPELINES{PIPELINE_SIMPLE_COLOR, PIPELINE_GOOCH,   PIPELINE_TEXTURED,
                                               PIPELINE_LINES,        PIPELINE_LAMBERT, PIPELINE_SKYBOX};
-} // namespace gfx_testing::pipeline
+} // namespace gfx_testing::pipeline::gfx

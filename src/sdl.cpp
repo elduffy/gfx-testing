@@ -103,10 +103,10 @@ namespace gfx_testing::sdl {
 } // namespace gfx_testing::sdl
 
 namespace gfx_testing::sdl {
-    SdlGfxPipeline::SdlGfxPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline) :
+    SdlPipeline::SdlPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline) :
         mContext(context), mPipeline(pipeline) {}
 
-    SdlGfxPipeline::~SdlGfxPipeline() { SDL_ReleaseGPUGraphicsPipeline(mContext.mDevice, mPipeline); }
+    SdlPipeline::~SdlPipeline() { SDL_ReleaseGPUGraphicsPipeline(mContext.mDevice, mPipeline); }
 } // namespace gfx_testing::sdl
 
 

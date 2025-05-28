@@ -73,5 +73,5 @@ namespace gfx_testing::render {
     }
 
     DebugAxes::DebugAxes(game::GameContext &gameContext) :
-        mRenderObject(gameContext, buildMesh(), pipeline::PipelineName::Lines, glm::identity<glm::mat4>()) {}
+        mRenderObject(gameContext, buildMesh(), pipeline::gfx::PipelineName::Lines, glm::identity<glm::mat4>()) {}
 } // namespace gfx_testing::render
