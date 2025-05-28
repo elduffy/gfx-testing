@@ -55,7 +55,7 @@ namespace gfx_testing::pipeline {
         static constexpr ShaderDefinition create(SpirvMeta const &spirvMeta, ShaderBindings shaderBindings) {
             return {
                     .mFilename = spirvMeta.mSourceFilename,
-                    .mStage = spirvMeta.mEntryPoint.mStage,
+                    .mStage = getGpuShaderStage(spirvMeta.mEntryPoint.mType),
                     .mSamplers = getBindingSlotCount(spirvMeta.mSeparateSamplers),
                     .mUniformBuffers = getBindingSlotCount(spirvMeta.mUbos),
                     .mStorageBuffers = getBindingSlotCount(spirvMeta.mSsbos),

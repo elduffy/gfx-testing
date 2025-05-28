@@ -7,5 +7,7 @@ target_link_libraries(spirv_header_gen PRIVATE
         nlohmann_json::nlohmann_json
         inja
         Boost::algorithm
+        absl::absl_check
+        absl::log
 )
 target_include_directories(spirv_header_gen SYSTEM PRIVATE .)

@@ -3,14 +3,33 @@
 #include <algorithm>
 #include <array>
 #include <boost/safe_numerics/checked_integer.hpp>
+#include <util/util.hpp>
 #include <variant>
 #include <vector>
 
 namespace gfx_testing::shader {
 
+    enum class ShaderType {
+        Vertex,
+        Fragment,
+        Compute,
+    };
+
+    constexpr static SDL_GPUShaderStage getGpuShaderStage(ShaderType type) {
+        switch (type) {
+            case ShaderType::Vertex:
+                return SDL_GPU_SHADERSTAGE_VERTEX;
+            case ShaderType::Fragment:
+                return SDL_GPU_SHADERSTAGE_FRAGMENT;
+            case ShaderType::Compute:
+                break;
+        }
+        FAIL("Not a GPU shader type: {}", static_cast<uint32_t>(type));
+    }
+
     struct EntryPoint {
         char const *mName;
-        SDL_GPUShaderStage mStage;
+        ShaderType mType;
     };
 
     struct MatrixData {

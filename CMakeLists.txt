@@ -61,7 +61,7 @@ foreach (SHADER_SOURCE ${SHADER_SOURCES})
     # JSON -> CPP headers
     add_custom_command(
             OUTPUT ${HPP_OUT}
-            DEPENDS spirv_header_gen ${JSON_OUT}
+            DEPENDS spirv_header_gen ${JSON_OUT} app/spirv_header_gen/template.hpp.inja
             COMMAND spirv_header_gen ${JSON_OUT} -o ${HPP_OUT}
     )
     list(APPEND HPP_OUTFILES ${HPP_OUT})

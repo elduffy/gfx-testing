@@ -23,7 +23,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     // Entrypoint
     constexpr gfx_testing::shader::EntryPoint ENTRY_POINT{
         .mName = "{{ entryPoint.name }}",
-        .mStage = {{ getShaderStage(entryPoint.mode) }},
+        .mType = {{ getShaderType(entryPoint.mode) }},
     };
 
     // Types
@@ -103,7 +103,7 @@ namespace spirv_header_gen::generated::{{ package_name }} {
         .mBlockSize = {{ssbo.block_size}},
         .mSet = {{ssbo.set}},
         .mBinding = {{ssbo.binding}},
-        .mReadOnly = {{ssbo.readonly}},
+        .mReadOnly = {{default(ssbo.readonly, false)}},
     };
     inline constexpr auto const& SSBO_{{getTypeVariableName(ssbo.name)}} = SSBO_{{loop.index}};
     inline constexpr auto const& SSBO_{{getTypeVariableName(ssbo.name)}}_TYPE = TYPE_{{lookupTypeVariableName(default(types, {}), ssbo.type)}};

@@ -1,3 +1,5 @@
+#include <absl/log/check.h>
+#include <boost/algorithm/string/replace.hpp>
 #include <format>
 #include <inja/inja.hpp>
 #include <write.hpp>
@@ -18,21 +20,27 @@ namespace spirv_header_gen {
         throw std::runtime_error("Could not find project root directory.");
     }
 
-    std::string getShaderStage(inja::Arguments const &args) {
+    std::string getShaderType(inja::Arguments const &args) {
         auto arg = args.at(0)->get<std::string>();
         if (arg == "vert") {
-            return "SDL_GPU_SHADERSTAGE_VERTEX";
+            return "gfx_testing::shader::ShaderType::Vertex";
         }
         if (arg == "frag") {
-            return "SDL_GPU_SHADERSTAGE_FRAGMENT";
+            return "gfx_testing::shader::ShaderType::Fragment";
         }
-        throw std::runtime_error(std::format("Unsupported shader mode: {}", arg));
+        if (arg == "comp") {
+            return "gfx_testing::shader::ShaderType::Compute";
+        }
+        CHECK(0) << "Unsupported shader mode: " << arg;
+        return "";
     }
 
     std::string getTypeVariableNameImpl(std::string const &typeStr) {
         auto const newStart =
                 boost::algorithm::detail::trim_begin(typeStr.begin(), typeStr.end(), boost::is_any_of("type."));
-        return std::string{&*newStart};
+        auto result = std::string{&*newStart};
+        boost::algorithm::replace_all(result, ".", "_");
+        return result;
     }
 
     std::string getTypeVariableName(inja::Arguments const &args) {
@@ -60,7 +68,7 @@ namespace spirv_header_gen {
 
     void writeHeader(WriteProperties const &writeProperties, nlohmann::json const &json, std::ostream *ostream) {
         inja::Environment env;
-        env.add_callback("getShaderStage", 1, getShaderStage);
+        env.add_callback("getShaderType", 1, getShaderType);
         env.add_callback("getTypeVariableName", 1, getTypeVariableName);
         env.add_callback("lookupTypeVariableName", 2, lookupTypeVariableName);
 

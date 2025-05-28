@@ -1,12 +1,12 @@
 #pragma once
 
+#include <SDL3/SDL_gpu.h>
 #include <absl/log/check.h>
 #include <filesystem>
 #include <optional>
 #include <ostream>
 #include <source_location>
 
-#include "../../../SDL_image/Xcode/iOS/SDL3.framework/Headers/SDL_gpu.h"
 #include "glm/geometric.hpp"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
