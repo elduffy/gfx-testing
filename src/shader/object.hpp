@@ -52,6 +52,8 @@ namespace gfx_testing::shader {
                         std::vector<ImageData> const &imageData);
         GpuShaderObject(GpuShaderObject &&) = default;
 
+        size_t mVertexCount;
+        uint32_t mIndexCount;
         sdl::SdlGpuBuffer mVertexBuffer;
         sdl::SdlGpuBuffer mIndexBuffer;
         std::vector<sdl::SdlGpuTexture> mTextures;

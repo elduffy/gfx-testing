@@ -88,6 +88,7 @@ add_library(gfx_testing_lib
         src/io/obj_loader.cpp
         src/io/resource_loader.cpp
         src/io/texture_loader.cpp
+        src/pipeline/compute/pipeline.cpp
         src/pipeline/gfx/pipeline.cpp
         src/pipeline/pipelines.cpp
         src/render/camera.cpp
@@ -106,7 +107,6 @@ add_library(gfx_testing_lib
         src/util/mesh.cpp
         src/util/stopwatch.cpp
         src/util/util.cpp
-        src/pipeline/compute/pipeline.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui

@@ -82,6 +82,7 @@ namespace gfx_testing::shader {
 
     GpuShaderObject::GpuShaderObject(sdl::SdlContext const &sdlContext, render::Samplers &samplers,
                                      MeshData const &meshData, std::vector<ImageData> const &imageData) :
+        mVertexCount(meshData.mVertices.size()), mIndexCount(meshData.mIndices.count()),
         mVertexBuffer(
                 sdl::SdlGpuBuffer::create(sdlContext, SDL_GPU_BUFFERUSAGE_VERTEX, meshData.getVertexBufferSize())),
         mIndexBuffer(sdl::SdlGpuBuffer::create(sdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),

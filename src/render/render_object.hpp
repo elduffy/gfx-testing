@@ -7,8 +7,13 @@ namespace gfx_testing::render {
 
     class RenderObject {
     public:
+        // Constructor for mesh data not already uploaded
         RenderObject(game::GameContext &gameContext, shader::ShaderObject const &shaderObject,
                      pipeline::gfx::PipelineName pipelineName, const glm::mat4 &initialTransform);
+
+        // Constructor for mesh data already uploaded to GPU
+        RenderObject(shader::GpuShaderObject gpuShaderObject, pipeline::gfx::PipelineName pipelineName,
+                     const glm::mat4 &initialTransform);
 
         void render(SDL_GPURenderPass *) const;
 
@@ -16,7 +21,7 @@ namespace gfx_testing::render {
 
         shader::GpuShaderObject const &getGpuShaderObject() const { return mGpuShaderObject; }
 
-        size_t getVertexCount() const { return mVertexCount; }
+        size_t getVertexCount() const { return mGpuShaderObject.mVertexCount; }
 
         void pushPerObjectUniforms(pipeline::gfx::PipelineDefinition const &pipelineDefinition,
                                    SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &projection,
@@ -27,7 +32,5 @@ namespace gfx_testing::render {
     private:
         pipeline::gfx::PipelineName mPipelineName;
         shader::GpuShaderObject mGpuShaderObject;
-        size_t mVertexCount;
-        uint32_t mIndexCount;
     };
 } // namespace gfx_testing::render

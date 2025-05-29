@@ -8,8 +8,11 @@ namespace gfx_testing::render {
     RenderObject::RenderObject(game::GameContext &gameContext, shader::ShaderObject const &shaderObject,
                                pipeline::gfx::PipelineName pipelineName, const glm::mat4 &initialTransform) :
         mTransform(initialTransform), mPipelineName(pipelineName),
-        mGpuShaderObject(shaderObject.upload(gameContext.mSdlContext, gameContext.mSamplers)),
-        mVertexCount(shaderObject.mMeshData.mVertices.size()), mIndexCount(shaderObject.mMeshData.mIndices.count()) {}
+        mGpuShaderObject(shaderObject.upload(gameContext.mSdlContext, gameContext.mSamplers)) {}
+
+    RenderObject::RenderObject(shader::GpuShaderObject gpuShaderObject, pipeline::gfx::PipelineName pipelineName,
+                               const glm::mat4 &initialTransform) :
+        mTransform(initialTransform), mPipelineName(pipelineName), mGpuShaderObject(std::move(gpuShaderObject)) {}
 
     void RenderObject::render(SDL_GPURenderPass *renderPass) const {
         const SDL_GPUBufferBinding vertexBufferBinding = {
@@ -27,7 +30,7 @@ namespace gfx_testing::render {
             SDL_BindGPUFragmentSamplers(renderPass, 0, mGpuShaderObject.mTextureSamplerBindings.data(),
                                         mGpuShaderObject.mTextureSamplerBindings.size());
         }
-        SDL_DrawGPUIndexedPrimitives(renderPass, mIndexCount, 1, 0, 0, 0);
+        SDL_DrawGPUIndexedPrimitives(renderPass, mGpuShaderObject.mIndexCount, 1, 0, 0, 0);
     }
 
     void RenderObject::pushPerObjectUniforms(pipeline::gfx::PipelineDefinition const &pipelineDefinition,
