@@ -30,6 +30,8 @@ namespace gfx_testing::shader {
     struct EntryPoint {
         char const *mName;
         ShaderType mType;
+        // Only set for compute shaders
+        std::array<uint32_t, 3> mWorkgroupSize;
     };
 
     struct MatrixData {

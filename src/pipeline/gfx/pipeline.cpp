@@ -7,41 +7,11 @@
 #include <algorithm>
 #include <pipeline/gfx/pipeline.hpp>
 #include <pipeline/gfx/pipeline_definition.hpp>
+#include <pipeline/util.hpp>
 #include <sdl.hpp>
 #include <shader/shader_models.hpp>
 
 namespace gfx_testing::pipeline::gfx {
-
-    template<typename Params>
-    void uploadParams(std::vector<sdl::SdlGpuBuffer> &bufferOut, sdl::SdlContext const &context, Params const &params) {
-        constexpr auto dataSize = sizeof(params);
-        const auto &buffer = bufferOut.emplace_back(
-                sdl::SdlGpuBuffer::create(context, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, dataSize));
-
-        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(context.mDevice);
-        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
-        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
-
-        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-        const sdl::SdlTransferBuffer transferBuffer =
-                sdl::SdlTransferBuffer::create(context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, dataSize);
-        // Write to transfer buffer
-        {
-            const auto mappedBuffer = transferBuffer.map(false);
-            *mappedBuffer.get<Params>() = params;
-        }
-        const SDL_GPUTransferBufferLocation source = {
-                .transfer_buffer = *transferBuffer,
-                .offset = 0,
-        };
-        const SDL_GPUBufferRegion destination = {
-                .buffer = *buffer,
-                .offset = 0,
-                .size = dataSize,
-        };
-        SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
-        SDL_EndGPUCopyPass(copyPass);
-    }
 
     std::vector<sdl::SdlGpuBuffer> allocateStorageBuffers(sdl::SdlContext const &context,
                                                           PipelineDefinition const &pipelineDefinition) {
@@ -52,7 +22,7 @@ namespace gfx_testing::pipeline::gfx {
                         .mCoolColor = {0, 0, 0.55},
                         .mWarmColor = {0.3, 0.3, 0},
                 };
-                uploadParams(result, context, params);
+                uploadParams(result, context, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, params);
                 break;
             }
             case PipelineName::Lambert: {
@@ -60,7 +30,7 @@ namespace gfx_testing::pipeline::gfx {
                         .mUnlitColor = {.1, .1, .1},
                         .mLitColor = {.3, .3, .3},
                 };
-                uploadParams(result, context, params);
+                uploadParams(result, context, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, params);
                 break;
             }
             case PipelineName::SimpleColor:
@@ -72,7 +42,7 @@ namespace gfx_testing::pipeline::gfx {
         return result;
     }
 
-    Pipeline::Pipeline(PipelineDefinition const &definition, sdl::SdlPipeline sdlPipeline) :
+    Pipeline::Pipeline(PipelineDefinition const &definition, sdl::SdlGfxPipeline sdlPipeline) :
         mDefinition(definition), mSdlPipeline(std::move(sdlPipeline)),
         mBuffers(allocateStorageBuffers(sdlPipeline.mContext, mDefinition)) {}
 

@@ -24,6 +24,9 @@ namespace spirv_header_gen::generated::{{ package_name }} {
     constexpr gfx_testing::shader::EntryPoint ENTRY_POINT{
         .mName = "{{ entryPoint.name }}",
         .mType = {{ getShaderType(entryPoint.mode) }},
+        .mWorkgroupSize = { {% for n in default(entryPoint.workgroup_size, []) %}
+            {{n}},{% endfor %}
+        },
     };
 
     // Types

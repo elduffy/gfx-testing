@@ -58,23 +58,27 @@ namespace gfx_testing::sdl {
         SDL_GPUShader *mShader = nullptr;
     };
 
+    template<typename PipelineT, void (*ReleaseFn)(SDL_GPUDevice *, PipelineT *)>
     class SdlPipeline {
     public:
         NO_COPY(SdlPipeline);
 
-        SdlPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline);
+        SdlPipeline(SdlContext const &context, PipelineT *pipeline) : mContext(context), mPipeline(pipeline) {}
 
-        ~SdlPipeline();
+        ~SdlPipeline() { ReleaseFn(mContext.mDevice, mPipeline); }
 
         SdlPipeline(SdlPipeline &&other) noexcept : mContext(other.mContext), mPipeline(other.mPipeline) {
             other.mPipeline = nullptr;
         }
 
-        SDL_GPUGraphicsPipeline *operator*() const { return mPipeline; }
+        PipelineT *operator*() const { return mPipeline; }
 
         SdlContext const &mContext;
-        SDL_GPUGraphicsPipeline *mPipeline = nullptr;
+        PipelineT *mPipeline = nullptr;
     };
+
+    using SdlGfxPipeline = SdlPipeline<SDL_GPUGraphicsPipeline, SDL_ReleaseGPUGraphicsPipeline>;
+    using SdlComputePipeline = SdlPipeline<SDL_GPUComputePipeline, SDL_ReleaseGPUComputePipeline>;
 
     class SdlGpuBuffer {
     public:

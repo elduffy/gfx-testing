@@ -70,9 +70,36 @@ namespace gfx_testing::pipeline {
         return pipeline;
     }
 
-    std::map<gfx::ShaderDefinition, io::ShaderCode> loadShaderCode(io::ResourceLoader const &resourceLoader) {
+    SDL_GPUComputePipeline *createPipeline(sdl::SdlContext const &context, io::ShaderCode const &shaderCode,
+                                           compute::PipelineDefinition const &pipelineDefinition) {
+        const SDL_GPUComputePipelineCreateInfo createInfo{
+                .code_size = shaderCode.mSize,
+                .code = shaderCode.mCode,
+                .entrypoint = "main",
+                .format = SDL_GPU_SHADERFORMAT_SPIRV,
+                .num_readonly_storage_buffers = pipelineDefinition.mShader.mReadonlyStorageBuffers,
+                .num_readwrite_storage_buffers = pipelineDefinition.mShader.mReadwriteStorageBuffers,
+                .threadcount_x = pipelineDefinition.mShader.mWorkgroupSize[0],
+                .threadcount_y = pipelineDefinition.mShader.mWorkgroupSize[1],
+                .threadcount_z = pipelineDefinition.mShader.mWorkgroupSize[2],
+        };
+        auto *pipeline = SDL_CreateGPUComputePipeline(context.mDevice, &createInfo);
+        CHECK_NE(pipeline, nullptr) << "Failed to create compute pipeline: " << SDL_GetError();
+        return pipeline;
+    }
+
+    std::map<gfx::ShaderDefinition, io::ShaderCode> loadGfxShaderCode(io::ResourceLoader const &resourceLoader) {
         std::map<gfx::ShaderDefinition, io::ShaderCode> shaderCodes;
         for (auto const &shaderDef: gfx::ALL_SHADERS) {
+            shaderCodes.emplace(shaderDef, resourceLoader.loadShaderCode(shaderDef.mFilename));
+        }
+        return shaderCodes;
+    }
+
+    std::map<compute::ShaderDefinition, io::ShaderCode>
+    loadComputeShaderCode(io::ResourceLoader const &resourceLoader) {
+        std::map<compute::ShaderDefinition, io::ShaderCode> shaderCodes;
+        for (auto const &shaderDef: compute::ALL_SHADERS) {
             shaderCodes.emplace(shaderDef, resourceLoader.loadShaderCode(shaderDef.mFilename));
         }
         return shaderCodes;
@@ -91,23 +118,34 @@ namespace gfx_testing::pipeline {
     }
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
-                         std::map<gfx::ShaderDefinition, io::ShaderCode> const &shaderCode) :
-        Pipelines(sdlContext, createShaders(sdlContext, shaderCode)) {}
+                         std::map<gfx::ShaderDefinition, io::ShaderCode> const &gfxShaderCode,
+                         std::map<compute::ShaderDefinition, io::ShaderCode> const &computeShaderCode) :
+        Pipelines(sdlContext, createShaders(sdlContext, gfxShaderCode), computeShaderCode) {}
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext,
-                         std::map<gfx::ShaderDefinition, sdl::SdlShader> const &shaders) {
+                         std::map<gfx::ShaderDefinition, sdl::SdlShader> const &gfxShaders,
+                         std::map<compute::ShaderDefinition, io::ShaderCode> const &computeShaderCode) {
         static_assert(isWellDefined(gfx::ALL_PIPELINES));
         for (auto const &pipelineDefinition: gfx::ALL_PIPELINES) {
-            auto *vertexShader = *shaders.at(pipelineDefinition.mVertexShader);
-            auto *fragmentShader = *shaders.at(pipelineDefinition.mFragmentShader);
+            auto *vertexShader = *gfxShaders.at(pipelineDefinition.mVertexShader);
+            auto *fragmentShader = *gfxShaders.at(pipelineDefinition.mFragmentShader);
             mGfxPipelines.emplace_back(
                     pipelineDefinition,
-                    sdl::SdlPipeline{sdlContext,
-                                     createPipeline(sdlContext, vertexShader, fragmentShader, pipelineDefinition)});
+                    sdl::SdlGfxPipeline{sdlContext,
+                                        createPipeline(sdlContext, vertexShader, fragmentShader, pipelineDefinition)});
             SDL_Log("Created graphics pipeline %s", getName(pipelineDefinition.mName));
+        }
+
+        static_assert(isWellDefined(compute::ALL_PIPELINES));
+        for (auto const &pipelineDefinition: compute::ALL_PIPELINES) {
+            auto const &shaderCode = computeShaderCode.at(pipelineDefinition.mShader);
+            mComputePipelines.emplace_back(
+                    pipelineDefinition,
+                    sdl::SdlComputePipeline{sdlContext, createPipeline(sdlContext, shaderCode, pipelineDefinition)});
+            SDL_Log("Created compute pipeline %s", getName(pipelineDefinition.mName));
         }
     }
 
     Pipelines::Pipelines(sdl::SdlContext const &sdlContext, io::ResourceLoader const &resourceLoader) :
-        Pipelines(sdlContext, loadShaderCode(resourceLoader)) {}
+        Pipelines(sdlContext, loadGfxShaderCode(resourceLoader), loadComputeShaderCode(resourceLoader)) {}
 } // namespace gfx_testing::pipeline

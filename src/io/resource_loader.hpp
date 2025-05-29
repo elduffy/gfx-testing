@@ -14,8 +14,8 @@ namespace gfx_testing::io {
     public:
         NO_COPY(ShaderCode);
 
-        explicit ShaderCode(std::filesystem::path const &compiledFilePath, SDL_GPUShaderStage stage) :
-            mSize(0), mCode(static_cast<uint8_t *>(SDL_LoadFile(compiledFilePath.c_str(), &mSize))), mStage(stage) {
+        explicit ShaderCode(std::filesystem::path const &compiledFilePath, shader::ShaderType type) :
+            mSize(0), mCode(static_cast<uint8_t *>(SDL_LoadFile(compiledFilePath.c_str(), &mSize))), mType(type) {
             CHECK_NE(mCode, nullptr) << "Could not load SPIRV shader from " << compiledFilePath.c_str() << ": "
                                      << SDL_GetError();
 
@@ -27,13 +27,13 @@ namespace gfx_testing::io {
             mCode = nullptr;
         }
 
-        ShaderCode(ShaderCode &&other) noexcept : mSize(other.mSize), mCode(other.mCode), mStage(other.mStage) {
+        ShaderCode(ShaderCode &&other) noexcept : mSize(other.mSize), mCode(other.mCode), mType(other.mType) {
             other.mCode = nullptr;
         }
 
         size_t mSize;
         uint8_t *mCode;
-        SDL_GPUShaderStage mStage;
+        shader::ShaderType mType;
     };
 
     class ResourceLoader {

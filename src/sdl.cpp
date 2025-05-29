@@ -5,7 +5,6 @@
 
 namespace gfx_testing::sdl {
 
-
     SdlContext::SdlContext(const bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes) :
         mWindow(nullptr), mDevice(nullptr) {
         CHECK(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) << "Failed to initialize SDL: " << SDL_GetError();
@@ -100,13 +99,6 @@ namespace gfx_testing::sdl {
         CHECK_NE(shader, nullptr) << "SDL_CreateGPUShader failed: " << SDL_GetError();
         return {context, shader};
     }
-} // namespace gfx_testing::sdl
-
-namespace gfx_testing::sdl {
-    SdlPipeline::SdlPipeline(SdlContext const &context, SDL_GPUGraphicsPipeline *pipeline) :
-        mContext(context), mPipeline(pipeline) {}
-
-    SdlPipeline::~SdlPipeline() { SDL_ReleaseGPUGraphicsPipeline(mContext.mDevice, mPipeline); }
 } // namespace gfx_testing::sdl
 
 

@@ -106,6 +106,7 @@ add_library(gfx_testing_lib
         src/util/mesh.cpp
         src/util/stopwatch.cpp
         src/util/util.cpp
+        src/pipeline/compute/pipeline.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui

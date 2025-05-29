@@ -15,13 +15,15 @@ namespace gfx_testing::io {
 
     ShaderCode ResourceLoader::loadShaderCode(std::string const &filename) const {
         auto const shaderSourcePath = mProjectRoot / "content/shaders/src" / filename;
-        SDL_GPUShaderStage stage;
+        shader::ShaderType type;
         if (SDL_strstr(shaderSourcePath.filename().c_str(), ".vert")) {
-            stage = SDL_GPU_SHADERSTAGE_VERTEX;
+            type = shader::ShaderType::Vertex;
         } else if (SDL_strstr(shaderSourcePath.filename().c_str(), ".frag")) {
-            stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+            type = shader::ShaderType::Fragment;
+        } else if (SDL_strstr(shaderSourcePath.filename().c_str(), ".comp")) {
+            type = shader::ShaderType::Compute;
         } else {
-            FAIL("Could not determine shader stage for file '{}'", filename);
+            FAIL("Could not determine shader type for file '{}'", filename);
         }
 
         CHECK(SDL_GetGPUShaderFormats(mSdlContext.mDevice) & SDL_GPU_SHADERFORMAT_SPIRV)
@@ -30,7 +32,7 @@ namespace gfx_testing::io {
         std::string compiledFilename = shaderSourcePath.filename().string();
         boost::replace_last(compiledFilename, ".hlsl", ".spv");
         const auto compiledFilePath = getShaderDir(mProjectRoot) / compiledFilename;
-        return ShaderCode(compiledFilePath, stage);
+        return ShaderCode(compiledFilePath, type);
     }
 
     shader::ShaderObject ResourceLoader::loadObjModel(std::string const &filename,
