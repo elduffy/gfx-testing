@@ -41,7 +41,7 @@ namespace gfx_testing::render {
                                              std::vector<glm::vec3> const &lightPosWs, Camera const &camera) const {
         if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
             glm::mat4 mvpTransform;
-            if (mPipelineName == pipeline::gfx::PipelineName::Skybox) {
+            if (pipelineDefinition.mIsBackground) {
                 auto view = camera.mView;
                 view[3] = {0, 0, 0, 1};
                 mvpTransform = projection * view * mTransform;
