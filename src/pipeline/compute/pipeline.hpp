@@ -14,10 +14,7 @@ namespace gfx_testing::pipeline::compute {
 
         Pipeline(Pipeline &&other) = default;
 
-        void bindStorageBuffers(SDL_GPUComputePass *computePass) const;
-
         PipelineDefinition const &mDefinition;
         sdl::SdlComputePipeline mSdlPipeline;
-        PipelineBuffers mBuffers;
     };
 } // namespace gfx_testing::pipeline::compute

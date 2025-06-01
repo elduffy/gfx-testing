@@ -11,11 +11,13 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-#define NO_COPY(T) T(const T &) = delete
+#define DEFAULT_MOVE(T) T(T &&) = default
+#define NO_COPY(T) T(const T &) = delete;
 #define NO_MOVE(T) T(T &&) = delete
 #define NO_COPY_NO_MOVE(T)                                                                                             \
     NO_COPY(T);                                                                                                        \
     NO_MOVE(T)
+#define NO_COPY_DEFAULT_MOVE(T) NO_COPY(T) DEFAULT_MOVE(T)
 
 // ReSharper disable once CppUnnamedNamespaceInHeaderFile
 namespace {

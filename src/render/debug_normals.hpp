@@ -10,7 +10,7 @@ namespace gfx_testing::render {
             glm::vec4 mLineColor{0, 1, .72, 1};
         };
 
-        DebugNormals(game::GameContext &gameContext, RenderObject &targetObject, Options const &options);
+        DebugNormals(game::GameContext const &gameContext, RenderObject &targetObject, Options const &options);
 
         void update();
 

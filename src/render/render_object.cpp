@@ -1,4 +1,3 @@
-#include <absl/log/check.h>
 #include <game.hpp>
 #include <render/render_object.hpp>
 #include <utility>
@@ -19,18 +18,22 @@ namespace gfx_testing::render {
                 .buffer = *mGpuShaderObject.mVertexBuffer,
                 .offset = 0,
         };
-        const SDL_GPUBufferBinding indexBufferBinding = {
-                .buffer = *mGpuShaderObject.mIndexBuffer,
-                .offset = 0,
-        };
         SDL_BindGPUVertexBuffers(renderPass, 0, &vertexBufferBinding, 1);
-        SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
         if (!mGpuShaderObject.mTextureSamplerBindings.empty()) {
             SDL_BindGPUFragmentSamplers(renderPass, 0, mGpuShaderObject.mTextureSamplerBindings.data(),
                                         mGpuShaderObject.mTextureSamplerBindings.size());
         }
-        SDL_DrawGPUIndexedPrimitives(renderPass, mGpuShaderObject.mIndexCount, 1, 0, 0, 0);
+        if (mGpuShaderObject.mIndexBuffer.has_value()) {
+            const SDL_GPUBufferBinding indexBufferBinding = {
+                    .buffer = *mGpuShaderObject.mIndexBuffer.value(),
+                    .offset = 0,
+            };
+            SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+            SDL_DrawGPUIndexedPrimitives(renderPass, mGpuShaderObject.mIndexCount, 1, 0, 0, 0);
+        } else {
+            SDL_DrawGPUPrimitives(renderPass, mGpuShaderObject.mVertexCount, 1, 0, 0);
+        }
     }
 
     void RenderObject::pushPerObjectUniforms(pipeline::gfx::PipelineDefinition const &pipelineDefinition,

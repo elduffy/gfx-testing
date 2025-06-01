@@ -1,67 +1,46 @@
 #include <render/debug_normals.hpp>
 
 namespace gfx_testing::render {
-    sdl::SdlMappedTransferBuffer downloadVertexData(sdl::SdlContext const &sdlContext,
-                                                    RenderObject const &targetObject) {
 
-        auto const dataSize = boost::safe_numerics::checked::cast<uint32_t>(targetObject.getVertexCount() *
-                                                                            sizeof(shader::VertexData));
-        auto const transferBuffer =
-                sdl::SdlTransferBuffer::create(sdlContext, SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD, dataSize);
-        const SDL_GPUBufferRegion source{
-                .buffer = *targetObject.getGpuShaderObject().mVertexBuffer,
-                .offset = 0,
-                .size = dataSize,
+    shader::GpuShaderObject createGpuShaderObject(const game::GameContext &gameContext,
+                                                  RenderObject const &targetObject,
+                                                  DebugNormals::Options const &options) {
+        shader::GpuShaderObject gpuShaderObject(gameContext.mSdlContext);
+        gpuShaderObject.reallocVertexBuffer(targetObject.getVertexCount() * 2,
+                                            SDL_GPU_BUFFERUSAGE_VERTEX | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE |
+                                                    SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
+
+        auto &pipeline = gameContext.mPipelines.get(pipeline::compute::PipelineName::DebugNormals);
+
+        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(gameContext.mSdlContext.mDevice);
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
+        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
+
+        CHECK_NE(*gpuShaderObject.mVertexBuffer, nullptr) << "No vertex buffer allocated";
+        const SDL_GPUStorageBufferReadWriteBinding rwBinding{
+                .buffer = *gpuShaderObject.mVertexBuffer,
+                .cycle = false,
         };
-        const SDL_GPUTransferBufferLocation dest{
-                .transfer_buffer = *transferBuffer,
-                .offset = 0,
-        };
+        SDL_GPUComputePass *computePass = SDL_BeginGPUComputePass(commandBuffer, nullptr, 0, &rwBinding, 1);
+        SDL_BindGPUComputePipeline(computePass, *pipeline.mSdlPipeline);
 
-        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(sdlContext.mDevice);
-        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire GPU command buffer";
-        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-        SDL_DownloadFromGPUBuffer(copyPass, &source, &dest);
-        SDL_EndGPUCopyPass(copyPass);
+        CHECK_EQ(pipeline.mDefinition.mShader.mReadonlyStorageBuffers, 1)
+                << "Unexpected number of RO storage buffers: " << pipeline.mDefinition.mShader.mReadonlyStorageBuffers;
+        auto *sourceBuffer = *targetObject.getGpuShaderObject().mVertexBuffer;
+        SDL_BindGPUComputeStorageBuffers(computePass, 0, &sourceBuffer, 1);
 
-        {
-            const sdl::SdlGpuFence fence{sdlContext, SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer)};
-            auto const start = std::chrono::steady_clock::now();
-            fence.wait(); // TODO: don't block, keep initializing and only wait later
-            SDL_Log("Debug normals: vertex download took %lu us",
-                    std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start)
-                            .count());
-        }
-        return transferBuffer.map(false);
+        const auto groupCount = static_cast<uint32_t>(std::ceil(static_cast<double>(targetObject.getVertexCount()) /
+                                                                pipeline.mDefinition.mShader.mWorkgroupSize[0]));
+        SDL_DispatchGPUCompute(computePass, groupCount, 1, 1);
+        SDL_EndGPUComputePass(computePass);
+        return gpuShaderObject;
     }
 
-    shader::ShaderObject createShaderObject(sdl::SdlContext const &sdlContext, RenderObject const &targetObject,
-                                            DebugNormals::Options const &options) {
-        shader::MeshDataBuilder builder;
-        const size_t targetVertexCount = targetObject.getVertexCount();
-        builder.mVertices.reserve(2 * targetVertexCount);
-        const sdl::SdlMappedTransferBuffer mappedBuffer = downloadVertexData(sdlContext, targetObject);
-        shader::VertexData const *vertexData = mappedBuffer.get<shader::VertexData>();
-
-        std::copy_n(vertexData, targetVertexCount, std::back_inserter(builder.mVertices));
-        for (uint32_t i = 0; i < targetVertexCount; i++) {
-            auto &v0 = builder.mVertices[i];
-            v0.mColor = options.mLineColor;
-            builder.mVertices.push_back({
-                    .mPosition = v0.mPosition + options.mLineLength * v0.mNormal,
-                    .mColor = v0.mColor,
-            });
-            builder.addIndex(i);
-            builder.addIndex(builder.mVertices.size() - 1);
-        }
-
-        return {builder.build(), {}};
-    }
-
-    DebugNormals::DebugNormals(game::GameContext &gameContext, RenderObject &targetObject, Options const &options) :
+    DebugNormals::DebugNormals(const game::GameContext &gameContext, RenderObject &targetObject,
+                               Options const &options) :
         mSdlContext(gameContext.mSdlContext),
-        mRenderObject(gameContext, createShaderObject(mSdlContext, targetObject, options),
-                      pipeline::gfx::PipelineName::Lines, targetObject.mTransform),
+        mRenderObject(createGpuShaderObject(gameContext, targetObject, options), pipeline::gfx::PipelineName::Lines,
+                      targetObject.mTransform),
         mTargetObject(targetObject) {}
 
     void DebugNormals::update() { mRenderObject.mTransform = mTargetObject.mTransform; }

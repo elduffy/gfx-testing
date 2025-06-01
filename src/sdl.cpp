@@ -111,6 +111,20 @@ namespace gfx_testing::sdl {
 
     SdlGpuBuffer::~SdlGpuBuffer() { SDL_ReleaseGPUBuffer(mContext.mDevice, mBuffer); }
 
+    SdlGpuBuffer &SdlGpuBuffer::operator=(SdlGpuBuffer &&other) noexcept {
+        CHECK(mContext == other.mContext) << "Assigning texture from another SDL context";
+        reset(other.mBuffer);
+        other.clear();
+        return *this;
+    }
+
+    void SdlGpuBuffer::reset(SDL_GPUBuffer *newBuffer) {
+        SDL_ReleaseGPUBuffer(mContext.mDevice, mBuffer);
+        mBuffer = newBuffer;
+    }
+
+    void SdlGpuBuffer::clear() { mBuffer = nullptr; }
+
     SdlGpuBuffer SdlGpuBuffer::create(SdlContext const &context, SDL_GPUBufferUsageFlags usage, uint32_t size) {
         const SDL_GPUBufferCreateInfo createInfo = {
                 .usage = usage,

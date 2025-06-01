@@ -92,6 +92,12 @@ namespace gfx_testing::sdl {
 
         SDL_GPUBuffer *operator*() const { return mBuffer; }
 
+        SdlGpuBuffer &operator=(SdlGpuBuffer &&) noexcept;
+
+        void reset(SDL_GPUBuffer *newBuffer);
+
+        void clear();
+
         static SdlGpuBuffer create(SdlContext const &context, SDL_GPUBufferUsageFlags usage, uint32_t size);
 
         SdlContext const &mContext;
@@ -130,10 +136,10 @@ namespace gfx_testing::sdl {
         SdlGpuTexture(SdlGpuTexture &&) noexcept;
 
         ~SdlGpuTexture();
+        SDL_GPUTexture *operator*() const { return mTexture; }
 
         SdlGpuTexture &operator=(SdlGpuTexture &&) noexcept;
 
-        SDL_GPUTexture *operator*() const { return mTexture; }
         void reset(SDL_GPUTexture *newTexture);
 
         void clear();

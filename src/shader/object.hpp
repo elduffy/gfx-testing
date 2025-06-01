@@ -6,7 +6,7 @@
 namespace gfx_testing::shader {
     // Pre-upload texture information
     struct ImageData {
-        NO_COPY(ImageData);
+        NO_COPY_DEFAULT_MOVE(ImageData);
 
     private:
         void checkType() const {
@@ -35,7 +35,6 @@ namespace gfx_testing::shader {
             mTextureType(type), mSurfaces(std::move(surfaces)), mSamplerCreateInfo(std::move(samplerCreateInfo)) {
             checkType();
         }
-        ImageData(ImageData &&) = default;
 
         SDL_GPUTextureType mTextureType;
         std::vector<sdl::SdlSurface> mSurfaces;
@@ -46,28 +45,35 @@ namespace gfx_testing::shader {
 
     // Post-upload shader resources
     struct GpuShaderObject {
-        NO_COPY(GpuShaderObject);
+        NO_COPY_DEFAULT_MOVE(GpuShaderObject);
 
+        explicit GpuShaderObject(sdl::SdlContext const &sdlContext) :
+            mVertexBuffer(sdlContext, nullptr), mIndexBuffer(std::nullopt) {}
+
+        // ctor that handles uploading resources to the gpu
         GpuShaderObject(sdl::SdlContext const &sdlContext, render::Samplers &samplers, MeshData const &meshData,
                         std::vector<ImageData> const &imageData);
-        GpuShaderObject(GpuShaderObject &&) = default;
 
-        size_t mVertexCount;
-        uint32_t mIndexCount;
+        void reallocVertexBuffer(size_t numVertices, SDL_GPUBufferUsageFlags usage);
+
+        sdl::SdlMappedTransferBuffer downloadVertexData() const;
+
+        size_t mVertexCount{0};
+        uint32_t mIndexCount{0};
         sdl::SdlGpuBuffer mVertexBuffer;
-        sdl::SdlGpuBuffer mIndexBuffer;
+        // if present, index-based draws are used
+        std::optional<sdl::SdlGpuBuffer> mIndexBuffer;
         std::vector<sdl::SdlGpuTexture> mTextures;
         std::vector<SDL_GPUTextureSamplerBinding> mTextureSamplerBindings;
     };
 
     // Pre-upload shader resources
     struct ShaderObject {
-        NO_COPY(ShaderObject);
+        NO_COPY_DEFAULT_MOVE(ShaderObject);
 
         ShaderObject(MeshData meshData, std::vector<ImageData> images) :
             mMeshData(std::move(meshData)), mImages(std::move(images)) {}
         explicit ShaderObject(MeshData meshData) : mMeshData(std::move(meshData)) {}
-        ShaderObject(ShaderObject &&) = default;
 
         GpuShaderObject upload(sdl::SdlContext const &context, render::Samplers &samplers) const;
 

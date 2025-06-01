@@ -50,8 +50,14 @@ namespace gfx_testing::render {
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mDebugNormals(gameContext, mPropObjects, {}),
         mPointLights(initPointLights(gameContext)) {
-        for (auto const *objPtr: {&mSkyBox.mRenderObject, &mDebugAxes.mRenderObject, &mPropObjects, &mLandscape,
-                                  &mTextureObject, &mDebugNormals.mRenderObject}) {
+        for (auto const *objPtr: {
+                     &mSkyBox.mRenderObject,
+                     &mDebugAxes.mRenderObject,
+                     &mPropObjects,
+                     &mLandscape,
+                     &mTextureObject,
+                     &mDebugNormals.mRenderObject,
+             }) {
             mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(objPtr->getPipelineName())).push_back(objPtr);
         }
         for (auto const &light: mPointLights) {

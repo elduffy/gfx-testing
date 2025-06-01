@@ -20,7 +20,7 @@ namespace gfx_testing::shader {
         // Set the vertex/index data
         {
             const auto mappedBuffer = transferBuffer.map(false);
-            auto *vertexData = mappedBuffer.get<shader::VertexData>();
+            auto *vertexData = mappedBuffer.get<VertexData>();
             std::ranges::copy(meshData.mVertices, vertexData);
 
             switch (meshData.mIndices.mElementSize) {
@@ -54,13 +54,13 @@ namespace gfx_testing::shader {
             SDL_UploadToGPUBuffer(copyPass, &source, &destination, false);
         }
         // Index upload
-        {
+        if (gpuShaderObject.mIndexBuffer.has_value()) {
             const SDL_GPUTransferBufferLocation source = {
                     .transfer_buffer = *transferBuffer,
                     .offset = meshData.getVertexBufferSize(),
             };
             const SDL_GPUBufferRegion destination = {
-                    .buffer = *gpuShaderObject.mIndexBuffer,
+                    .buffer = *gpuShaderObject.mIndexBuffer.value(),
                     .offset = 0,
                     .size = meshData.getIndexBufferSize(),
             };
@@ -83,8 +83,9 @@ namespace gfx_testing::shader {
     GpuShaderObject::GpuShaderObject(sdl::SdlContext const &sdlContext, render::Samplers &samplers,
                                      MeshData const &meshData, std::vector<ImageData> const &imageData) :
         mVertexCount(meshData.mVertices.size()), mIndexCount(meshData.mIndices.count()),
-        mVertexBuffer(
-                sdl::SdlGpuBuffer::create(sdlContext, SDL_GPU_BUFFERUSAGE_VERTEX, meshData.getVertexBufferSize())),
+        mVertexBuffer(sdl::SdlGpuBuffer::create(sdlContext,
+                                                SDL_GPU_BUFFERUSAGE_VERTEX | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ,
+                                                meshData.getVertexBufferSize())),
         mIndexBuffer(sdl::SdlGpuBuffer::create(sdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),
         mTextures(createTextures(sdlContext, imageData)) {
         transferBufferData(sdlContext, meshData, *this);
@@ -106,8 +107,45 @@ namespace gfx_testing::shader {
         }
     }
 
+    void GpuShaderObject::reallocVertexBuffer(size_t numVertices, SDL_GPUBufferUsageFlags usage) {
+        mVertexBuffer = sdl::SdlGpuBuffer::create(mVertexBuffer.mContext, usage, getVertexBufferSize(numVertices));
+        mVertexCount = numVertices;
+    }
+
     GpuShaderObject ShaderObject::upload(sdl::SdlContext const &context, render::Samplers &samplers) const {
         GpuShaderObject gpuShaderObject(context, samplers, mMeshData, mImages);
         return gpuShaderObject;
+    }
+
+    sdl::SdlMappedTransferBuffer GpuShaderObject::downloadVertexData() const {
+        auto const dataSize = boost::safe_numerics::checked::cast<uint32_t>(mVertexCount * sizeof(VertexData));
+        auto const &sdlContext = mVertexBuffer.mContext;
+        auto const transferBuffer =
+                sdl::SdlTransferBuffer::create(sdlContext, SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD, dataSize);
+        const SDL_GPUBufferRegion source{
+                .buffer = *mVertexBuffer,
+                .offset = 0,
+                .size = dataSize,
+        };
+        const SDL_GPUTransferBufferLocation dest{
+                .transfer_buffer = *transferBuffer,
+                .offset = 0,
+        };
+
+        auto *commandBuffer = SDL_AcquireGPUCommandBuffer(sdlContext.mDevice);
+        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire GPU command buffer";
+        auto *copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+        SDL_DownloadFromGPUBuffer(copyPass, &source, &dest);
+        SDL_EndGPUCopyPass(copyPass);
+
+        {
+            const sdl::SdlGpuFence fence{sdlContext, SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer)};
+            auto const start = std::chrono::steady_clock::now();
+            fence.wait(); // TODO: don't block, keep initializing and only wait later
+            SDL_Log("Vertex download took %lu us",
+                    std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start)
+                            .count());
+        }
+        return transferBuffer.map(false);
     }
 } // namespace gfx_testing::shader

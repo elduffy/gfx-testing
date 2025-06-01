@@ -25,6 +25,10 @@ namespace gfx_testing::pipeline {
             return mGfxPipelines.at(getIndex(pipelineName));
         }
 
+        compute::Pipeline const &get(compute::PipelineName pipelineName) const {
+            return mComputePipelines.at(getIndex(pipelineName));
+        }
+
     private:
         std::vector<gfx::Pipeline> mGfxPipelines;
         std::vector<compute::Pipeline> mComputePipelines;

@@ -1,7 +1,8 @@
 #pragma once
+#include <game.hpp>
+#include <pipeline/gfx/pipeline_definition.hpp>
 #include <render/camera.hpp>
 #include <sdl.hpp>
-#include <shader/object.hpp>
 
 namespace gfx_testing::render {
 

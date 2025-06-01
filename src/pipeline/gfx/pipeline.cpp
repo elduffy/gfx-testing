@@ -1,7 +1,3 @@
-//
-// Created by eric on 5/3/25.
-//
-
 #include <SDL3/SDL_gpu.h>
 #include <absl/log/check.h>
 #include <algorithm>

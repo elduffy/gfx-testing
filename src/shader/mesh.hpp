@@ -113,6 +113,10 @@ namespace gfx_testing::shader {
         return asUint32();
     }
 
+    inline uint32_t getVertexBufferSize(size_t vertexCount) {
+        return boost::safe_numerics::checked::cast<uint32_t>(vertexCount * sizeof(VertexData));
+    }
+
     struct MeshData {
         NO_COPY(MeshData);
 
@@ -121,9 +125,7 @@ namespace gfx_testing::shader {
 
         MeshData(MeshData &&) = default;
 
-        [[nodiscard]] uint32_t getVertexBufferSize() const {
-            return boost::safe_numerics::checked::cast<uint32_t>(mVertices.size() * sizeof(VertexData));
-        }
+        [[nodiscard]] uint32_t getVertexBufferSize() const { return shader::getVertexBufferSize(mVertices.size()); }
 
         [[nodiscard]] uint32_t getIndexBufferSize() const {
             return boost::safe_numerics::checked::cast<uint32_t>(mIndices.bufferSize());
