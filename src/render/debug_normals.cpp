@@ -1,6 +1,15 @@
 #include <render/debug_normals.hpp>
 
 namespace gfx_testing::render {
+    struct VertexBufferOffsets {
+        // This gets around a lack of offsetof in HLSL https://github.com/microsoft/hlsl-specs/issues/257
+        uint32_t mNormalOffset;
+        uint32_t mColorOffset;
+    };
+    static constexpr VertexBufferOffsets VERTEX_BUFFER_OFFSETS{
+            .mNormalOffset = offsetof(shader::VertexData, mNormal),
+            .mColorOffset = offsetof(shader::VertexData, mColor),
+    };
 
     shader::GpuShaderObject createGpuShaderObject(const game::GameContext &gameContext,
                                                   RenderObject const &targetObject,
@@ -23,7 +32,14 @@ namespace gfx_testing::render {
         };
         SDL_GPUComputePass *computePass = SDL_BeginGPUComputePass(commandBuffer, nullptr, 0, &rwBinding, 1);
         SDL_BindGPUComputePipeline(computePass, *pipeline.mSdlPipeline);
-        SDL_PushGPUComputeUniformData(commandBuffer, 0, &options, sizeof(options));
+
+        SDL_PushGPUComputeUniformData(commandBuffer,
+                                      spirv_header_gen::generated::debug_normals_comp::UBO_Options.mBinding, &options,
+                                      sizeof(options));
+
+        SDL_PushGPUComputeUniformData(commandBuffer,
+                                      spirv_header_gen::generated::debug_normals_comp::UBO_VertexBufferOffsets.mBinding,
+                                      &VERTEX_BUFFER_OFFSETS, sizeof(VERTEX_BUFFER_OFFSETS));
 
         CHECK_EQ(pipeline.mDefinition.mShader.mReadonlyStorageBuffers, 1)
                 << "Unexpected number of RO storage buffers: " << pipeline.mDefinition.mShader.mReadonlyStorageBuffers;

@@ -13,23 +13,24 @@ UNIFORM_BUFFER_COMPUTE(Options, 0) {
     float lineLength;
 };
 
+// Someday we might have an offsetof macro to use instead of this: https://github.com/microsoft/hlsl-specs/issues/257
+UNIFORM_BUFFER_COMPUTE(VertexBufferOffsets, 1) {
+    uint normalOffset;
+    uint colorOffset;
+};
+
 [numthreads(64, 1, 1)]
 void main(uint3 GlobalInvocationID : SV_DispatchThreadID) {
     uint vertexInIdx = GlobalInvocationID.x;
 
-    //float lineLength = 0.1;
-    //float4 lineColor = float4(0,0,1,1);
-    // TODO: this is very brittle, can we use sizeof/offset?
     uint stride = sizeof(DefaultVertexData);
-    uint normOffset = sizeof(float3) + sizeof(float2);
-    uint colorOffset = normOffset + sizeof(float3);
     uint numBytes;
     VertexBufferIn.GetDimensions(numBytes);
     uint numVertices = numBytes / stride;
 
     if (vertexInIdx < numVertices) {
         float3 posIn = VertexBufferIn.Load<float3>(vertexInIdx * stride);
-        float3 normIn = VertexBufferIn.Load<float3>(vertexInIdx * stride + normOffset);
+        float3 normIn = VertexBufferIn.Load<float3>(vertexInIdx * stride + normalOffset);
         // First vertex out
         VertexBufferOut.Store<float3>(2 * vertexInIdx * stride, posIn);
         VertexBufferOut.Store<float4>(2 * vertexInIdx * stride + colorOffset, float4(lineColor, 1));
