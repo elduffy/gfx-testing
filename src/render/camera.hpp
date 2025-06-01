@@ -13,6 +13,8 @@ namespace gfx_testing::render {
 
         void approach(float deltaRadius);
 
+        void translate(glm::vec3 const &deltaPos);
+
     private:
         void updateViewMatrix();
 

@@ -31,5 +31,7 @@ namespace gfx_testing::render {
         updateViewMatrix();
     }
 
+    void Camera::translate(glm::vec3 const &deltaPos) { mPosWs += deltaPos; }
+
     void Camera::updateViewMatrix() { mView = lookAt(mPosWs, glm::vec3(0, 0, 0), glm::vec3(0, 0, 1)); }
 } // namespace gfx_testing::render

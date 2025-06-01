@@ -84,6 +84,7 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 add_library(gfx_testing_lib
         src/game.cpp
         src/imgui_context.cpp
+        src/io/input_manager.cpp
         src/io/gltf_loader.cpp
         src/io/obj_loader.cpp
         src/io/resource_loader.cpp
