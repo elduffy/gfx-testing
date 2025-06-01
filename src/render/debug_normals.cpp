@@ -41,10 +41,11 @@ namespace gfx_testing::render {
                                       spirv_header_gen::generated::debug_normals_comp::UBO_VertexBufferOffsets.mBinding,
                                       &VERTEX_BUFFER_OFFSETS, sizeof(VERTEX_BUFFER_OFFSETS));
 
-        CHECK_EQ(pipeline.mDefinition.mShader.mReadonlyStorageBuffers, 1)
-                << "Unexpected number of RO storage buffers: " << pipeline.mDefinition.mShader.mReadonlyStorageBuffers;
+        static_assert(spirv_header_gen::generated::debug_normals_comp::SSBO_VertexBufferIn.mReadOnly);
         auto *sourceBuffer = *targetObject.getGpuShaderObject().mVertexBuffer;
-        SDL_BindGPUComputeStorageBuffers(computePass, 0, &sourceBuffer, 1);
+        SDL_BindGPUComputeStorageBuffers(computePass,
+                                         spirv_header_gen::generated::debug_normals_comp::SSBO_VertexBufferIn.mBinding,
+                                         &sourceBuffer, 1);
 
         const auto groupCount = static_cast<uint32_t>(std::ceil(static_cast<double>(targetObject.getVertexCount()) /
                                                                 pipeline.mDefinition.mShader.mWorkgroupSize[0]));
