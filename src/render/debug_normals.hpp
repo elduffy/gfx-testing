@@ -6,9 +6,10 @@ namespace gfx_testing::render {
     class DebugNormals {
     public:
         struct Options {
+            SHADER_ALIGN glm::vec3 mLineColor{0, 1, .72};
             float mLineLength = 0.1;
-            glm::vec4 mLineColor{0, 1, .72, 1};
         };
+        static_assert(sizeof(Options) == 16);
 
         DebugNormals(game::GameContext const &gameContext, RenderObject &targetObject, Options const &options);
 

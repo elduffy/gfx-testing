@@ -23,6 +23,7 @@ namespace gfx_testing::render {
         };
         SDL_GPUComputePass *computePass = SDL_BeginGPUComputePass(commandBuffer, nullptr, 0, &rwBinding, 1);
         SDL_BindGPUComputePipeline(computePass, *pipeline.mSdlPipeline);
+        SDL_PushGPUComputeUniformData(commandBuffer, 0, &options, sizeof(options));
 
         CHECK_EQ(pipeline.mDefinition.mShader.mReadonlyStorageBuffers, 1)
                 << "Unexpected number of RO storage buffers: " << pipeline.mDefinition.mShader.mReadonlyStorageBuffers;

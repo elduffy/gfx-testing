@@ -79,6 +79,7 @@ namespace gfx_testing::pipeline {
                 .format = SDL_GPU_SHADERFORMAT_SPIRV,
                 .num_readonly_storage_buffers = pipelineDefinition.mShader.mReadonlyStorageBuffers,
                 .num_readwrite_storage_buffers = pipelineDefinition.mShader.mReadwriteStorageBuffers,
+                .num_uniform_buffers = pipelineDefinition.mShader.mUniformBuffers,
                 .threadcount_x = pipelineDefinition.mShader.mWorkgroupSize[0],
                 .threadcount_y = pipelineDefinition.mShader.mWorkgroupSize[1],
                 .threadcount_z = pipelineDefinition.mShader.mWorkgroupSize[2],

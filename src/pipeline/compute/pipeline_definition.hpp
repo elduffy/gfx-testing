@@ -27,7 +27,7 @@ namespace gfx_testing::pipeline::compute {
 
         char const *mFilename;
         // uint32_t mSamplers{0};
-        // uint32_t mUniformBuffers{0};
+        uint32_t mUniformBuffers{0};
         uint32_t mReadwriteStorageBuffers{0};
         uint32_t mReadonlyStorageBuffers{0};
         // uint32_t mStorageTextures{0};
@@ -41,7 +41,7 @@ namespace gfx_testing::pipeline::compute {
     };
 
     template<typename Bindables>
-    constexpr uint32_t getBindingSlotCount(Bindables const &bindables, bool readOnly) {
+    constexpr uint32_t getSsboBindingSlotCount(Bindables const &bindables, bool readOnly) {
         size_t result = 0;
         for (auto const &b: bindables) {
             if (readOnly != b.mReadOnly) {
@@ -54,10 +54,11 @@ namespace gfx_testing::pipeline::compute {
 
     static constexpr auto SHADER_DEBUG_NORMALS = ShaderDefinition{
             .mFilename = spirv_header_gen::generated::debug_normals_comp::META.mSourceFilename,
+            .mUniformBuffers = getBindingSlotCount(spirv_header_gen::generated::debug_normals_comp::META.mUbos),
             .mReadwriteStorageBuffers =
-                    getBindingSlotCount(spirv_header_gen::generated::debug_normals_comp::META.mSsbos, false),
+                    getSsboBindingSlotCount(spirv_header_gen::generated::debug_normals_comp::META.mSsbos, false),
             .mReadonlyStorageBuffers =
-                    getBindingSlotCount(spirv_header_gen::generated::debug_normals_comp::META.mSsbos, true),
+                    getSsboBindingSlotCount(spirv_header_gen::generated::debug_normals_comp::META.mSsbos, true),
             .mWorkgroupSize = spirv_header_gen::generated::debug_normals_comp::META.mEntryPoint.mWorkgroupSize,
     };
 
