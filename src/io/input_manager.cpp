@@ -1,7 +1,7 @@
 #include <io/input_manager.hpp>
 
 namespace gfx_testing::io {
-    void InputManager::handleEvent(SDL_Event const &event) const {
+    void InputManager::handleEvent(SDL_Event const &event) {
         if (mImGuiContext.processEvent(event)) {
             return;
         }
@@ -13,6 +13,11 @@ namespace gfx_testing::io {
                 });
                 break;
             }
+            case SDL_EVENT_KEY_DOWN: {
+                if (event.key.key == SDLK_LSHIFT) {
+                    mShift = true;
+                }
+            }
             case SDL_EVENT_KEY_UP: {
                 if (!event.key.down && !event.key.repeat && event.key.key == SDLK_RETURN) {
                     mGameContext.mStopwatch.toggle();
@@ -20,14 +25,26 @@ namespace gfx_testing::io {
                 if (!event.key.down && !event.key.repeat && event.key.key == SDLK_D) {
                     mImGuiContext.toggleOpen();
                 }
+                if (!event.key.down && !event.key.repeat && event.key.key == SDLK_LSHIFT) {
+                    mShift = false;
+                }
                 break;
             }
             case SDL_EVENT_MOUSE_MOTION: {
                 if ((event.motion.state & SDL_BUTTON_MMASK) != 0) {
-                    constexpr auto RADS_PER_VIEWPORT_DIMENSIONS = 4.f;
-                    auto const extent = mScene.getViewportExtent().asVec2() / RADS_PER_VIEWPORT_DIMENSIONS;
-                    glm::vec2 const &radians = {-event.motion.yrel / extent.y, -event.motion.xrel / extent.x};
-                    mScene.getCamera().pivot(radians);
+
+                    auto &camera = mScene.getCamera();
+                    auto const extent = mScene.getViewportExtent().asVec2();
+                    if (mShift) {
+                        glm::vec2 const dir = {-event.motion.xrel / extent.x, event.motion.yrel / extent.y};
+                        auto const pivotDist = glm::length(camera.mPivot - camera.mPosWs);
+                        camera.translate(dir * pivotDist);
+                    } else {
+                        constexpr auto RADS_PER_VIEWPORT = 4.f;
+                        glm::vec2 const radians = RADS_PER_VIEWPORT * glm::vec2{-event.motion.yrel / extent.y,
+                                                                                -event.motion.xrel / extent.x};
+                        camera.pivot(radians);
+                    }
                 }
                 break;
             }

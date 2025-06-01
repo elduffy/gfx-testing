@@ -6,6 +6,8 @@
 
 namespace gfx_testing::render {
     class Camera {
+        static constexpr glm::vec3 UP{0, 0, 1};
+
     public:
         explicit Camera(glm::vec3 const &initialPos);
 
@@ -13,13 +15,14 @@ namespace gfx_testing::render {
 
         void approach(float deltaRadius);
 
-        void translate(glm::vec3 const &deltaPos);
+        void translate(glm::vec2 const &planeDelta);
 
     private:
         void updateViewMatrix();
 
     public:
         glm::vec3 mPosWs;
+        glm::vec3 mPivot{0, 0, 0};
         glm::mat4x4 mView;
     };
 } // namespace gfx_testing::render
