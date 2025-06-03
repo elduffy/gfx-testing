@@ -63,6 +63,7 @@ namespace gfx_testing::shader {
         sdl::SdlGpuBuffer mVertexBuffer;
         // if present, index-based draws are used
         std::optional<sdl::SdlGpuBuffer> mIndexBuffer;
+        SDL_GPUIndexElementSize const mIndexSize{SDL_GPU_INDEXELEMENTSIZE_16BIT};
         std::vector<sdl::SdlGpuTexture> mTextures;
         std::vector<SDL_GPUTextureSamplerBinding> mTextureSamplerBindings;
     };

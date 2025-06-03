@@ -29,7 +29,7 @@ namespace gfx_testing::render {
                     .buffer = *mGpuShaderObject.mIndexBuffer.value(),
                     .offset = 0,
             };
-            SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+            SDL_BindGPUIndexBuffer(renderPass, &indexBufferBinding, mGpuShaderObject.mIndexSize);
             SDL_DrawGPUIndexedPrimitives(renderPass, mGpuShaderObject.mIndexCount, 1, 0, 0, 0);
         } else {
             SDL_DrawGPUPrimitives(renderPass, mGpuShaderObject.mVertexCount, 1, 0, 0);

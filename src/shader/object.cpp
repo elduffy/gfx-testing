@@ -87,7 +87,7 @@ namespace gfx_testing::shader {
                                                 SDL_GPU_BUFFERUSAGE_VERTEX | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ,
                                                 meshData.getVertexBufferSize())),
         mIndexBuffer(sdl::SdlGpuBuffer::create(sdlContext, SDL_GPU_BUFFERUSAGE_INDEX, meshData.getIndexBufferSize())),
-        mTextures(createTextures(sdlContext, imageData)) {
+        mIndexSize(meshData.mIndices.mElementSize), mTextures(createTextures(sdlContext, imageData)) {
         transferBufferData(sdlContext, meshData, *this);
 
         CHECK_EQ(mTextures.size(), imageData.size());
