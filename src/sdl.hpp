@@ -35,6 +35,19 @@ namespace gfx_testing::sdl {
         return std::move(guard);
     }
 
+    class ScopedCommandBuffer {
+    public:
+        NO_COPY(ScopedCommandBuffer);
+
+        explicit ScopedCommandBuffer(SDL_GPUCommandBuffer *commandBuffer);
+        ~ScopedCommandBuffer();
+        ScopedCommandBuffer(ScopedCommandBuffer &&other) noexcept;
+
+        SDL_GPUCommandBuffer *operator*() const { return mCommandBuffer; }
+
+        SDL_GPUCommandBuffer *mCommandBuffer;
+    };
+
 
     class SdlShader {
     public:

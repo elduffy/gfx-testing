@@ -95,6 +95,7 @@ add_library(gfx_testing_lib
         src/render/camera.cpp
         src/render/debug_axes.cpp
         src/render/debug_normals.cpp
+        src/render/draw_context.cpp
         src/render/point_light.cpp
         src/render/render_object.cpp
         src/render/samplers.cpp

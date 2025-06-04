@@ -3,10 +3,10 @@
 #include <game.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
-#include <imgui_context.hpp>
 #include <render/camera.hpp>
 #include <render/debug_axes.hpp>
 #include <render/debug_normals.hpp>
+#include <render/draw_context.hpp>
 #include <render/point_light.hpp>
 #include <render/render_object.hpp>
 #include <render/sky_box.hpp>
@@ -49,13 +49,13 @@ namespace gfx_testing::render {
 
     class Scene {
     public:
-        Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext);
+        explicit Scene(game::GameContext &gameContext);
 
         void update();
 
         void onResize(util::Extent2D extent);
 
-        void draw() const;
+        void draw(DrawContext const &drawContext) const;
 
         [[nodiscard]] util::Extent2D getViewportExtent() const { return mViewportExtent; };
 
@@ -65,7 +65,6 @@ namespace gfx_testing::render {
         void drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const;
 
         game::GameContext &mGameContext;
-        imgui::ImGuiContext &mImGuiContext;
         util::Extent2D mViewportExtent;
         Camera mCamera;
         glm::mat4x4 mProjection;

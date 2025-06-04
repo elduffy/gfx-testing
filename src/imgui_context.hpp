@@ -1,4 +1,8 @@
 #pragma once
+
+#include <render/draw_context.hpp>
+#include <render/scene.hpp>
+
 #include "sdl.hpp"
 
 namespace gfx_testing::imgui {
@@ -17,10 +21,10 @@ namespace gfx_testing::imgui {
          */
         bool processEvent(SDL_Event const &sdlEvent) const;
 
-        void renderFrame(SDL_GPUCommandBuffer *commandBuffer, SDL_GPUColorTargetInfo const &colorTargetInfo);
+        void renderFrame(render::DrawContext const &drawContext, render::Scene &scene);
 
     private:
-        void showDebugWindow();
+        void showDebugWindow(render::Scene &scene);
 
         bool mOpenWindow{false};
     };

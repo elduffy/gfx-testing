@@ -79,9 +79,9 @@ namespace gfx_testing::render {
         }
     }
 
-    Scene::Scene(game::GameContext &gameContext, imgui::ImGuiContext &imGuiContext) :
-        mGameContext(gameContext), mImGuiContext(imGuiContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT),
-        mCamera(INITIAL_CAMERA_POSITION), mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
+    Scene::Scene(game::GameContext &gameContext) :
+        mGameContext(gameContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT), mCamera(INITIAL_CAMERA_POSITION),
+        mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
         mDepthTexture(createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
         mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
 
@@ -96,25 +96,27 @@ namespace gfx_testing::render {
 
     void Scene::update() { mSceneObjects.update(); }
 
-    void Scene::draw() const {
-        SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(mGameContext.mSdlContext.mDevice);
-        CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
-        auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
-
-        SDL_GPUTexture *swapchainTexture = nullptr;
-        CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow, &swapchainTexture,
-                                                    nullptr, nullptr))
-                << "Failed to acquire swapchain texture: " << SDL_GetError();
+    void Scene::draw(DrawContext const &drawContext) const {
+        // SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(mGameContext.mSdlContext.mDevice);
+        // CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
+        // auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
+        //
+        // SDL_GPUTexture *swapchainTexture = nullptr;
+        // CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow,
+        // &swapchainTexture,
+        //                                             nullptr, nullptr))
+        //         << "Failed to acquire swapchain texture: " << SDL_GetError();
 
         mGameContext.maybeLimitFps();
 
-        if (swapchainTexture == nullptr) {
-            SDL_Log("Swapchain texture is null");
-            return;
-        }
+        // if (swapchainTexture == nullptr) {
+        //     SDL_Log("Swapchain texture is null");
+        //     return;
+        // }
+        CHECK_NE(drawContext.mSwapchainTexture, nullptr) << "Scene::draw called with null swapchain.";
 
         SDL_GPUColorTargetInfo mainColorTarget{
-                .texture = swapchainTexture,
+                .texture = drawContext.mSwapchainTexture,
                 .clear_color = {0, 0, 0, 1},
                 .load_op = SDL_GPU_LOADOP_CLEAR,
                 .store_op = SDL_GPU_STOREOP_STORE,
@@ -123,7 +125,7 @@ namespace gfx_testing::render {
         if (mMultisampleTextureOpt.has_value()) {
             mainColorTarget.texture = *mMultisampleTextureOpt.value();
             mainColorTarget.store_op = SDL_GPU_STOREOP_RESOLVE;
-            mainColorTarget.resolve_texture = swapchainTexture;
+            mainColorTarget.resolve_texture = drawContext.mSwapchainTexture;
         }
 
         const SDL_GPUDepthStencilTargetInfo depthStencilTargetInfo{
@@ -136,20 +138,20 @@ namespace gfx_testing::render {
                 .cycle = true,
         };
         SDL_GPURenderPass *renderPass =
-                SDL_BeginGPURenderPass(commandBuffer, &mainColorTarget, 1, &depthStencilTargetInfo);
-        drawObjects(commandBuffer, renderPass);
+                SDL_BeginGPURenderPass(*drawContext.mCommandBuffer, &mainColorTarget, 1, &depthStencilTargetInfo);
+        drawObjects(*drawContext.mCommandBuffer, renderPass);
         SDL_EndGPURenderPass(renderPass);
 
         // imgui -- must occur after render pass has ended
-        {
-            SDL_GPUColorTargetInfo swapchainTargetInfo{
-                    .texture = swapchainTexture,
-                    .clear_color = {0, 0, 0, 1},
-                    .load_op = SDL_GPU_LOADOP_LOAD,
-                    .store_op = SDL_GPU_STOREOP_STORE,
-            };
-            mImGuiContext.renderFrame(commandBuffer, swapchainTargetInfo);
-        }
+        // {
+        //     const SDL_GPUColorTargetInfo swapchainTargetInfo{
+        //             .texture = swapchainTexture,
+        //             .clear_color = {0, 0, 0, 1},
+        //             .load_op = SDL_GPU_LOADOP_LOAD,
+        //             .store_op = SDL_GPU_STOREOP_STORE,
+        //     };
+        //     mImGuiContext.renderFrame(commandBuffer, swapchainTargetInfo);
+        // }
     }
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {

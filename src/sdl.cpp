@@ -73,6 +73,20 @@ namespace gfx_testing::sdl {
 } // namespace gfx_testing::sdl
 
 namespace gfx_testing::sdl {
+    ScopedCommandBuffer::ScopedCommandBuffer(SDL_GPUCommandBuffer *commandBuffer) : mCommandBuffer(commandBuffer) {}
+
+    ScopedCommandBuffer::~ScopedCommandBuffer() {
+        CHECK(SDL_SubmitGPUCommandBuffer(mCommandBuffer)) << "Command buffer submit failed: " << SDL_GetError();
+    }
+
+    ScopedCommandBuffer::ScopedCommandBuffer(ScopedCommandBuffer &&other) noexcept :
+        mCommandBuffer(other.mCommandBuffer) {
+        other.mCommandBuffer = nullptr;
+    }
+} // namespace gfx_testing::sdl
+
+
+namespace gfx_testing::sdl {
     SdlShader::SdlShader(SdlContext const &context, SDL_GPUShader *shader) : mContext(context), mShader(shader) {}
 
     SdlShader::~SdlShader() {

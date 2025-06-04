@@ -40,7 +40,7 @@ namespace gfx_testing::imgui {
         return io.WantCaptureMouse || io.WantCaptureKeyboard;
     }
 
-    void ImGuiContext::showDebugWindow() {
+    void ImGuiContext::showDebugWindow(render::Scene &scene) {
         ImGuiWindowFlags windowFlags = 0;
         windowFlags |= ImGuiWindowFlags_NoNav;
         if (!ImGui::Begin("Debug", &mOpenWindow, windowFlags)) {
@@ -52,10 +52,18 @@ namespace gfx_testing::imgui {
         if (ImGui::CollapsingHeader("Perf")) {
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
+        if (ImGui::CollapsingHeader("Camera")) {
+            const auto &camera = scene.getCamera();
+            float position[] = {camera.mPosWs.x, camera.mPosWs.y, camera.mPosWs.z};
+            float pivot[] = {camera.mPivot.x, camera.mPivot.y, camera.mPivot.z};
+
+            ImGui::InputFloat3("Position", position);
+            ImGui::InputFloat3("Pivot", pivot);
+        }
         ImGui::End();
     }
 
-    void ImGuiContext::renderFrame(SDL_GPUCommandBuffer *commandBuffer, SDL_GPUColorTargetInfo const &colorTargetInfo) {
+    void ImGuiContext::renderFrame(render::DrawContext const &drawContext, render::Scene &scene) {
         if (!mOpenWindow) {
             return;
         }
@@ -65,14 +73,21 @@ namespace gfx_testing::imgui {
         if constexpr (SHOW_DEMO) {
             ImGui::ShowDemoWindow(&mOpenWindow);
         }
-        showDebugWindow();
+        showDebugWindow(scene);
         ImGui::Render();
 
         auto *drawData = ImGui::GetDrawData();
-        Imgui_ImplSDLGPU3_PrepareDrawData(drawData, commandBuffer);
+        Imgui_ImplSDLGPU3_PrepareDrawData(drawData, *drawContext.mCommandBuffer);
 
-        SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, nullptr);
-        ImGui_ImplSDLGPU3_RenderDrawData(drawData, commandBuffer, renderPass);
+        const SDL_GPUColorTargetInfo colorTargetInfo{
+                .texture = drawContext.mSwapchainTexture,
+                .clear_color = {0, 0, 0, 1},
+                .load_op = SDL_GPU_LOADOP_LOAD,
+                .store_op = SDL_GPU_STOREOP_STORE,
+        };
+        SDL_GPURenderPass *renderPass =
+                SDL_BeginGPURenderPass(*drawContext.mCommandBuffer, &colorTargetInfo, 1, nullptr);
+        ImGui_ImplSDLGPU3_RenderDrawData(drawData, *drawContext.mCommandBuffer, renderPass);
         SDL_EndGPURenderPass(renderPass);
     }
 } // namespace gfx_testing::imgui

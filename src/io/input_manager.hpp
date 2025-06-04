@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_events.h>
 #include <game.hpp>
+#include <imgui_context.hpp>
 #include <render/scene.hpp>
 
 namespace gfx_testing::io {
