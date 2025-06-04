@@ -10,6 +10,16 @@ namespace gfx_testing::imgui {
     // Set true to show the demo menu to try out widgets, etc
     static auto constexpr SHOW_DEMO = false;
 
+    float *getVectorData(glm::vec3 &v) {
+        static_assert(offsetof(glm::vec3, x) == 0);
+        static_assert(sizeof(v.x) == sizeof(float));
+        static_assert(offsetof(glm::vec3, y) == sizeof(float));
+        static_assert(sizeof(v.y) == sizeof(float));
+        static_assert(offsetof(glm::vec3, z) == offsetof(glm::vec3, y) + sizeof(float));
+        static_assert(sizeof(v.z) == sizeof(float));
+        return &v.x;
+    }
+
     ImGuiContext::ImGuiContext(sdl::SdlContext const &sdlContext) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -53,12 +63,17 @@ namespace gfx_testing::imgui {
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
         if (ImGui::CollapsingHeader("Camera")) {
-            const auto &camera = scene.getCamera();
-            float position[] = {camera.mPosWs.x, camera.mPosWs.y, camera.mPosWs.z};
-            float pivot[] = {camera.mPivot.x, camera.mPivot.y, camera.mPivot.z};
+            auto &camera = scene.getCamera();
+            glm::vec3 cameraPos = camera.getPosition();
+            glm::vec3 cameraPivot = camera.getPivot();
+            auto *position = getVectorData(cameraPos);
+            auto *pivot = getVectorData(cameraPivot);
 
-            ImGui::InputFloat3("Position", position);
-            ImGui::InputFloat3("Pivot", pivot);
+            ImGui::DragFloat3("Position", position);
+            ImGui::DragFloat3("Pivot", pivot);
+
+            camera.setPosition(cameraPos);
+            camera.setPivot(cameraPivot);
         }
         ImGui::End();
     }

@@ -37,7 +37,7 @@ namespace gfx_testing::io {
                     auto const extent = mScene.getViewportExtent().asVec2();
                     if (mShift) {
                         glm::vec2 const dir = {-event.motion.xrel / extent.x, event.motion.yrel / extent.y};
-                        auto const pivotDist = glm::length(camera.mPivot - camera.mPosWs);
+                        auto const pivotDist = glm::length(camera.getPivot() - camera.getPosition());
                         camera.translate(dir * pivotDist);
                     } else {
                         constexpr auto RADS_PER_VIEWPORT = 4.f;

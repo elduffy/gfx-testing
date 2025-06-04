@@ -42,5 +42,16 @@ namespace gfx_testing::render {
         updateViewMatrix();
     }
 
+    void Camera::setPosition(glm::vec3 const &newPosWs) {
+        mPosWs = newPosWs;
+        updateViewMatrix();
+    }
+
+    void Camera::setPivot(glm::vec3 const &newPivot) {
+        mPivot = newPivot;
+        updateViewMatrix();
+    }
+
     void Camera::updateViewMatrix() { mView = lookAt(mPosWs, mPivot, UP); }
+
 } // namespace gfx_testing::render

@@ -17,10 +17,19 @@ namespace gfx_testing::render {
 
         void translate(glm::vec2 const &planeDelta);
 
+        glm::vec3 const &getPosition() const { return mPosWs; }
+
+        void setPosition(glm::vec3 const &newPosWs);
+
+        glm::vec3 const &getPivot() const { return mPivot; }
+
+        void setPivot(glm::vec3 const &newPivot);
+
+        glm::mat4x4 const &getViewMatrix() const { return mView; }
+
     private:
         void updateViewMatrix();
 
-    public:
         glm::vec3 mPosWs;
         glm::vec3 mPivot{0, 0, 0};
         glm::mat4x4 mView;

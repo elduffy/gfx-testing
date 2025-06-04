@@ -42,18 +42,18 @@ namespace gfx_testing::render {
         if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
             glm::mat4 mvpTransform;
             if (pipelineDefinition.mIsBackground) {
-                auto view = camera.mView;
+                auto view = camera.getViewMatrix();
                 view[3] = {0, 0, 0, 1};
                 mvpTransform = projection * view * mTransform;
             } else {
-                mvpTransform = projection * camera.mView * mTransform;
+                mvpTransform = projection * camera.getViewMatrix() * mTransform;
             }
             SDL_PushGPUVertexUniformData(commandBuffer,
                                          *pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding,
                                          &mvpTransform, sizeof(mvpTransform));
         }
         if (pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding.has_value()) {
-            auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, camera.mPosWs);
+            auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, camera.getPosition());
             SDL_PushGPUFragmentUniformData(commandBuffer,
                                            *pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding,
                                            &objectLighting, sizeof(objectLighting));
