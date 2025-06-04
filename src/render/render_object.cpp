@@ -38,22 +38,25 @@ namespace gfx_testing::render {
 
     void RenderObject::pushPerObjectUniforms(pipeline::gfx::PipelineDefinition const &pipelineDefinition,
                                              SDL_GPUCommandBuffer *commandBuffer, glm::mat4 const &projection,
-                                             std::vector<glm::vec3> const &lightPosWs, Camera const &camera) const {
+                                             glm::mat4 const &view, std::vector<glm::vec3> const &lightPosWs,
+                                             glm::vec3 const &cameraPosWs) const {
         if (pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding.has_value()) {
+
             glm::mat4 mvpTransform;
             if (pipelineDefinition.mIsBackground) {
-                auto view = camera.getViewMatrix();
-                view[3] = {0, 0, 0, 1};
-                mvpTransform = projection * view * mTransform;
+                auto newView = view;
+                newView[3] = {0, 0, 0, 1};
+                mvpTransform = projection * newView * mTransform;
             } else {
-                mvpTransform = projection * camera.getViewMatrix() * mTransform;
+                mvpTransform = projection * view * mTransform;
             }
+
             SDL_PushGPUVertexUniformData(commandBuffer,
                                          *pipelineDefinition.mVertexShader.mShaderBindings.mMvpTransformBinding,
                                          &mvpTransform, sizeof(mvpTransform));
         }
         if (pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding.has_value()) {
-            auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, camera.getPosition());
+            auto const objectLighting = shader::ObjectLighting::create(mTransform, lightPosWs, cameraPosWs);
             SDL_PushGPUFragmentUniformData(commandBuffer,
                                            *pipelineDefinition.mFragmentShader.mShaderBindings.mObjectLightingBinding,
                                            &objectLighting, sizeof(objectLighting));

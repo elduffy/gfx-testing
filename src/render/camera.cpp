@@ -6,9 +6,7 @@
 #include "glm/trigonometric.hpp"
 
 namespace gfx_testing::render {
-    Camera::Camera(glm::vec3 const &initialPos) : mPosWs(initialPos), mView(glm::identity<glm::mat4x4>()) {
-        updateViewMatrix();
-    }
+    Camera::Camera(glm::vec3 const &initialPos) : mPosWs(initialPos) {}
 
     void Camera::pivot(glm::vec2 const &radians) {
         // Using ISO/physics convention.
@@ -21,7 +19,6 @@ namespace gfx_testing::render {
         constexpr auto MAX_THETA = glm::radians(180.f) - MIN_THETA;
         newSpherical.y = glm::clamp(newSpherical.y, MIN_THETA, MAX_THETA);
         mPosWs = util::getCartesianCoords(newSpherical) + mPivot;
-        updateViewMatrix();
     }
 
     void Camera::approach(float const deltaRadius) {
@@ -29,7 +26,6 @@ namespace gfx_testing::render {
         auto newSpherical = util::getSphericalCoords(mPosWs - mPivot) + glm::vec3(deltaRadius, 0, 0);
         newSpherical.x = std::max(newSpherical.x, MIN_RADIUS);
         mPosWs = util::getCartesianCoords(newSpherical) + mPivot;
-        updateViewMatrix();
     }
 
     void Camera::translate(glm::vec2 const &planeDelta) {
@@ -39,19 +35,12 @@ namespace gfx_testing::render {
         auto const wsDelta = planeDelta.x * right + planeDelta.y * up;
         mPosWs += wsDelta;
         mPivot += wsDelta;
-        updateViewMatrix();
     }
 
-    void Camera::setPosition(glm::vec3 const &newPosWs) {
-        mPosWs = newPosWs;
-        updateViewMatrix();
-    }
+    void Camera::setPosition(glm::vec3 const &newPosWs) { mPosWs = newPosWs; }
 
-    void Camera::setPivot(glm::vec3 const &newPivot) {
-        mPivot = newPivot;
-        updateViewMatrix();
-    }
+    void Camera::setPivot(glm::vec3 const &newPivot) { mPivot = newPivot; }
 
-    void Camera::updateViewMatrix() { mView = lookAt(mPosWs, mPivot, UP); }
+    glm::mat4x4 Camera::computeViewMatrix() const { return lookAt(mPosWs, mPivot, UP); }
 
 } // namespace gfx_testing::render

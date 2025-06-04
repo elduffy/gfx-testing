@@ -170,8 +170,10 @@ namespace gfx_testing::render {
             SDL_BindGPUGraphicsPipeline(renderPass, *pipeline.mSdlPipeline);
             pipeline.bindStorageBuffers(renderPass);
 
+            auto const view = mCamera.computeViewMatrix();
             for (auto const *renderObject: renderObjects) {
-                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, lightPosWs, mCamera);
+                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, view, lightPosWs,
+                                                    mCamera.getPosition());
                 renderObject->render(renderPass);
             }
         }

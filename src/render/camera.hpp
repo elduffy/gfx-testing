@@ -25,13 +25,10 @@ namespace gfx_testing::render {
 
         void setPivot(glm::vec3 const &newPivot);
 
-        glm::mat4x4 const &getViewMatrix() const { return mView; }
+        glm::mat4x4 computeViewMatrix() const;
 
     private:
-        void updateViewMatrix();
-
         glm::vec3 mPosWs;
         glm::vec3 mPivot{0, 0, 0};
-        glm::mat4x4 mView;
     };
 } // namespace gfx_testing::render
