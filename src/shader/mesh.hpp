@@ -24,15 +24,13 @@ namespace gfx_testing::shader {
         }
 
     public:
-        NO_COPY(IndexList);
+        NO_COPY_DEFAULT_MOVE(IndexList);
 
         explicit IndexList(std::vector<uint16_t> const &indices) :
             mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_16BIT) {}
 
         explicit IndexList(std::vector<uint32_t> const &indices) :
             mCount(indices.size()), mBuffer(copyVector(indices)), mElementSize(SDL_GPU_INDEXELEMENTSIZE_32BIT) {}
-
-        IndexList(IndexList &&) = default;
 
         size_t count() const { return mCount; }
 
@@ -118,12 +116,10 @@ namespace gfx_testing::shader {
     }
 
     struct MeshData {
-        NO_COPY(MeshData);
+        NO_COPY_DEFAULT_MOVE(MeshData);
 
         MeshData(std::vector<VertexData> vertices, IndexList indices) :
             mVertices(std::move(vertices)), mIndices(std::move(indices)) {}
-
-        MeshData(MeshData &&) = default;
 
         [[nodiscard]] uint32_t getVertexBufferSize() const { return shader::getVertexBufferSize(mVertices.size()); }
 
