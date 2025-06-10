@@ -17,6 +17,7 @@ namespace gfx_testing::io {
                 if (event.key.key == SDLK_LSHIFT) {
                     mShift = true;
                 }
+                break;
             }
             case SDL_EVENT_KEY_UP: {
                 if (!event.key.down && !event.key.repeat && event.key.key == SDLK_RETURN) {
