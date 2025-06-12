@@ -97,22 +97,6 @@ namespace gfx_testing::render {
     void Scene::update() { mSceneObjects.update(); }
 
     void Scene::draw(DrawContext const &drawContext) const {
-        // SDL_GPUCommandBuffer *commandBuffer = SDL_AcquireGPUCommandBuffer(mGameContext.mSdlContext.mDevice);
-        // CHECK_NE(commandBuffer, nullptr) << "Failed to acquire command buffer: " << SDL_GetError();
-        // auto scopedSubmit = sdl::scopedSubmitCommandBuffer(commandBuffer);
-        //
-        // SDL_GPUTexture *swapchainTexture = nullptr;
-        // CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, mGameContext.mSdlContext.mWindow,
-        // &swapchainTexture,
-        //                                             nullptr, nullptr))
-        //         << "Failed to acquire swapchain texture: " << SDL_GetError();
-
-        mGameContext.maybeLimitFps();
-
-        // if (swapchainTexture == nullptr) {
-        //     SDL_Log("Swapchain texture is null");
-        //     return;
-        // }
         CHECK_NE(drawContext.mSwapchainTexture, nullptr) << "Scene::draw called with null swapchain.";
 
         SDL_GPUColorTargetInfo mainColorTarget{
@@ -141,17 +125,6 @@ namespace gfx_testing::render {
                 SDL_BeginGPURenderPass(*drawContext.mCommandBuffer, &mainColorTarget, 1, &depthStencilTargetInfo);
         drawObjects(*drawContext.mCommandBuffer, renderPass);
         SDL_EndGPURenderPass(renderPass);
-
-        // imgui -- must occur after render pass has ended
-        // {
-        //     const SDL_GPUColorTargetInfo swapchainTargetInfo{
-        //             .texture = swapchainTexture,
-        //             .clear_color = {0, 0, 0, 1},
-        //             .load_op = SDL_GPU_LOADOP_LOAD,
-        //             .store_op = SDL_GPU_STOREOP_STORE,
-        //     };
-        //     mImGuiContext.renderFrame(commandBuffer, swapchainTargetInfo);
-        // }
     }
 
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {

@@ -10,11 +10,12 @@
 void handleUpdate(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
                   gfx_testing::imgui::ImGuiContext &imGuiContext) {
     scene.update();
-    gfx_testing::render::DrawContext drawContext{gameContext.mSdlContext};
+    const gfx_testing::render::DrawContext drawContext{gameContext.mSdlContext};
     if (!drawContext.hasSwapchain()) {
         SDL_Log("Swapchain texture is null");
         return;
     }
+    gameContext.maybeLimitFps();
     scene.draw(drawContext);
     imGuiContext.renderFrame(drawContext, scene);
 }
