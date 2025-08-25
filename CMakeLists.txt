@@ -107,6 +107,7 @@ add_library(gfx_testing_lib
         src/util/cube_map.cpp
         src/util/fps_capper.cpp
         src/util/mesh.cpp
+        src/util/scoped_timer.cpp
         src/util/stopwatch.cpp
         src/util/util.cpp
 )

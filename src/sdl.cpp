@@ -2,6 +2,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <sdl.hpp>
 #include <stdexcept>
+#include <util/scoped_timer.hpp>
 
 namespace gfx_testing::sdl {
 
@@ -10,12 +11,14 @@ namespace gfx_testing::sdl {
         CHECK(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) << "Failed to initialize SDL: " << SDL_GetError();
         SDL_Log("SDL initialized.");
 
-        mWindow = SDL_CreateWindow("gfx-testing", INITIAL_EXTENT.mWidth, INITIAL_EXTENT.mHeight, SDL_WINDOW_RESIZABLE);
+        mWindow = LOG_DURATION(SDL_CreateWindow, "gfx-testing", INITIAL_EXTENT.mWidth, INITIAL_EXTENT.mHeight,
+                               SDL_WINDOW_RESIZABLE);
         CHECK_NE(mWindow, nullptr) << "SDL_CreateWindow failed: " << SDL_GetError();
         SDL_Log("Window created.");
 
-        mDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
-                                      gfxDebug, nullptr);
+        mDevice = LOG_DURATION(SDL_CreateGPUDevice,
+                               SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
+                               gfxDebug, nullptr);
         CHECK_NE(mDevice, nullptr) << "SDL_CreateGPUDevice failed: " << SDL_GetError();
         SDL_Log("GPU Device created.");
 
