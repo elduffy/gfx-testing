@@ -15,13 +15,11 @@ include(cmake/fetch-inja.cmake)
 include(cmake/fetch-fastgltf.cmake)
 
 find_package(SDL3 REQUIRED)
+find_package(Boost CONFIG REQUIRED algorithm safe_numerics scope)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
 add_subdirectory(deps/abseil-cpp EXCLUDE_FROM_ALL)
 add_subdirectory(app/spirv_header_gen)
-set(BOOST_INCLUDE_LIBRARIES algorithm safe_numerics scope)
-set(BOOST_ENABLE_CMAKE ON)
-add_subdirectory(deps/boost EXCLUDE_FROM_ALL)
 add_subdirectory(deps/glm EXCLUDE_FROM_ALL)
 
 # Shader compilation

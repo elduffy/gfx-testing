@@ -5,13 +5,6 @@
 	branch = lts_2025_08_14
 	ignore = dirty
 
-[submodule "boost"]
-	path = deps/boost
-	url = git@github.com:boostorg/boost.git
-	shallow = true
-	branch = boost-1.88.0
-	ignore = dirty # Significantly speeds up `git status`, etc
-
 [submodule "glm"]
 	path = deps/glm
 	url = git@github.com:g-truc/glm.git

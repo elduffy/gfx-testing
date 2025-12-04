@@ -1,0 +1,18 @@
+{
+  "dependencies": [
+    {
+      "name": "boost-algorithm",
+      "version>=": "1.88.0"
+    },
+    {
+      "name": "boost-scope",
+      "version>=": "1.88.0"
+    },
+    {
+      "name": "boost-safe-numerics",
+      "version>=": "1.88.0"
+    }
+  ],
+  "version": "0.0.1",
+  "name": "gfx-testing"
+}
