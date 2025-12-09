@@ -11,6 +11,10 @@
     {
       "name": "boost-safe-numerics",
       "version>=": "1.88.0"
+    },
+    {
+      "name": "glm",
+      "version>=": "1.0.1"
     }
   ],
   "version": "0.0.1",

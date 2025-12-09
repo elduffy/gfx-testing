@@ -5,9 +5,3 @@
 	branch = lts_2025_08_14
 	ignore = dirty
 
-[submodule "glm"]
-	path = deps/glm
-	url = git@github.com:g-truc/glm.git
-	shallow = true
-	branch = 1.0.1
-	ignore = dirty
