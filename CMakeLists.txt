@@ -17,11 +17,10 @@ include(cmake/fetch-fastgltf.cmake)
 find_package(SDL3 REQUIRED)
 find_package(Boost CONFIG REQUIRED algorithm safe_numerics scope)
 find_package(glm CONFIG REQUIRED)
+find_package(absl CONFIG REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
-add_subdirectory(deps/abseil-cpp EXCLUDE_FROM_ALL)
 add_subdirectory(app/spirv_header_gen)
-#add_subdirectory(deps/glm EXCLUDE_FROM_ALL)
 
 # Shader compilation
 
