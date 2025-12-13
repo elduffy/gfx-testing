@@ -67,10 +67,16 @@ namespace gfx_testing::imgui {
             glm::vec3 cameraPos = camera.getPosition();
             glm::vec3 cameraPivot = camera.getPivot();
             auto *position = getVectorData(cameraPos);
-            auto *pivot = getVectorData(cameraPivot);
 
             ImGui::DragFloat3("Position", position);
+
+            auto *pivot = getVectorData(cameraPivot);
             ImGui::DragFloat3("Pivot", pivot);
+            ImGui::SameLine();
+            if (ImGui::Button("Reset")) {
+                memset(pivot, 0.f, 3 * sizeof(float));
+            }
+
 
             camera.setPosition(cameraPos);
             camera.setPivot(cameraPivot);
