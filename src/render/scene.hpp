@@ -32,7 +32,15 @@ namespace gfx_testing::render {
 
         void update();
 
+        RenderObject const &getPropObjects() { return mPropObjects; }
+
+        DebugNormals const &getDebugNormals() { return mDebugNormals; }
+
+        void toggleDebugNormals(bool enable);
+
     private:
+        std::vector<util::cref_vec<RenderObject>> calculateRenderObjectsByPipeline() const;
+
         game::GameContext &mGameContext;
         SkyBox mSkyBox;
         RenderObject mPropObjects;
@@ -45,7 +53,7 @@ namespace gfx_testing::render {
         std::vector<PointLight> mPointLights;
 
     private:
-        std::vector<util::cref_vec<RenderObject>> mRenderObjectsByPipeline{pipeline::gfx::ALL_PIPELINES.size()};
+        std::vector<util::cref_vec<RenderObject>> mRenderObjectsByPipeline;
     };
 
     class Scene {
@@ -61,6 +69,11 @@ namespace gfx_testing::render {
         [[nodiscard]] util::Extent2D getViewportExtent() const { return mViewportExtent; };
 
         Camera &getCamera() { return mCamera; }
+
+        SceneObjects &getSceneObjects() { return mSceneObjects; }
+
+        game::GameContext &getGameContext() const { return mGameContext; }
+
 
     private:
         void drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const;

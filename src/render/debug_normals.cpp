@@ -71,7 +71,7 @@ namespace gfx_testing::render {
         }
     }
 
-    void DebugNormals::enable(game::GameContext const &gameContext, RenderObject &targetObject,
+    void DebugNormals::enable(game::GameContext const &gameContext, RenderObject const &targetObject,
                               Options const &options) {
         if (mRenderObject.has_value()) {
             return;
@@ -81,5 +81,8 @@ namespace gfx_testing::render {
         mTargetObject = targetObject;
     }
 
-    void DebugNormals::disable() { mRenderObject.reset(); }
+    void DebugNormals::disable() {
+        mRenderObject.reset();
+        mTargetObject.reset();
+    }
 } // namespace gfx_testing::render

@@ -81,6 +81,15 @@ namespace gfx_testing::imgui {
             camera.setPosition(cameraPos);
             camera.setPivot(cameraPivot);
         }
+        if (ImGui::CollapsingHeader("Debug")) {
+            // Debug Normals
+            {
+                auto &sceneObjects = scene.getSceneObjects();
+                bool normalsEnabled = sceneObjects.getDebugNormals().areEnabled();
+                ImGui::Checkbox("Debug Normals", &normalsEnabled);
+                sceneObjects.toggleDebugNormals(normalsEnabled);
+            }
+        }
         ImGui::End();
     }
 

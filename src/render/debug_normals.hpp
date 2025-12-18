@@ -12,8 +12,9 @@ namespace gfx_testing::render {
         };
         static_assert(sizeof(Options) == 16);
 
+        bool areEnabled() const { return mRenderObject.has_value(); }
         void update();
-        void enable(game::GameContext const &gameContext, RenderObject &targetObject, Options const &options);
+        void enable(game::GameContext const &gameContext, RenderObject const &targetObject, Options const &options);
         void disable();
 
         std::optional<RenderObject> mRenderObject;

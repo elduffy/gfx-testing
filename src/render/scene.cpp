@@ -50,11 +50,15 @@ namespace gfx_testing::render {
                        pipeline::gfx::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
+        mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
+    }
+
+    std::vector<util::cref_vec<RenderObject>> SceneObjects::calculateRenderObjectsByPipeline() const {
+        std::vector<util::cref_vec<RenderObject>> result{pipeline::gfx::ALL_PIPELINES.size()};
 
         std::vector<util::cref<RenderObject>> renderObjects{
                 mSkyBox.mRenderObject, mDebugAxes.mRenderObject, mPropObjects, mLandscape, mTextureObject,
         };
-        mDebugNormals.enable(gameContext, mPropObjects, {});
         util::if_present(mDebugNormals.mRenderObject,
                          [&renderObjects](auto const &v) { renderObjects.emplace_back(v); });
         for (auto const &light: mPointLights) {
@@ -62,8 +66,9 @@ namespace gfx_testing::render {
         }
 
         for (auto const &objPtr: renderObjects) {
-            mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(objPtr.get().getPipelineName())).push_back(objPtr);
+            result.at(pipeline::gfx::getIndex(objPtr.get().getPipelineName())).push_back(objPtr);
         }
+        return result;
     }
 
     void SceneObjects::update() {
@@ -77,6 +82,14 @@ namespace gfx_testing::render {
         for (auto &light: mPointLights) {
             light.update();
         }
+    }
+    void SceneObjects::toggleDebugNormals(bool enable) {
+        if (enable) {
+            mDebugNormals.enable(mGameContext, mPropObjects, {});
+        } else {
+            mDebugNormals.disable();
+        }
+        mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
     }
 
     Scene::Scene(game::GameContext &gameContext) :
