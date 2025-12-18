@@ -11,6 +11,7 @@
 #include <render/render_object.hpp>
 #include <render/sky_box.hpp>
 #include <sdl.hpp>
+#include <util/ref.hpp>
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
@@ -25,7 +26,7 @@ namespace gfx_testing::render {
     public:
         explicit SceneObjects(game::GameContext &gameContext);
 
-        std::vector<RenderObject const *> const &getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
+        std::vector<util::cref<RenderObject>> const &getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
             return mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(pipelineName));
         }
 
@@ -44,7 +45,7 @@ namespace gfx_testing::render {
         std::vector<PointLight> mPointLights;
 
     private:
-        std::vector<std::vector<RenderObject const *>> mRenderObjectsByPipeline{pipeline::gfx::ALL_PIPELINES.size()};
+        std::vector<util::cref_vec<RenderObject>> mRenderObjectsByPipeline{pipeline::gfx::ALL_PIPELINES.size()};
     };
 
     class Scene {

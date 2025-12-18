@@ -11,12 +11,13 @@ namespace gfx_testing::render {
         };
         static_assert(sizeof(Options) == 16);
 
-        DebugNormals(game::GameContext const &gameContext, RenderObject &targetObject, Options const &options);
+        DebugNormals(game::GameContext const &gameContext, RenderObject &targetObject, bool enabled,
+                     Options const &options);
 
         void update();
 
         sdl::SdlContext const &mSdlContext;
-        RenderObject mRenderObject;
+        std::optional<RenderObject> mRenderObject;
 
     private:
         RenderObject const &mTargetObject;

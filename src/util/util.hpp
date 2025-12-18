@@ -3,7 +3,6 @@
 #include <SDL3/SDL_gpu.h>
 #include <absl/log/check.h>
 #include <filesystem>
-#include <optional>
 #include <ostream>
 #include <source_location>
 
@@ -33,9 +32,6 @@ namespace {
 
 namespace gfx_testing::util {
     std::filesystem::path getProjectRoot();
-
-    template<typename T>
-    using optref = std::optional<std::reference_wrapper<T>>;
 
     struct Extent2D {
         uint32_t mWidth;
@@ -89,26 +85,4 @@ namespace gfx_testing::util {
         }
         return ss.str();
     }
-
-    // template<typename MsgFn>
-    // std::string failMessageString(MsgFn &&msgFn) {
-    //     std::stringstream ss;
-    //     msgFn(ss);
-    //     return ss.str();
-    // }
-
-    // template<typename... Args>
-    // [[noreturn]] void fail(std::format_string<Args...> message, Args &&...args) {
-    //     CHECK(false) << "util::fail: " << std::format(message, std::forward<Args>(args)...);
-    // }
-    //
-    // template<typename... Args>
-    // [[noreturn]] void fail(std::source_location const &location, std::format_string<Args...> message, Args &&...args)
-    // {
-    //     CHECK(false).AtLocation(location.file_name(), location.line())
-    //             << "util::fail: " << std::format(message, std::forward<Args>(args)...);
-    // }
-
 } // namespace gfx_testing::util
-
-// #define FAIL(...) ::gfx_testing::util::fail(std::source_location::current(), __VA_ARGS__)

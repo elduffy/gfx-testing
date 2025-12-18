@@ -54,12 +54,24 @@ namespace gfx_testing::render {
         return gpuShaderObject;
     }
 
-    DebugNormals::DebugNormals(const game::GameContext &gameContext, RenderObject &targetObject,
+    std::optional<RenderObject> createRenderObject(const game::GameContext &gameContext,
+                                                   RenderObject const &targetObject, bool enabled,
+                                                   DebugNormals::Options const &options) {
+        if (!enabled) {
+            return std::nullopt;
+        }
+        return RenderObject{createGpuShaderObject(gameContext, targetObject, options),
+                            pipeline::gfx::PipelineName::Lines, targetObject.mTransform};
+    }
+
+    DebugNormals::DebugNormals(const game::GameContext &gameContext, RenderObject &targetObject, bool enabled,
                                Options const &options) :
         mSdlContext(gameContext.mSdlContext),
-        mRenderObject(createGpuShaderObject(gameContext, targetObject, options), pipeline::gfx::PipelineName::Lines,
-                      targetObject.mTransform),
-        mTargetObject(targetObject) {}
+        mRenderObject(createRenderObject(gameContext, targetObject, enabled, options)), mTargetObject(targetObject) {}
 
-    void DebugNormals::update() { mRenderObject.mTransform = mTargetObject.mTransform; }
+    void DebugNormals::update() {
+        if (mRenderObject.has_value()) {
+            mRenderObject->mTransform = mTargetObject.mTransform;
+        }
+    }
 } // namespace gfx_testing::render

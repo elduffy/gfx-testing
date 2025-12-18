@@ -9,6 +9,7 @@
 #include <render/scene.hpp>
 #include <sdl_factories.hpp>
 #include <tiny_obj_loader.h>
+#include <util/optional.hpp>
 #include <util/util.hpp>
 
 
@@ -48,21 +49,20 @@ namespace gfx_testing::render {
         mTextureObject(gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
                        pipeline::gfx::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext), mDebugNormals(gameContext, mPropObjects, {}),
+        mDebugAxes(gameContext), mDebugNormals(gameContext, mPropObjects, true, {}),
         mPointLights(initPointLights(gameContext)) {
-        for (auto const *objPtr: {
-                     &mSkyBox.mRenderObject,
-                     &mDebugAxes.mRenderObject,
-                     &mPropObjects,
-                     &mLandscape,
-                     &mTextureObject,
-                     &mDebugNormals.mRenderObject,
-             }) {
-            mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(objPtr->getPipelineName())).push_back(objPtr);
-        }
+
+        std::vector<util::cref<RenderObject>> renderObjects{
+                mSkyBox.mRenderObject, mDebugAxes.mRenderObject, mPropObjects, mLandscape, mTextureObject,
+        };
+        util::if_present(mDebugNormals.mRenderObject,
+                         [&renderObjects](auto const &v) { renderObjects.emplace_back(v); });
         for (auto const &light: mPointLights) {
-            mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(light.mRenderObject.getPipelineName()))
-                    .push_back(&light.mRenderObject);
+            renderObjects.emplace_back(light.mRenderObject);
+        }
+
+        for (auto const &objPtr: renderObjects) {
+            mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(objPtr.get().getPipelineName())).push_back(objPtr);
         }
     }
 
@@ -144,10 +144,10 @@ namespace gfx_testing::render {
             pipeline.bindStorageBuffers(renderPass);
 
             auto const view = mCamera.computeViewMatrix();
-            for (auto const *renderObject: renderObjects) {
-                renderObject->pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, view, lightPosWs,
-                                                    mCamera.getPosition());
-                renderObject->render(renderPass);
+            for (auto renderObject: renderObjects) {
+                renderObject.get().pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, view, lightPosWs,
+                                                         mCamera.getPosition());
+                renderObject.get().render(renderPass);
             }
         }
     }

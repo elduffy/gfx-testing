@@ -7,6 +7,7 @@
 #include <shader/object.hpp>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <fastgltf/glm_element_traits.hpp>
+#include <util/optional.hpp>
 
 namespace gfx_testing::io {
     // Arbitrary limit, could probably be increased
@@ -16,7 +17,7 @@ namespace gfx_testing::io {
         size_t mTexcoordIndex;
     };
 
-    util::optref<const fastgltf::Accessor>
+    util::ref_opt<const fastgltf::Accessor>
     getAccessor(fastgltf::Asset const &asset, fastgltf::Primitive const &primitive, std::string_view attributeName) {
         const auto *iter = primitive.findAttribute(attributeName);
         if (iter == primitive.attributes.end()) {
@@ -123,7 +124,7 @@ namespace gfx_testing::io {
 
         const auto &normalAccessor = getAccessorOrThrow(asset, primitive, "NORMAL");
 
-        util::optref<const fastgltf::Accessor> texCoordAccessor{};
+        util::ref_opt<const fastgltf::Accessor> texCoordAccessor{};
         if (materialAttributes.has_value()) {
             // Textures referenced in the gltf will use this
             texCoordAccessor.emplace(getAccessorOrThrow(
