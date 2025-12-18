@@ -49,12 +49,12 @@ namespace gfx_testing::render {
         mTextureObject(gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
                        pipeline::gfx::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
-        mDebugAxes(gameContext), mDebugNormals(gameContext, mPropObjects, true, {}),
-        mPointLights(initPointLights(gameContext)) {
+        mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
 
         std::vector<util::cref<RenderObject>> renderObjects{
                 mSkyBox.mRenderObject, mDebugAxes.mRenderObject, mPropObjects, mLandscape, mTextureObject,
         };
+        mDebugNormals.enable(gameContext, mPropObjects, {});
         util::if_present(mDebugNormals.mRenderObject,
                          [&renderObjects](auto const &v) { renderObjects.emplace_back(v); });
         for (auto const &light: mPointLights) {

@@ -1,6 +1,7 @@
 #pragma once
 #include <game.hpp>
 #include <render/render_object.hpp>
+#include <util/ref.hpp>
 
 namespace gfx_testing::render {
     class DebugNormals {
@@ -11,15 +12,13 @@ namespace gfx_testing::render {
         };
         static_assert(sizeof(Options) == 16);
 
-        DebugNormals(game::GameContext const &gameContext, RenderObject &targetObject, bool enabled,
-                     Options const &options);
-
         void update();
+        void enable(game::GameContext const &gameContext, RenderObject &targetObject, Options const &options);
+        void disable();
 
-        sdl::SdlContext const &mSdlContext;
         std::optional<RenderObject> mRenderObject;
 
     private:
-        RenderObject const &mTargetObject;
+        util::cref_opt<RenderObject> mTargetObject;
     };
 } // namespace gfx_testing::render

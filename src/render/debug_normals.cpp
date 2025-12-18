@@ -64,14 +64,22 @@ namespace gfx_testing::render {
                             pipeline::gfx::PipelineName::Lines, targetObject.mTransform};
     }
 
-    DebugNormals::DebugNormals(const game::GameContext &gameContext, RenderObject &targetObject, bool enabled,
-                               Options const &options) :
-        mSdlContext(gameContext.mSdlContext),
-        mRenderObject(createRenderObject(gameContext, targetObject, enabled, options)), mTargetObject(targetObject) {}
-
     void DebugNormals::update() {
         if (mRenderObject.has_value()) {
-            mRenderObject->mTransform = mTargetObject.mTransform;
+            CHECK(mTargetObject.has_value()) << "DebugNormals has a render object but no target object.";
+            mRenderObject->mTransform = mTargetObject.value().get().mTransform;
         }
     }
+
+    void DebugNormals::enable(game::GameContext const &gameContext, RenderObject &targetObject,
+                              Options const &options) {
+        if (mRenderObject.has_value()) {
+            return;
+        }
+        mRenderObject.emplace(createGpuShaderObject(gameContext, targetObject, options),
+                              pipeline::gfx::PipelineName::Lines, targetObject.mTransform);
+        mTargetObject = targetObject;
+    }
+
+    void DebugNormals::disable() { mRenderObject.reset(); }
 } // namespace gfx_testing::render
