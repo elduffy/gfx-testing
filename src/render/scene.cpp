@@ -5,6 +5,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
+#include <render/point_light.hpp>
 #include <render/samplers.hpp>
 #include <render/scene.hpp>
 #include <sdl_factories.hpp>
@@ -70,11 +71,16 @@ namespace gfx_testing::render {
         SDL_EndGPURenderPass(renderPass);
     }
 
+    std::vector<glm::vec3> getLightPositions(ecs::Ecs const &ecs) {
+        auto const view = ecs.mRegistry.view<PointLight>();
+        std::vector<glm::vec3> positions;
+        std::ranges::transform(view, std::back_inserter(positions),
+                               [&](auto &entity) { return view.get<PointLight>(entity).mPosWs; });
+        return positions;
+    }
+
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
-        std::vector<glm::vec3> lightPosWs{mSceneObjects.mPointLights.size()};
-        for (size_t i = 0; i < mSceneObjects.mPointLights.size(); i++) {
-            lightPosWs[i] = mSceneObjects.mPointLights.at(i).mPosWs;
-        }
+        const std::vector<glm::vec3> lightPosWs = getLightPositions(mEcs);
         for (auto const &pipelineDef: pipeline::gfx::ALL_PIPELINES) {
             // auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
             auto const renderObjects = mEcs.getRenderObjects(pipelineDef.mName);

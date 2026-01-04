@@ -30,7 +30,6 @@ namespace gfx_testing::render {
 
         ecs::Ecs &getEcs() { return mEcs; }
 
-
     private:
         void drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const;
 

@@ -25,6 +25,9 @@ namespace gfx_testing::ecs {
 
         void addRenderObject(render::RenderObject const &renderObject);
 
+        template<typename T, typename Fn>
+        void forEach(Fn const &fn) const;
+
         entt::registry mRegistry;
     };
 

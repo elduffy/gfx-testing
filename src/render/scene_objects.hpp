@@ -3,7 +3,6 @@
 #include <ecs/ecs.hpp>
 #include <game.hpp>
 #include <render/debug_normals.hpp>
-#include <render/point_light.hpp>
 #include <render/render_object.hpp>
 
 namespace gfx_testing::render {
@@ -19,7 +18,7 @@ namespace gfx_testing::render {
     public:
         explicit SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs);
 
-        void update();
+        void update() const;
 
         bool hasDebugNormals() const { return mDebugNormals.has_value(); }
 
@@ -27,10 +26,8 @@ namespace gfx_testing::render {
 
     private:
         game::GameContext &mGameContext;
+        ecs::Ecs &mEcs;
         ecs::EntityRef<RenderObject> mPropObjects;
         util::ref_opt<DebugNormals> mDebugNormals;
-
-    public:
-        std::vector<PointLight> mPointLights;
     };
 } // namespace gfx_testing::render

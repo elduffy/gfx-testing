@@ -1,5 +1,6 @@
 #include <ecs/ecs.hpp>
 #include <render/debug_axes.hpp>
+#include <render/point_light.hpp>
 #include <render/scene_objects.hpp>
 #include <render/sky_box.hpp>
 #include <util/optional.hpp>
@@ -10,25 +11,18 @@ namespace gfx_testing::render {
             .mTexCoord = util::TexCoordTreatment::DISCARD,
     };
 
-    std::vector<PointLight> initPointLights(game::GameContext &gameContext, ecs::Ecs &ecs) {
-        constexpr auto NUM_POINT_LIGHTS = 3;
-        auto const shaderObject = PointLight::loadShaderObject(gameContext.mResourceLoader);
-        std::vector<PointLight> pointLights;
-        pointLights.reserve(NUM_POINT_LIGHTS);
-        for (auto i = 0; i < NUM_POINT_LIGHTS; ++i) {
-            auto const phase = (2 * glm::pi<float>() * static_cast<float>(i)) / NUM_POINT_LIGHTS;
-            pointLights.emplace_back(
-                    PointLight::create(ecs, gameContext, shaderObject, glm::length(INITIAL_LIGHT_POSITION), phase));
-        }
-        return pointLights;
-    }
-
     SceneObjects::SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs) :
-        mGameContext(gameContext),
+        mGameContext(gameContext), mEcs(ecs),
         mPropObjects(ecs.createAndEmplace<RenderObject>(
                 gameContext, gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
-                pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))),
-        mPointLights(initPointLights(gameContext, ecs)) {
+                pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))) {
+        // Point lights
+        constexpr auto NUM_POINT_LIGHTS = 3;
+        auto const shaderObject = PointLight::loadShaderObject(gameContext.mResourceLoader);
+        for (auto i = 0; i < NUM_POINT_LIGHTS; ++i) {
+            auto const phase = (2 * glm::pi<float>() * static_cast<float>(i)) / NUM_POINT_LIGHTS;
+            PointLight::create(ecs, gameContext, shaderObject, glm::length(INITIAL_LIGHT_POSITION), phase);
+        }
         // Skybox
         SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night"));
         // Debug axes
@@ -43,13 +37,9 @@ namespace gfx_testing::render {
                 gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
                 pipeline::gfx::PipelineName::Textured,
                 glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE));
-
-        for (auto const &pl: mPointLights) {
-            ecs.addRenderObject(pl.mRenderObject);
-        }
     }
 
-    void SceneObjects::update() {
+    void SceneObjects::update() const {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
         auto &propObjects = mPropObjects.mRef;
@@ -58,9 +48,9 @@ namespace gfx_testing::render {
                        glm::vec3(0, 0, 1));
         // Needs to come after the prop objects update
         util::if_present(mDebugNormals, [](const DebugNormals &n) { n.update(); });
-        for (auto &light: mPointLights) {
-            light.update();
-        }
+
+        auto const view = mEcs.mRegistry.view<PointLight>();
+        view.each([&](PointLight &light) { light.update(); });
     }
 
     void SceneObjects::toggleDebugNormals(bool enable) {
