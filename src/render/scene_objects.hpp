@@ -22,10 +22,6 @@ namespace gfx_testing::render {
     public:
         explicit SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs);
 
-        std::vector<util::cref<RenderObject>> const &getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
-            return mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(pipelineName));
-        }
-
         void update();
 
         RenderObject const &getPropObjects() { return mPropObjects; }
@@ -47,8 +43,5 @@ namespace gfx_testing::render {
 
     public:
         std::vector<PointLight> mPointLights;
-
-    private:
-        std::vector<util::cref_vec<RenderObject>> mRenderObjectsByPipeline;
     };
 } // namespace gfx_testing::render

@@ -32,7 +32,6 @@ namespace gfx_testing::render {
                        pipeline::gfx::PipelineName::Textured,
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
-        mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
 
         ecs.addRenderObject(mSkyBox.mRenderObject);
         ecs.addRenderObject(mPropObjects);
@@ -81,6 +80,6 @@ namespace gfx_testing::render {
         } else {
             mDebugNormals.disable();
         }
-        mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
+        // mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
     }
 } // namespace gfx_testing::render
