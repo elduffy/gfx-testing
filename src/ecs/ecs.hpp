@@ -25,9 +25,6 @@ namespace gfx_testing::ecs {
 
         void addRenderObject(render::RenderObject const &renderObject);
 
-        // template<typename T>
-        // EntityRef<T> findSingleton() const;
-
         entt::registry mRegistry;
     };
 

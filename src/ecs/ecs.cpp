@@ -4,12 +4,18 @@
 
 namespace gfx_testing::ecs {
     EntityId Ecs::create() {
-        return {
+        const EntityId id{
                 .mEcs = *this,
                 .mEntity = mRegistry.create(),
         };
+        SDL_Log("Created entity %u", id.getId());
+        return id;
     }
-    void Ecs::destroy(EntityId id) { mRegistry.destroy(id.mEntity); }
+
+    void Ecs::destroy(EntityId id) {
+        SDL_Log("Destroying entity %u", id.getId());
+        mRegistry.destroy(id.mEntity);
+    }
 
     util::ref_opt<EntityId> EntityId::getParent() const {
         auto *parent = mEcs.mRegistry.try_get<ParentEntity>(mEntity);

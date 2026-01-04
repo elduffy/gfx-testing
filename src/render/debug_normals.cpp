@@ -82,24 +82,5 @@ namespace gfx_testing::render {
         const auto &targetObj = targetId->get().get<RenderObject>();
 
         mEntityId.get<RenderObject>().mTransform = targetObj.mTransform;
-        // if (mTargetObject.has_value()) {
-        //     mTargetObject->mRef.mTransform;
-        //     mRenderObject->mTransform = mTargetObject.value().get().mTransform;
-        // }
     }
-
-    // void DebugNormals::enable(game::GameContext const &gameContext, RenderObject const &targetObject,
-    //                           Options const &options) {
-    //     if (mRenderObject.has_value()) {
-    //         return;
-    //     }
-    //     mRenderObject.emplace(createGpuShaderObject(gameContext, targetObject, options),
-    //                           pipeline::gfx::PipelineName::Lines, targetObject.mTransform);
-    //     mTargetObject = targetObject;
-    // }
-    //
-    // void DebugNormals::disable() {
-    //     mRenderObject.reset();
-    //     mTargetObject.reset();
-    // }
 } // namespace gfx_testing::render

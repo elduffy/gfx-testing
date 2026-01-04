@@ -21,8 +21,5 @@ namespace gfx_testing::render {
         void update() const;
 
         ecs::EntityId mEntityId;
-
-    private:
-        // std::optional<ecs::EntityRef<RenderObject>> mTargetObject;
     };
 } // namespace gfx_testing::render
