@@ -1,6 +1,7 @@
 #include <ecs/ecs.hpp>
+#include <render/debug_axes.hpp>
 #include <render/scene_objects.hpp>
-#include <util/optional.hpp>
+#include <render/sky_box.hpp>
 
 namespace gfx_testing::render {
     static constexpr util::AttribTreatment UNTEXTURED_ATTRIB_TREATMENT{
@@ -23,12 +24,14 @@ namespace gfx_testing::render {
 
     SceneObjects::SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs) :
         mGameContext(gameContext),
-        mSkyBox(SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night"))),
         mPropObjects(ecs.createAndEmplace<RenderObject>(
                 gameContext, gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
                 pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))),
-        mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
-
+        mPointLights(initPointLights(gameContext)) {
+        // Skybox
+        SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night"));
+        // Debug axes
+        DebugAxes::create(ecs, gameContext);
         // Landscape
         ecs.createAndEmplace<RenderObject>(
                 gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
@@ -40,30 +43,10 @@ namespace gfx_testing::render {
                 pipeline::gfx::PipelineName::Textured,
                 glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE));
 
-        ecs.addRenderObject(mDebugAxes.mRenderObject);
         // TODO: debug normals no longer working
         for (auto const &pl: mPointLights) {
             ecs.addRenderObject(pl.mRenderObject);
         }
-    }
-
-    std::vector<util::cref_vec<RenderObject>> SceneObjects::calculateRenderObjectsByPipeline() const {
-        std::vector<util::cref_vec<RenderObject>> result{pipeline::gfx::ALL_PIPELINES.size()};
-
-        std::vector<util::cref<RenderObject>> renderObjects{
-                mSkyBox.mRenderObject,
-                mDebugAxes.mRenderObject,
-        };
-        util::if_present(mDebugNormals.mRenderObject,
-                         [&renderObjects](auto const &v) { renderObjects.emplace_back(v); });
-        for (auto const &light: mPointLights) {
-            renderObjects.emplace_back(light.mRenderObject);
-        }
-
-        for (auto const &objPtr: renderObjects) {
-            result.at(pipeline::gfx::getIndex(objPtr.get().getPipelineName())).push_back(objPtr);
-        }
-        return result;
     }
 
     void SceneObjects::update() {
@@ -86,6 +69,5 @@ namespace gfx_testing::render {
         } else {
             mDebugNormals.disable();
         }
-        // mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
     }
 } // namespace gfx_testing::render

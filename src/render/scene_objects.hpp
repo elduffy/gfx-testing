@@ -2,12 +2,9 @@
 
 #include <ecs/ecs.hpp>
 #include <game.hpp>
-#include <render/debug_axes.hpp>
 #include <render/debug_normals.hpp>
 #include <render/point_light.hpp>
 #include <render/render_object.hpp>
-#include <render/sky_box.hpp>
-#include <util/ref.hpp>
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
@@ -31,12 +28,8 @@ namespace gfx_testing::render {
         void toggleDebugNormals(bool enable);
 
     private:
-        std::vector<util::cref_vec<RenderObject>> calculateRenderObjectsByPipeline() const;
-
         game::GameContext &mGameContext;
-        SkyBox &mSkyBox;
         ecs::EntityRef<RenderObject> mPropObjects;
-        DebugAxes mDebugAxes;
         DebugNormals mDebugNormals;
 
     public:

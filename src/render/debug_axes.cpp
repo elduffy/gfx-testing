@@ -72,6 +72,13 @@ namespace gfx_testing::render {
         return {builder.build(), {}};
     }
 
-    DebugAxes::DebugAxes(game::GameContext &gameContext) :
-        mRenderObject(gameContext, buildMesh(), pipeline::gfx::PipelineName::Lines, glm::identity<glm::mat4>()) {}
+    DebugAxes &DebugAxes::create(ecs::Ecs &ecs, game::GameContext &gameContext) {
+        auto entityId = ecs.create();
+        auto &debugAxes = entityId.emplace<DebugAxes>(entityId, gameContext);
+        return debugAxes;
+    }
+
+    DebugAxes::DebugAxes(ecs::EntityId entityId, game::GameContext &gameContext) :
+        mRenderObject(entityId.emplace<RenderObject>(gameContext, buildMesh(), pipeline::gfx::PipelineName::Lines,
+                                                     glm::identity<glm::mat4>())) {}
 } // namespace gfx_testing::render
