@@ -18,6 +18,7 @@ find_package(SDL3 REQUIRED SDL3)
 find_package(Boost CONFIG REQUIRED algorithm safe_numerics scope)
 find_package(glm CONFIG REQUIRED glm)
 find_package(absl CONFIG REQUIRED base absl_check log)
+find_package(EnTT CONFIG REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
 add_subdirectory(app/spirv_header_gen)
@@ -82,6 +83,7 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 add_library(gfx_testing_lib
         src/game.cpp
         src/imgui_context.cpp
+        src/ecs/ecs.cpp
         src/io/input_manager.cpp
         src/io/gltf_loader.cpp
         src/io/obj_loader.cpp
@@ -122,6 +124,7 @@ target_link_libraries(gfx_testing_lib PUBLIC
         Boost::scope
         glm::glm
         fastgltf::fastgltf
+        EnTT::EnTT
 )
 add_dependencies(gfx_testing_lib build_shaders)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)

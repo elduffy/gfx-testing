@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ecs/ecs.hpp>
 #include <game.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
@@ -35,6 +36,7 @@ namespace gfx_testing::render {
         util::Extent2D mViewportExtent;
         Camera mCamera;
         glm::mat4x4 mProjection;
+        ecs::Ecs mEcs;
         SceneObjects mSceneObjects;
         sdl::SdlGpuTexture mDepthTexture;
         std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;

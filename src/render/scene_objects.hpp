@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ecs/ecs.hpp>
 #include <game.hpp>
 #include <render/debug_axes.hpp>
 #include <render/debug_normals.hpp>
@@ -19,7 +20,7 @@ namespace gfx_testing::render {
     class SceneObjects {
 
     public:
-        explicit SceneObjects(game::GameContext &gameContext);
+        explicit SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs);
 
         std::vector<util::cref<RenderObject>> const &getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
             return mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(pipelineName));

@@ -20,7 +20,7 @@ namespace gfx_testing::render {
         return pointLights;
     }
 
-    SceneObjects::SceneObjects(game::GameContext &gameContext) :
+    SceneObjects::SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs) :
         mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night")),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
@@ -33,6 +33,16 @@ namespace gfx_testing::render {
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
         mRenderObjectsByPipeline = calculateRenderObjectsByPipeline();
+
+        ecs.addRenderObject(mSkyBox.mRenderObject);
+        ecs.addRenderObject(mPropObjects);
+        ecs.addRenderObject(mLandscape);
+        ecs.addRenderObject(mTextureObject);
+        ecs.addRenderObject(mDebugAxes.mRenderObject);
+        // TODO: debug normals no longer working
+        for (auto const &pl: mPointLights) {
+            ecs.addRenderObject(pl.mRenderObject);
+        }
     }
 
     std::vector<util::cref_vec<RenderObject>> SceneObjects::calculateRenderObjectsByPipeline() const {

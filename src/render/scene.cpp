@@ -24,7 +24,7 @@ namespace gfx_testing::render {
 
     Scene::Scene(game::GameContext &gameContext) :
         mGameContext(gameContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT), mCamera(INITIAL_CAMERA_POSITION),
-        mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
+        mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext, mEcs),
         mDepthTexture(createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
         mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
 
@@ -76,7 +76,8 @@ namespace gfx_testing::render {
             lightPosWs[i] = mSceneObjects.mPointLights.at(i).mPosWs;
         }
         for (auto const &pipelineDef: pipeline::gfx::ALL_PIPELINES) {
-            auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
+            // auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
+            auto const renderObjects = mEcs.getRenderObjects(pipelineDef.mName);
 
             if (renderObjects.empty()) {
                 continue;
