@@ -2,6 +2,7 @@
 #include <render/debug_axes.hpp>
 #include <render/scene_objects.hpp>
 #include <render/sky_box.hpp>
+#include <util/optional.hpp>
 
 namespace gfx_testing::render {
     static constexpr util::AttribTreatment UNTEXTURED_ATTRIB_TREATMENT{
@@ -43,7 +44,6 @@ namespace gfx_testing::render {
                 pipeline::gfx::PipelineName::Textured,
                 glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE));
 
-        // TODO: debug normals no longer working
         for (auto const &pl: mPointLights) {
             ecs.addRenderObject(pl.mRenderObject);
         }
@@ -57,7 +57,7 @@ namespace gfx_testing::render {
                 rotate(propObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                        glm::vec3(0, 0, 1));
         // Needs to come after the prop objects update
-        mDebugNormals.update();
+        util::if_present(mDebugNormals, [](const DebugNormals &n) { n.update(); });
         for (auto &light: mPointLights) {
             light.update();
         }
@@ -65,9 +65,17 @@ namespace gfx_testing::render {
 
     void SceneObjects::toggleDebugNormals(bool enable) {
         if (enable) {
-            mDebugNormals.enable(mGameContext, mPropObjects.mRef, {});
+            if (mDebugNormals.has_value()) {
+                return;
+            }
+            mDebugNormals = DebugNormals::create(mPropObjects.mId, mGameContext, {});
         } else {
-            mDebugNormals.disable();
+            if (!mDebugNormals.has_value()) {
+                return;
+            }
+
+            mDebugNormals->get().mEntityId.destroy();
+            mDebugNormals.reset();
         }
     }
 } // namespace gfx_testing::render

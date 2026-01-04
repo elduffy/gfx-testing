@@ -28,6 +28,8 @@ namespace gfx_testing::render {
 
         game::GameContext &getGameContext() const { return mGameContext; }
 
+        ecs::Ecs &getEcs() { return mEcs; }
+
 
     private:
         void drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const;

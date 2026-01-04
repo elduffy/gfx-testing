@@ -21,16 +21,14 @@ namespace gfx_testing::render {
 
         void update();
 
-        RenderObject const &getPropObjects() const { return mPropObjects.mRef; }
-
-        DebugNormals const &getDebugNormals() { return mDebugNormals; }
+        bool hasDebugNormals() const { return mDebugNormals.has_value(); }
 
         void toggleDebugNormals(bool enable);
 
     private:
         game::GameContext &mGameContext;
         ecs::EntityRef<RenderObject> mPropObjects;
-        DebugNormals mDebugNormals;
+        util::ref_opt<DebugNormals> mDebugNormals;
 
     public:
         std::vector<PointLight> mPointLights;

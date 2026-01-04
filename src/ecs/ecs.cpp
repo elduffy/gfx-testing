@@ -9,6 +9,17 @@ namespace gfx_testing::ecs {
                 .mEntity = mRegistry.create(),
         };
     }
+    void Ecs::destroy(EntityId id) { mRegistry.destroy(id.mEntity); }
+
+    util::ref_opt<EntityId> EntityId::getParent() const {
+        auto *parent = mEcs.mRegistry.try_get<ParentEntity>(mEntity);
+        if (parent == nullptr) {
+            return {};
+        }
+        return {parent->mParent};
+    }
+
+    void EntityId::setParent(EntityId parent) const { mEcs.mRegistry.emplace<ParentEntity>(mEntity, parent); }
 
     std::vector<util::cref<render::RenderObject>>
     Ecs::getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {

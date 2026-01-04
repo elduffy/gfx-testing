@@ -10,9 +10,13 @@ namespace gfx_testing::ecs {
     template<typename T>
     struct EntityRef;
 
+    struct ParentEntity;
+
     class Ecs {
     public:
         EntityId create();
+
+        void destroy(EntityId id);
 
         template<typename T, typename... Args>
         EntityRef<T> createAndEmplace(Args &&...args);
@@ -21,6 +25,9 @@ namespace gfx_testing::ecs {
 
         void addRenderObject(render::RenderObject const &renderObject);
 
+        // template<typename T>
+        // EntityRef<T> findSingleton() const;
+
         entt::registry mRegistry;
     };
 
@@ -28,10 +35,19 @@ namespace gfx_testing::ecs {
         Ecs &mEcs;
         entt::entity mEntity;
 
+        void destroy() const { mEcs.destroy(*this); }
+
         uint32_t getId() const {
             static_assert(std::is_same_v<ENTT_ID_TYPE, uint32_t>);
             return static_cast<uint32_t>(mEntity);
         };
+
+        template<typename T>
+        EntityRef<T> asEntityRef() const;
+
+        util::ref_opt<EntityId> getParent() const;
+
+        void setParent(EntityId parent) const;
 
         template<typename T, typename... Args>
         T &emplace(Args &&...args) {
@@ -51,6 +67,11 @@ namespace gfx_testing::ecs {
     };
     static_assert(sizeof(EntityId) <= 32);
 
+    struct ParentEntity {
+        EntityId mParent;
+    };
+
+
     template<typename T>
     struct EntityRef {
         EntityId mId;
@@ -62,5 +83,10 @@ namespace gfx_testing::ecs {
         auto entityId = create();
         auto &obj = entityId.emplace<T>(std::forward<Args>(args)...);
         return {entityId, obj};
+    }
+
+    template<typename T>
+    EntityRef<T> EntityId::asEntityRef() const {
+        return {*this, get<T>()};
     }
 } // namespace gfx_testing::ecs

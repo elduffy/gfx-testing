@@ -25,7 +25,6 @@ namespace gfx_testing::util {
         }
     }
 
-
     template<typename T>
     T const *nullable_pointer(std::optional<T> const &opt) {
         if (opt.has_value()) {
