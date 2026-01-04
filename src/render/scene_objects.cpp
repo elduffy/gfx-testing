@@ -10,15 +10,15 @@ namespace gfx_testing::render {
             .mTexCoord = util::TexCoordTreatment::DISCARD,
     };
 
-
-    std::vector<PointLight> initPointLights(game::GameContext &gameContext) {
+    std::vector<PointLight> initPointLights(game::GameContext &gameContext, ecs::Ecs &ecs) {
         constexpr auto NUM_POINT_LIGHTS = 3;
         auto const shaderObject = PointLight::loadShaderObject(gameContext.mResourceLoader);
         std::vector<PointLight> pointLights;
         pointLights.reserve(NUM_POINT_LIGHTS);
         for (auto i = 0; i < NUM_POINT_LIGHTS; ++i) {
             auto const phase = (2 * glm::pi<float>() * static_cast<float>(i)) / NUM_POINT_LIGHTS;
-            pointLights.emplace_back(gameContext, shaderObject, glm::length(INITIAL_LIGHT_POSITION), phase);
+            pointLights.emplace_back(
+                    PointLight::create(ecs, gameContext, shaderObject, glm::length(INITIAL_LIGHT_POSITION), phase));
         }
         return pointLights;
     }
@@ -28,7 +28,7 @@ namespace gfx_testing::render {
         mPropObjects(ecs.createAndEmplace<RenderObject>(
                 gameContext, gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
                 pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))),
-        mPointLights(initPointLights(gameContext)) {
+        mPointLights(initPointLights(gameContext, ecs)) {
         // Skybox
         SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night"));
         // Debug axes
