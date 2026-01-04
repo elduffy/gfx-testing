@@ -34,7 +34,7 @@ namespace gfx_testing::render {
         std::vector<util::cref_vec<RenderObject>> calculateRenderObjectsByPipeline() const;
 
         game::GameContext &mGameContext;
-        SkyBox mSkyBox;
+        SkyBox &mSkyBox;
         RenderObject mPropObjects;
         RenderObject mLandscape;
         RenderObject mTextureObject;

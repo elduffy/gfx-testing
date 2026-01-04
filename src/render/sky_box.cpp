@@ -51,8 +51,18 @@ namespace gfx_testing::render {
         return {createMeshData(), std::move(images)};
     }
 
+    RenderObject &createRenderObject(ecs::EntityId entityId, game::GameContext &gameContext, util::CubeMap cubeMap) {
+        return entityId.emplace<RenderObject>(gameContext, createShaderObject(std::move(cubeMap)),
+                                              pipeline::gfx::PipelineName::Skybox, glm::identity<glm::mat4>());
+    }
 
-    SkyBox::SkyBox(game::GameContext &gameContext, util::CubeMap cubeMap) :
-        mRenderObject(gameContext, createShaderObject(std::move(cubeMap)), pipeline::gfx::PipelineName::Skybox,
-                      glm::identity<glm::mat4>()) {}
+
+    SkyBox &SkyBox::create(ecs::Ecs &ecs, game::GameContext &gameContext, util::CubeMap cubeMap) {
+        auto entityId = ecs.create();
+        return entityId.emplace<SkyBox>(entityId, gameContext, std::move(cubeMap));
+    }
+
+
+    SkyBox::SkyBox(ecs::EntityId entityId, game::GameContext &gameContext, util::CubeMap cubeMap) :
+        mEntityId(entityId), mRenderObject(createRenderObject(entityId, gameContext, std::move(cubeMap))) {}
 } // namespace gfx_testing::render

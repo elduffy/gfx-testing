@@ -21,7 +21,8 @@ namespace gfx_testing::render {
     }
 
     SceneObjects::SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs) :
-        mGameContext(gameContext), mSkyBox(gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night")),
+        mGameContext(gameContext),
+        mSkyBox(SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night"))),
         mPropObjects(gameContext,
                      gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
                      pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
@@ -33,7 +34,6 @@ namespace gfx_testing::render {
                        glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
 
-        ecs.addRenderObject(mSkyBox.mRenderObject);
         ecs.addRenderObject(mPropObjects);
         ecs.addRenderObject(mLandscape);
         ecs.addRenderObject(mTextureObject);
