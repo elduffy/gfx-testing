@@ -1,3 +1,4 @@
+#include <ecs/ecs.hpp>
 #include <render/scene_objects.hpp>
 #include <util/optional.hpp>
 
@@ -23,20 +24,22 @@ namespace gfx_testing::render {
     SceneObjects::SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs) :
         mGameContext(gameContext),
         mSkyBox(SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap("desert-night"))),
-        mPropObjects(gameContext,
-                     gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
-                     pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION)),
-        mLandscape(gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
-                   pipeline::gfx::PipelineName::Lambert,
-                   glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE)),
-        mTextureObject(gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
-                       pipeline::gfx::PipelineName::Textured,
-                       glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE)),
+        mPropObjects(ecs.createAndEmplace<RenderObject>(
+                gameContext, gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
+                pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))),
         mDebugAxes(gameContext), mPointLights(initPointLights(gameContext)) {
 
-        ecs.addRenderObject(mPropObjects);
-        ecs.addRenderObject(mLandscape);
-        ecs.addRenderObject(mTextureObject);
+        // Landscape
+        ecs.createAndEmplace<RenderObject>(
+                gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
+                pipeline::gfx::PipelineName::Lambert,
+                glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE));
+        // Textured object
+        ecs.createAndEmplace<RenderObject>(
+                gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
+                pipeline::gfx::PipelineName::Textured,
+                glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE));
+
         ecs.addRenderObject(mDebugAxes.mRenderObject);
         // TODO: debug normals no longer working
         for (auto const &pl: mPointLights) {
@@ -48,7 +51,8 @@ namespace gfx_testing::render {
         std::vector<util::cref_vec<RenderObject>> result{pipeline::gfx::ALL_PIPELINES.size()};
 
         std::vector<util::cref<RenderObject>> renderObjects{
-                mSkyBox.mRenderObject, mDebugAxes.mRenderObject, mPropObjects, mLandscape, mTextureObject,
+                mSkyBox.mRenderObject,
+                mDebugAxes.mRenderObject,
         };
         util::if_present(mDebugNormals.mRenderObject,
                          [&renderObjects](auto const &v) { renderObjects.emplace_back(v); });
@@ -65,8 +69,9 @@ namespace gfx_testing::render {
     void SceneObjects::update() {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
-        mPropObjects.mTransform =
-                rotate(mPropObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
+        auto &propObjects = mPropObjects.mRef;
+        propObjects.mTransform =
+                rotate(propObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                        glm::vec3(0, 0, 1));
         // Needs to come after the prop objects update
         mDebugNormals.update();
@@ -74,9 +79,10 @@ namespace gfx_testing::render {
             light.update();
         }
     }
+
     void SceneObjects::toggleDebugNormals(bool enable) {
         if (enable) {
-            mDebugNormals.enable(mGameContext, mPropObjects, {});
+            mDebugNormals.enable(mGameContext, mPropObjects.mRef, {});
         } else {
             mDebugNormals.disable();
         }

@@ -24,7 +24,7 @@ namespace gfx_testing::render {
 
         void update();
 
-        RenderObject const &getPropObjects() { return mPropObjects; }
+        RenderObject const &getPropObjects() const { return mPropObjects.mRef; }
 
         DebugNormals const &getDebugNormals() { return mDebugNormals; }
 
@@ -35,9 +35,7 @@ namespace gfx_testing::render {
 
         game::GameContext &mGameContext;
         SkyBox &mSkyBox;
-        RenderObject mPropObjects;
-        RenderObject mLandscape;
-        RenderObject mTextureObject;
+        ecs::EntityRef<RenderObject> mPropObjects;
         DebugAxes mDebugAxes;
         DebugNormals mDebugNormals;
 

@@ -10,6 +10,13 @@ namespace gfx_testing::ecs {
         };
     }
 
+    // template<typename T, typename... Args>
+    // EntityRef<T> Ecs::createAndEmplace(Args &&...args) {
+    //     auto entityId = create();
+    //     auto obj = entityId.emplace<T>(std::forward<Args>(args)...);
+    //     return {entityId, obj};
+    // }
+
     std::vector<util::cref<render::RenderObject>>
     Ecs::getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
         std::vector<util::cref<render::RenderObject>> result;
