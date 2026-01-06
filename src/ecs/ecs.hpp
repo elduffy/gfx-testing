@@ -21,13 +21,6 @@ namespace gfx_testing::ecs {
         template<typename T, typename... Args>
         EntityRef<T> createAndEmplace(Args &&...args);
 
-        std::vector<util::cref<render::RenderObject>> getRenderObjects(pipeline::gfx::PipelineName pipelineName) const;
-
-        void addRenderObject(render::RenderObject const &renderObject);
-
-        template<typename T, typename Fn>
-        void forEach(Fn const &fn) const;
-
         entt::registry mRegistry;
     };
 

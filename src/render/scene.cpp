@@ -82,10 +82,9 @@ namespace gfx_testing::render {
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
         const std::vector<glm::vec3> lightPosWs = getLightPositions(mEcs);
         for (auto const &pipelineDef: pipeline::gfx::ALL_PIPELINES) {
-            // auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
-            auto const renderObjects = mEcs.getRenderObjects(pipelineDef.mName);
+            auto const renderObjects = mEcs.mRegistry.view<RenderObject>();
 
-            if (renderObjects.empty()) {
+            if (renderObjects.size_hint<>() == 0) {
                 continue;
             }
 
@@ -94,10 +93,14 @@ namespace gfx_testing::render {
             pipeline.bindStorageBuffers(renderPass);
 
             auto const view = mCamera.computeViewMatrix();
-            for (auto renderObject: renderObjects) {
-                renderObject.get().pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, view, lightPosWs,
-                                                         mCamera.getPosition());
-                renderObject.get().render(renderPass);
+            for (const auto entity: renderObjects) {
+                auto const &renderObject = renderObjects.get<RenderObject>(entity);
+                if (renderObject.getPipelineName() != pipelineDef.mName) {
+                    continue;
+                }
+                renderObject.pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, view, lightPosWs,
+                                                   mCamera.getPosition());
+                renderObject.render(renderPass);
             }
         }
     }
