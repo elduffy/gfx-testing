@@ -16,7 +16,7 @@ namespace gfx_testing::render {
     class SceneObjects {
 
     public:
-        explicit SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs);
+        explicit SceneObjects(game::GameContext &gameContext);
 
         void update() const;
 
@@ -26,7 +26,6 @@ namespace gfx_testing::render {
 
     private:
         game::GameContext &mGameContext;
-        ecs::Ecs &mEcs;
         ecs::EntityRef<RenderObject> mPropObjects;
         util::ref_opt<DebugNormals> mDebugNormals;
     };

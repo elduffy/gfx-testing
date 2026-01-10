@@ -1,3 +1,4 @@
+#include <ecs/render_ecs.hpp>
 #include <render/debug_normals.hpp>
 
 namespace gfx_testing::render {
@@ -54,12 +55,6 @@ namespace gfx_testing::render {
         return gpuShaderObject;
     }
 
-    RenderObject createRenderObject(const game::GameContext &gameContext, RenderObject const &targetObject,
-                                    DebugNormals::Options const &options) {
-        return RenderObject{createGpuShaderObject(gameContext, targetObject, options),
-                            pipeline::gfx::PipelineName::Lines, targetObject.mTransform};
-    }
-
     DebugNormals &DebugNormals::create(ecs::EntityId target, game::GameContext const &gameContext,
                                        Options const &options) {
         auto &ecs = target.mEcs;
@@ -73,7 +68,9 @@ namespace gfx_testing::render {
     DebugNormals::DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext,
                                const ecs::EntityRef<RenderObject> &target, Options const &options) :
         mEntityId(entityId) {
-        mEntityId.emplace<RenderObject>(createRenderObject(gameContext, target.mRef, options));
+        ecs::render::emplaceRenderObject<pipeline::gfx::PipelineName::Lines>(
+                entityId, createGpuShaderObject(gameContext, target.mRef, options), pipeline::gfx::PipelineName::Lines,
+                target.mRef.mTransform);
     }
 
     void DebugNormals::update() const {

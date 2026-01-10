@@ -1,3 +1,4 @@
+#include <ecs/render_ecs.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <render/debug_axes.hpp>
 #include <shader/shader_models.hpp>
@@ -79,6 +80,6 @@ namespace gfx_testing::render {
     }
 
     DebugAxes::DebugAxes(ecs::EntityId entityId, game::GameContext &gameContext) :
-        mRenderObject(entityId.emplace<RenderObject>(gameContext, buildMesh(), pipeline::gfx::PipelineName::Lines,
-                                                     glm::identity<glm::mat4>())) {}
+        mRenderObject(ecs::render::emplaceRenderObject<pipeline::gfx::PipelineName::Lines>(
+                entityId, gameContext, buildMesh(), pipeline::gfx::PipelineName::Lines, glm::identity<glm::mat4>())) {}
 } // namespace gfx_testing::render

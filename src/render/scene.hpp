@@ -1,8 +1,6 @@
 #pragma once
 
-#include <ecs/ecs.hpp>
 #include <game.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <render/camera.hpp>
 #include <render/draw_context.hpp>
@@ -28,16 +26,17 @@ namespace gfx_testing::render {
 
         game::GameContext &getGameContext() const { return mGameContext; }
 
-        ecs::Ecs &getEcs() { return mEcs; }
-
     private:
         void drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const;
+
+        template<pipeline::gfx::PipelineName>
+        void drawForPipeline(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass,
+                             glm::mat4x4 const &view, std::vector<glm::vec3> const &lightPosWs) const;
 
         game::GameContext &mGameContext;
         util::Extent2D mViewportExtent;
         Camera mCamera;
         glm::mat4x4 mProjection;
-        ecs::Ecs mEcs;
         SceneObjects mSceneObjects;
         sdl::SdlGpuTexture mDepthTexture;
         std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;

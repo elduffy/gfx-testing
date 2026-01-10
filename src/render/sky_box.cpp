@@ -1,5 +1,5 @@
+#include <ecs/render_ecs.hpp>
 #include <game.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <render/sky_box.hpp>
 
 namespace gfx_testing::render {
@@ -52,8 +52,9 @@ namespace gfx_testing::render {
     }
 
     RenderObject &createRenderObject(ecs::EntityId entityId, game::GameContext &gameContext, util::CubeMap cubeMap) {
-        return entityId.emplace<RenderObject>(gameContext, createShaderObject(std::move(cubeMap)),
-                                              pipeline::gfx::PipelineName::Skybox, glm::identity<glm::mat4>());
+        return ecs::render::emplaceRenderObject<pipeline::gfx::PipelineName::Skybox>(
+                entityId, gameContext, createShaderObject(std::move(cubeMap)), pipeline::gfx::PipelineName::Skybox,
+                glm::identity<glm::mat4>());
     }
 
 

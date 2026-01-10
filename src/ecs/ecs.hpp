@@ -1,7 +1,6 @@
 #pragma once
 
 #include <entt/entt.hpp>
-#include <render/render_object.hpp>
 #include <util/ref.hpp>
 
 namespace gfx_testing::ecs {
@@ -43,7 +42,7 @@ namespace gfx_testing::ecs {
         void setParent(EntityId parent) const;
 
         template<typename T, typename... Args>
-        T &emplace(Args &&...args) {
+        decltype(auto) emplace(Args &&...args) {
             return mEcs.mRegistry.emplace<T>(mEntity, std::forward<Args>(args)...);
         }
 

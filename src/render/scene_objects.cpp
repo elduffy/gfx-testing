@@ -1,4 +1,5 @@
 #include <ecs/ecs.hpp>
+#include <ecs/render_ecs.hpp>
 #include <render/debug_axes.hpp>
 #include <render/point_light.hpp>
 #include <render/scene_objects.hpp>
@@ -11,11 +12,13 @@ namespace gfx_testing::render {
             .mTexCoord = util::TexCoordTreatment::DISCARD,
     };
 
-    SceneObjects::SceneObjects(game::GameContext &gameContext, ecs::Ecs &ecs) :
-        mGameContext(gameContext), mEcs(ecs),
-        mPropObjects(ecs.createAndEmplace<RenderObject>(
-                gameContext, gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
+    SceneObjects::SceneObjects(game::GameContext &gameContext) :
+        mGameContext(gameContext),
+        mPropObjects(gfx_testing::ecs::render::createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Gooch>(
+                gameContext.getEcs(), gameContext,
+                gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
                 pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))) {
+        auto &ecs = gameContext.getEcs();
         // Point lights
         constexpr auto NUM_POINT_LIGHTS = 3;
         auto const shaderObject = PointLight::loadShaderObject(gameContext.mResourceLoader);
@@ -28,13 +31,13 @@ namespace gfx_testing::render {
         // Debug axes
         DebugAxes::create(ecs, gameContext);
         // Landscape
-        ecs.createAndEmplace<RenderObject>(
-                gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
+        ecs::render::createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Lambert>(
+                ecs, gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
                 pipeline::gfx::PipelineName::Lambert,
                 glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE));
         // Textured object
-        ecs.createAndEmplace<RenderObject>(
-                gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
+        ecs::render::createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Textured>(
+                ecs, gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
                 pipeline::gfx::PipelineName::Textured,
                 glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE));
     }
@@ -49,7 +52,7 @@ namespace gfx_testing::render {
         // Needs to come after the prop objects update
         util::if_present(mDebugNormals, [](const DebugNormals &n) { n.update(); });
 
-        auto const view = mEcs.mRegistry.view<PointLight>();
+        auto const view = mGameContext.getEcs().mRegistry.view<PointLight>();
         view.each([&](PointLight &light) { light.update(); });
     }
 
