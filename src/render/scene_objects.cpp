@@ -45,7 +45,7 @@ namespace gfx_testing::render {
     void SceneObjects::update() const {
         constexpr auto RADS_PER_SECOND = glm::pi<float>() / 8.f;
 
-        auto &propObjects = mPropObjects.mRef;
+        auto &propObjects = mPropObjects.get<RenderObject>();
         propObjects.mTransform =
                 rotate(propObjects.mTransform, mGameContext.getFrameSnapshot().mDeltaTime * RADS_PER_SECOND,
                        glm::vec3(0, 0, 1));
@@ -61,7 +61,7 @@ namespace gfx_testing::render {
             if (mDebugNormals.has_value()) {
                 return;
             }
-            mDebugNormals = DebugNormals::create(mPropObjects.mId, mGameContext, {});
+            mDebugNormals = DebugNormals::create(mPropObjects, mGameContext, {});
         } else {
             if (!mDebugNormals.has_value()) {
                 return;

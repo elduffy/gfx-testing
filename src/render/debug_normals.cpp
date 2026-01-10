@@ -59,18 +59,17 @@ namespace gfx_testing::render {
                                        Options const &options) {
         auto &ecs = target.mEcs;
         auto entityId = ecs.create();
-        auto &debugNormals =
-                entityId.emplace<DebugNormals>(entityId, gameContext, target.asEntityRef<RenderObject>(), options);
+        auto &debugNormals = entityId.emplace<DebugNormals>(entityId, gameContext, target, options);
         entityId.setParent(target);
         return debugNormals;
     }
 
-    DebugNormals::DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext,
-                               const ecs::EntityRef<RenderObject> &target, Options const &options) :
-        mEntityId(entityId) {
+    DebugNormals::DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext, ecs::EntityId target,
+                               Options const &options) : mEntityId(entityId) {
+        auto &targetRo = target.get<RenderObject>();
         ecs::render::emplaceRenderObject<pipeline::gfx::PipelineName::Lines>(
-                entityId, createGpuShaderObject(gameContext, target.mRef, options), pipeline::gfx::PipelineName::Lines,
-                target.mRef.mTransform);
+                entityId, createGpuShaderObject(gameContext, targetRo, options), pipeline::gfx::PipelineName::Lines,
+                targetRo.mTransform);
     }
 
     void DebugNormals::update() const {

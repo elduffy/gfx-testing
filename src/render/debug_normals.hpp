@@ -2,7 +2,6 @@
 
 #include <ecs/ecs.hpp>
 #include <game.hpp>
-#include <render/render_object.hpp>
 
 namespace gfx_testing::render {
     class DebugNormals {
@@ -15,8 +14,8 @@ namespace gfx_testing::render {
 
         static DebugNormals &create(ecs::EntityId target, game::GameContext const &gameContext, Options const &options);
 
-        DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext,
-                     const ecs::EntityRef<RenderObject> &target, Options const &options);
+        DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext, ecs::EntityId target,
+                     Options const &options);
 
         void update() const;
 

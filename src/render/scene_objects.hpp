@@ -3,7 +3,6 @@
 #include <ecs/ecs.hpp>
 #include <game.hpp>
 #include <render/debug_normals.hpp>
-#include <render/render_object.hpp>
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
@@ -26,7 +25,7 @@ namespace gfx_testing::render {
 
     private:
         game::GameContext &mGameContext;
-        ecs::EntityRef<RenderObject> mPropObjects;
+        ecs::EntityId mPropObjects;
         util::ref_opt<DebugNormals> mDebugNormals;
     };
 } // namespace gfx_testing::render

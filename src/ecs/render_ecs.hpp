@@ -17,11 +17,10 @@ namespace gfx_testing::ecs::render {
     }
 
     template<pipeline::gfx::PipelineName pipelineName, typename... Args>
-    EntityRef<gfx_testing::render::RenderObject> &createAndEmplaceRenderObject(Ecs &ecs, Args &&...args) {
-        auto entityRef = ecs.createAndEmplace<gfx_testing::render::RenderObject>(std::forward<Args>(args)...);
-        CHECK_EQ(pipelineName, entityRef.mRef.getPipelineName());
-        entityRef.mId.template emplace<PipelineNameTag<pipelineName>>();
-        return entityRef;
+    EntityId createAndEmplaceRenderObject(Ecs &ecs, Args &&...args) {
+        auto entityId = ecs.create();
+        emplaceRenderObject<pipelineName>(entityId, std::forward<Args>(args)...);
+        return entityId;
     }
 
     template<pipeline::gfx::PipelineName pipelineName, typename Fn>
