@@ -8,6 +8,16 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       }
+    },
+    {
+      "name": "default-example",
+      "inherits": "vcpkg",
+      "environment": {
+        "VCPKG_ROOT": "~/dev/vcpkg"
+      },
+      "cacheVariables": {
+        "SDL_IMAGE_DIR": "$env{HOME}/dev/SDL_image"
+      }
     }
   ]
 }
