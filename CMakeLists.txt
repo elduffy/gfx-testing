@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.28)
 project(gfx_testing)
 add_compile_options(-Wall -Wpedantic)
 set(CMAKE_CXX_STANDARD 20)
