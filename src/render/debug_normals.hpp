@@ -1,7 +1,8 @@
 #pragma once
+
+#include <ecs/ecs.hpp>
 #include <game.hpp>
 #include <render/render_object.hpp>
-#include <util/ref.hpp>
 
 namespace gfx_testing::render {
     class DebugNormals {
@@ -12,14 +13,13 @@ namespace gfx_testing::render {
         };
         static_assert(sizeof(Options) == 16);
 
-        bool areEnabled() const { return mRenderObject.has_value(); }
-        void update();
-        void enable(game::GameContext const &gameContext, RenderObject const &targetObject, Options const &options);
-        void disable();
+        static DebugNormals &create(ecs::EntityId target, game::GameContext const &gameContext, Options const &options);
 
-        std::optional<RenderObject> mRenderObject;
+        DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext,
+                     const ecs::EntityRef<RenderObject> &target, Options const &options);
 
-    private:
-        util::cref_opt<RenderObject> mTargetObject;
+        void update() const;
+
+        ecs::EntityId mEntityId;
     };
 } // namespace gfx_testing::render

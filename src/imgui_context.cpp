@@ -85,7 +85,7 @@ namespace gfx_testing::imgui {
             // Debug Normals
             {
                 auto &sceneObjects = scene.getSceneObjects();
-                bool normalsEnabled = sceneObjects.getDebugNormals().areEnabled();
+                bool normalsEnabled = sceneObjects.hasDebugNormals();
                 ImGui::Checkbox("Debug Normals", &normalsEnabled);
                 sceneObjects.toggleDebugNormals(normalsEnabled);
             }

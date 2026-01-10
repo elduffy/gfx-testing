@@ -1,3 +1,4 @@
+#include <ecs/render_ecs.hpp>
 #include <render/debug_normals.hpp>
 
 namespace gfx_testing::render {
@@ -54,35 +55,29 @@ namespace gfx_testing::render {
         return gpuShaderObject;
     }
 
-    std::optional<RenderObject> createRenderObject(const game::GameContext &gameContext,
-                                                   RenderObject const &targetObject, bool enabled,
-                                                   DebugNormals::Options const &options) {
-        if (!enabled) {
-            return std::nullopt;
-        }
-        return RenderObject{createGpuShaderObject(gameContext, targetObject, options),
-                            pipeline::gfx::PipelineName::Lines, targetObject.mTransform};
+    DebugNormals &DebugNormals::create(ecs::EntityId target, game::GameContext const &gameContext,
+                                       Options const &options) {
+        auto &ecs = target.mEcs;
+        auto entityId = ecs.create();
+        auto &debugNormals =
+                entityId.emplace<DebugNormals>(entityId, gameContext, target.asEntityRef<RenderObject>(), options);
+        entityId.setParent(target);
+        return debugNormals;
     }
 
-    void DebugNormals::update() {
-        if (mRenderObject.has_value()) {
-            CHECK(mTargetObject.has_value()) << "DebugNormals has a render object but no target object.";
-            mRenderObject->mTransform = mTargetObject.value().get().mTransform;
-        }
+    DebugNormals::DebugNormals(ecs::EntityId entityId, game::GameContext const &gameContext,
+                               const ecs::EntityRef<RenderObject> &target, Options const &options) :
+        mEntityId(entityId) {
+        ecs::render::emplaceRenderObject<pipeline::gfx::PipelineName::Lines>(
+                entityId, createGpuShaderObject(gameContext, target.mRef, options), pipeline::gfx::PipelineName::Lines,
+                target.mRef.mTransform);
     }
 
-    void DebugNormals::enable(game::GameContext const &gameContext, RenderObject const &targetObject,
-                              Options const &options) {
-        if (mRenderObject.has_value()) {
-            return;
-        }
-        mRenderObject.emplace(createGpuShaderObject(gameContext, targetObject, options),
-                              pipeline::gfx::PipelineName::Lines, targetObject.mTransform);
-        mTargetObject = targetObject;
-    }
+    void DebugNormals::update() const {
+        const auto targetId = mEntityId.getParent();
+        CHECK(targetId.has_value()) << "DebugNormals::update: entity has no parent.";
+        const auto &targetObj = targetId->get().get<RenderObject>();
 
-    void DebugNormals::disable() {
-        mRenderObject.reset();
-        mTargetObject.reset();
+        mEntityId.get<RenderObject>().mTransform = targetObj.mTransform;
     }
 } // namespace gfx_testing::render

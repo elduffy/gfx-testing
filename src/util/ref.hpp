@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <optional>
 
 namespace gfx_testing::util {
     template<typename T>

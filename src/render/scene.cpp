@@ -2,9 +2,11 @@
 #include <array>
 #include <boost/scope/scope_exit.hpp>
 #include <cmath>
+#include <ecs/render_ecs.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
+#include <render/point_light.hpp>
 #include <render/samplers.hpp>
 #include <render/scene.hpp>
 #include <sdl_factories.hpp>
@@ -70,28 +72,55 @@ namespace gfx_testing::render {
         SDL_EndGPURenderPass(renderPass);
     }
 
+    std::vector<glm::vec3> getLightPositions(ecs::Ecs const &ecs) {
+        auto const view = ecs.mRegistry.view<PointLight>();
+        std::vector<glm::vec3> positions;
+        std::ranges::transform(view, std::back_inserter(positions),
+                               [&](auto &entity) { return view.get<PointLight>(entity).mPosWs; });
+        return positions;
+    }
+
     void Scene::drawObjects(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass) const {
-        std::vector<glm::vec3> lightPosWs{mSceneObjects.mPointLights.size()};
-        for (size_t i = 0; i < mSceneObjects.mPointLights.size(); i++) {
-            lightPosWs[i] = mSceneObjects.mPointLights.at(i).mPosWs;
-        }
-        for (auto const &pipelineDef: pipeline::gfx::ALL_PIPELINES) {
-            auto const renderObjects = mSceneObjects.getRenderObjects(pipelineDef.mName);
+        const auto &ecs = mGameContext.getEcs();
+        const std::vector<glm::vec3> lightPosWs = getLightPositions(ecs);
+        auto const view = mCamera.computeViewMatrix();
 
-            if (renderObjects.empty()) {
-                continue;
+        for (auto const &pipeline: pipeline::gfx::ALL_PIPELINES) {
+            switch (pipeline.mName) {
+                case pipeline::gfx::PipelineName::SimpleColor:
+                    drawForPipeline<pipeline::gfx::PipelineName::SimpleColor>(commandBuffer, renderPass, view,
+                                                                              lightPosWs);
+                    break;
+                case pipeline::gfx::PipelineName::Gooch:
+                    drawForPipeline<pipeline::gfx::PipelineName::Gooch>(commandBuffer, renderPass, view, lightPosWs);
+                    break;
+                case pipeline::gfx::PipelineName::Textured:
+                    drawForPipeline<pipeline::gfx::PipelineName::Textured>(commandBuffer, renderPass, view, lightPosWs);
+                    break;
+                case pipeline::gfx::PipelineName::Lines:
+                    drawForPipeline<pipeline::gfx::PipelineName::Lines>(commandBuffer, renderPass, view, lightPosWs);
+                    break;
+                case pipeline::gfx::PipelineName::Lambert:
+                    drawForPipeline<pipeline::gfx::PipelineName::Lambert>(commandBuffer, renderPass, view, lightPosWs);
+                    break;
+                case pipeline::gfx::PipelineName::Skybox:
+                    drawForPipeline<pipeline::gfx::PipelineName::Skybox>(commandBuffer, renderPass, view, lightPosWs);
+                    break;
             }
-
-            auto const &pipeline = mGameContext.mPipelines.get(pipelineDef.mName);
-            SDL_BindGPUGraphicsPipeline(renderPass, *pipeline.mSdlPipeline);
-            pipeline.bindStorageBuffers(renderPass);
-
-            auto const view = mCamera.computeViewMatrix();
-            for (auto renderObject: renderObjects) {
-                renderObject.get().pushPerObjectUniforms(pipelineDef, commandBuffer, mProjection, view, lightPosWs,
-                                                         mCamera.getPosition());
-                renderObject.get().render(renderPass);
-            }
         }
+    }
+
+    template<pipeline::gfx::PipelineName pipelineName>
+    void Scene::drawForPipeline(SDL_GPUCommandBuffer *commandBuffer, SDL_GPURenderPass *renderPass,
+                                glm::mat4x4 const &view, std::vector<glm::vec3> const &lightPosWs) const {
+        auto const &pipeline = mGameContext.mPipelines.get(pipelineName);
+        SDL_BindGPUGraphicsPipeline(renderPass, *pipeline.mSdlPipeline);
+        pipeline.bindStorageBuffers(renderPass);
+
+        ecs::render::eachRenderObject<pipelineName>(mGameContext.getEcs(), [&](RenderObject const &renderObject) {
+            renderObject.pushPerObjectUniforms(pipeline.mDefinition, commandBuffer, mProjection, view, lightPosWs,
+                                               mCamera.getPosition());
+            renderObject.render(renderPass);
+        });
     }
 } // namespace gfx_testing::render

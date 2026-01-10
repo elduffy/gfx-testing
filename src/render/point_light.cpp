@@ -1,3 +1,4 @@
+#include <ecs/render_ecs.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <io/obj_loader.hpp>
 #include <render/point_light.hpp>
@@ -14,13 +15,20 @@ namespace gfx_testing::render {
         return resourceLoader.loadObjModel("uv-sphere.obj", {util::NormalTreatment::AVERAGE});
     }
 
-    PointLight::PointLight(game::GameContext &gameContext, shader::ShaderObject const &shaderObject, float pathRadius,
-                           float phase) :
+    PointLight &PointLight::create(ecs::Ecs &ecs, game::GameContext &gameContext,
+                                   shader::ShaderObject const &shaderObject, float pathRadius, float phase) {
+        auto entityId = ecs.create();
+        return entityId.emplace<PointLight>(entityId, gameContext, shaderObject, pathRadius, phase);
+    }
+
+    PointLight::PointLight(ecs::EntityId entityId, game::GameContext &gameContext,
+                           shader::ShaderObject const &shaderObject, float pathRadius, float phase) :
         mGameContext(gameContext),
         mPosWs(getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, pathRadius, phase)),
         mPathRadius(pathRadius), mPhase(phase),
-        mRenderObject(gameContext, shaderObject, pipeline::gfx::PipelineName::SimpleColor,
-                      translate(glm::mat4(1.0f), mPosWs)) {}
+        mRenderObject(ecs::render::emplaceRenderObject<pipeline::gfx::PipelineName::SimpleColor>(
+                entityId, gameContext, shaderObject, pipeline::gfx::PipelineName::SimpleColor,
+                translate(glm::mat4(1.0f), mPosWs))) {}
 
     void PointLight::update() {
         mPosWs = getPosition(mGameContext.getFrameSnapshot().mAccumulatedTime, mPathRadius, mPhase);

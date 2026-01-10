@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ecs/ecs.hpp>
 #include <pipeline/pipelines.hpp>
 #include <render/samplers.hpp>
 #include <sdl.hpp>
@@ -50,6 +51,8 @@ namespace gfx_testing::game {
 
         void maybeLimitFps() { mFpsCapper.wait(); }
 
+        ecs::Ecs &getEcs() { return mEcs; }
+
     private:
         util::Snapshot mLastFrame{};
 
@@ -60,5 +63,8 @@ namespace gfx_testing::game {
         render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};
         util::FpsCapper mFpsCapper;
+
+    private:
+        ecs::Ecs mEcs;
     };
 } // namespace gfx_testing::game

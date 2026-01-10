@@ -1,12 +1,9 @@
 #pragma once
 
+#include <ecs/ecs.hpp>
 #include <game.hpp>
-#include <render/debug_axes.hpp>
 #include <render/debug_normals.hpp>
-#include <render/point_light.hpp>
 #include <render/render_object.hpp>
-#include <render/sky_box.hpp>
-#include <util/ref.hpp>
 
 namespace gfx_testing::render {
     static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
@@ -21,33 +18,15 @@ namespace gfx_testing::render {
     public:
         explicit SceneObjects(game::GameContext &gameContext);
 
-        std::vector<util::cref<RenderObject>> const &getRenderObjects(pipeline::gfx::PipelineName pipelineName) const {
-            return mRenderObjectsByPipeline.at(pipeline::gfx::getIndex(pipelineName));
-        }
+        void update() const;
 
-        void update();
-
-        RenderObject const &getPropObjects() { return mPropObjects; }
-
-        DebugNormals const &getDebugNormals() { return mDebugNormals; }
+        bool hasDebugNormals() const { return mDebugNormals.has_value(); }
 
         void toggleDebugNormals(bool enable);
 
     private:
-        std::vector<util::cref_vec<RenderObject>> calculateRenderObjectsByPipeline() const;
-
         game::GameContext &mGameContext;
-        SkyBox mSkyBox;
-        RenderObject mPropObjects;
-        RenderObject mLandscape;
-        RenderObject mTextureObject;
-        DebugAxes mDebugAxes;
-        DebugNormals mDebugNormals;
-
-    public:
-        std::vector<PointLight> mPointLights;
-
-    private:
-        std::vector<util::cref_vec<RenderObject>> mRenderObjectsByPipeline;
+        ecs::EntityRef<RenderObject> mPropObjects;
+        util::ref_opt<DebugNormals> mDebugNormals;
     };
 } // namespace gfx_testing::render

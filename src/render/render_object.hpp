@@ -2,7 +2,6 @@
 #include <game.hpp>
 #include <pipeline/gfx/pipeline_definition.hpp>
 #include <render/camera.hpp>
-#include <sdl.hpp>
 
 namespace gfx_testing::render {
 
