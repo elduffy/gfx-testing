@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(FetchContent)
 
-include(cmake/fetch-tinyobjloader.cmake)
 include(cmake/fetch-catch2.cmake)
 include(cmake/fetch-imgui.cmake)
 include(cmake/fetch-clipp.cmake)
@@ -19,6 +18,7 @@ find_package(Boost CONFIG REQUIRED algorithm safe_numerics scope)
 find_package(glm CONFIG REQUIRED glm)
 find_package(absl CONFIG REQUIRED base absl_check log)
 find_package(EnTT CONFIG REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 
 add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
 add_subdirectory(app/spirv_header_gen)
@@ -127,7 +127,6 @@ target_link_libraries(gfx_testing_lib PUBLIC
         EnTT::EnTT
 )
 add_dependencies(gfx_testing_lib build_shaders)
-target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC src/)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC ${SHADER_HPP_INCLUDE})
 
