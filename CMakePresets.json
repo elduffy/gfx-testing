@@ -14,9 +14,6 @@
       "inherits": "vcpkg",
       "environment": {
         "VCPKG_ROOT": "~/dev/vcpkg"
-      },
-      "cacheVariables": {
-        "SDL_IMAGE_DIR": "$env{HOME}/dev/SDL_image"
       }
     }
   ]

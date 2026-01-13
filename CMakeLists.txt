@@ -7,7 +7,9 @@ include(FetchContent)
 
 include(cmake/fetch-imgui.cmake)
 
-find_package(SDL3 REQUIRED SDL3)
+set(SDL_STATIC ON)
+find_package(SDL3 REQUIRED SDL3 SDL3-static)
+find_package(SDL3_image CONFIG REQUIRED)
 find_package(Boost CONFIG REQUIRED algorithm safe_numerics scope)
 find_package(glm CONFIG REQUIRED glm)
 find_package(absl CONFIG REQUIRED base absl_check log)
@@ -19,7 +21,6 @@ find_package(fastgltf CONFIG REQUIRED fastgltf)
 find_package(nlohmann_json CONFIG REQUIRED nlohmann_json)
 find_package(inja CONFIG REQUIRED)
 
-add_subdirectory(${SDL_IMAGE_DIR} ${SDL_IMAGE_DIR}/build EXCLUDE_FROM_ALL)
 add_subdirectory(app/spirv_header_gen)
 
 # Shader compilation
