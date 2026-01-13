@@ -5,7 +5,7 @@ add_executable(spirv_header_gen
 target_link_libraries(spirv_header_gen PRIVATE
         clipp::clipp
         nlohmann_json::nlohmann_json
-        inja
+        pantor::inja
         Boost::algorithm
         absl::absl_check
         absl::log

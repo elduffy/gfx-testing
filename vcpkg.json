@@ -31,6 +31,14 @@
     {
       "name": "fastgltf",
       "version>=": "0.8.0"
+    },
+    {
+      "name": "nlohmann-json",
+      "version>=": "3.12.0"
+    },
+    {
+      "name": "inja",
+      "version>=": "3.4.0"
     }
   ],
   "version": "0.0.1",
