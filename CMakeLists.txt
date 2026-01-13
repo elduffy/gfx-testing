@@ -3,10 +3,6 @@ project(gfx_testing)
 add_compile_options(-Wall -Wpedantic)
 set(CMAKE_CXX_STANDARD 20)
 
-include(FetchContent)
-
-include(cmake/fetch-imgui.cmake)
-
 set(SDL_STATIC ON)
 find_package(SDL3 REQUIRED SDL3 SDL3-static)
 find_package(SDL3_image CONFIG REQUIRED)
@@ -20,6 +16,7 @@ find_package(tinyobjloader CONFIG REQUIRED)
 find_package(fastgltf CONFIG REQUIRED fastgltf)
 find_package(nlohmann_json CONFIG REQUIRED nlohmann_json)
 find_package(inja CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 add_subdirectory(app/spirv_header_gen)
 
@@ -67,18 +64,6 @@ foreach (SHADER_SOURCE ${SHADER_SOURCES})
 endforeach ()
 add_custom_target(build_shaders ALL DEPENDS ${SPV_OUTFILES} ${JSON_OUTFILES} ${HPP_OUTFILES})
 
-# imgui build
-add_library(imgui
-        ${imgui_SOURCE_DIR}/imgui.cpp
-        ${imgui_SOURCE_DIR}/imgui_draw.cpp
-        ${imgui_SOURCE_DIR}/imgui_tables.cpp
-        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-        ${imgui_SOURCE_DIR}/imgui_demo.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp
-)
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
-
 # gfx_testing_lib main library
 add_library(gfx_testing_lib
         src/game.cpp
@@ -113,7 +98,7 @@ add_library(gfx_testing_lib
         src/util/util.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
-        imgui
+        imgui::imgui
         SDL3::SDL3
         SDL3_image::SDL3_image
         absl::base

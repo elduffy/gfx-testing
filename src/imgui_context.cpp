@@ -1,9 +1,9 @@
 #include <SDL3/SDL_log.h>
 #include <absl/log/check.h>
-#include <backends/imgui_impl_sdl3.h>
-#include <backends/imgui_impl_sdlgpu3.h>
 #include <imgui.h>
 #include <imgui_context.hpp>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlgpu3.h>
 #include <sdl.hpp>
 
 namespace gfx_testing::imgui {
