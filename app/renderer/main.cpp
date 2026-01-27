@@ -9,6 +9,8 @@
 #include <util/debug.hpp>
 #include <util/util.hpp>
 
+#include "cli.hpp"
+
 void handleUpdate(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
                   gfx_testing::imgui::ImGuiContext &imGuiContext) {
     scene.update();
@@ -22,21 +24,11 @@ void handleUpdate(gfx_testing::game::GameContext &gameContext, gfx_testing::rend
     imGuiContext.renderFrame(drawContext, scene);
 }
 
-gfx_testing::game::GameSettings loadGameSettings(std::string &path) {
-    // TODO: load
-    return gfx_testing::game::GameSettings{.mTargetFps = 120};
-}
-
 int main(int argc, char *argv[]) {
     gfx_testing::game::GameSettings gameSettings;
     {
-        std::string configFilePath;
-        if (const auto cli = clipp::option("-c", "--config") & clipp::value("config toml file", configFilePath);
-            !parse(argc, argv, cli)) {
-            std::cout << make_man_page(cli, std::filesystem::path{argv[0]}.filename().string());
-            return 1;
-        }
-        gameSettings = loadGameSettings(configFilePath);
+        gfx_testing::Cli cli(argc, argv);
+        gameSettings = cli.loadGameSettings();
     }
 
     std::vector<SDL_GPUPresentMode> presentModes;
