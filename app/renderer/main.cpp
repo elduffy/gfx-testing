@@ -27,15 +27,7 @@ int main(int argc, char *argv[]) {
         gfx_testing::Cli cli(argc, argv);
         gameSettings = cli.loadGameSettings();
     }
-
-    std::vector<SDL_GPUPresentMode> presentModes;
-    if (gameSettings.mTargetFps.has_value() || gameSettings.mVsyncDisabled) {
-        presentModes.push_back(SDL_GPU_PRESENTMODE_MAILBOX);
-        presentModes.push_back(SDL_GPU_PRESENTMODE_IMMEDIATE);
-    }
-    presentModes.push_back(SDL_GPU_PRESENTMODE_VSYNC);
-
-    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, presentModes};
+    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, gameSettings.getPresentModes()};
     const gfx_testing::io::ResourceLoader resourceLoader{sdlContext};
 
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader, gameSettings);

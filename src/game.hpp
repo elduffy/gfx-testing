@@ -16,6 +16,8 @@ namespace gfx_testing::game {
         std::optional<float> mTargetFps = std::nullopt;
         bool mVsyncDisabled = false;
 
+        std::vector<SDL_GPUPresentMode> getPresentModes() const;
+
         friend std::ostream &operator<<(std::ostream &os, const GameSettings &settings) {
             return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "none") << "\n"
                       << "  mVsyncDisabled: " << util::toString(settings.mVsyncDisabled);

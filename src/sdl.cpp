@@ -61,6 +61,11 @@ namespace gfx_testing::sdl {
                 break;
             }
         }
+        if (presentMode == SDL_GPU_PRESENTMODE_VSYNC &&
+            std::ranges::find(presentModes, SDL_GPU_PRESENTMODE_VSYNC) == presentModes.end()) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "%s was not requested but no other present modes are supported.",
+                        getPresentModeName(presentMode));
+        }
         constexpr auto swapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
         SDL_Log("Swapchain parameters: composition=%s, present mode=%s",
                 getSwapchainCompositionName(swapchainComposition), getPresentModeName(presentMode));
