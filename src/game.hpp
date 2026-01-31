@@ -16,7 +16,7 @@ namespace gfx_testing::game {
         std::optional<float> mTargetFps = std::nullopt;
 
         friend std::ostream &operator<<(std::ostream &os, const GameSettings &settings) {
-            return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "n/a");
+            return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "none");
         }
     };
 
@@ -68,6 +68,7 @@ namespace gfx_testing::game {
         pipeline::Pipelines mPipelines;
         render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};
+        GameSettings const &mGameSettings;
         util::FpsCapper mFpsCapper;
 
     private:

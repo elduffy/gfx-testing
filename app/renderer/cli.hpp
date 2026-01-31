@@ -11,7 +11,8 @@ namespace gfx_testing {
         static constexpr bool LOG_TOML = false;
         using toml_doc = toml::basic_value<toml::type_config>;
 
-        static float findFloatLenient(toml_doc const &parsed, char const *name, float defaultValue) {
+        static std::optional<float> findOptionalFloatLenient(toml_doc const &parsed, char const *name,
+                                                             float defaultValue) {
             if (!parsed.contains(name)) {
                 return defaultValue;
             }
@@ -21,8 +22,15 @@ namespace gfx_testing {
                     return static_cast<float>(parsedVal.as_floating());
                 case toml::value_t::integer:
                     return static_cast<float>(parsedVal.as_integer());
+                case toml::value_t::string: {
+                    auto const &strVal = parsedVal.as_string();
+                    if (strVal == "none") {
+                        return std::nullopt;
+                    }
+                    FAIL("Illegal string value \"{}\" for config key \"{}\"", strVal.c_str(), name);
+                }
                 default:
-                    FAIL("Unable to handle type for %s", name);
+                    FAIL("Illegal type {} for \"{}\"", toml::to_string(parsedVal.type()), name);
             }
         }
 
@@ -53,7 +61,7 @@ namespace gfx_testing {
                     ss << parsed;
                     SDL_Log("Loaded contents of %s:\n%s", mConfigFilePath.c_str(), ss.str().c_str());
                 }
-                gameSettings.mTargetFps = findFloatLenient(parsed, "target_fps", DEFAULT_TARGET_FPS);
+                gameSettings.mTargetFps = findOptionalFloatLenient(parsed, "target_fps", DEFAULT_TARGET_FPS);
             } else {
                 SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to load settings from %s. Using defaults.",
                             mConfigFilePath.c_str());

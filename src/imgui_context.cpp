@@ -60,6 +60,11 @@ namespace gfx_testing::imgui {
         const ImGuiIO &io = ImGui::GetIO();
 
         if (ImGui::CollapsingHeader("Perf")) {
+            if (auto const &targetFps = scene.getGameContext().mGameSettings.mTargetFps; targetFps.has_value()) {
+                ImGui::Text("FPS target is %.1f", targetFps.value());
+            } else {
+                ImGui::Text("FPS is uncapped.");
+            }
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
         if (ImGui::CollapsingHeader("Camera")) {

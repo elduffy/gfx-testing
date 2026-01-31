@@ -1,13 +1,10 @@
-#include <clipp.h>
 #include <game.hpp>
 #include <imgui_context.hpp>
 #include <io/input_manager.hpp>
-#include <iostream>
 #include <render/draw_context.hpp>
 #include <render/scene.hpp>
 #include <sdl.hpp>
 #include <util/debug.hpp>
-#include <util/util.hpp>
 
 #include "cli.hpp"
 
