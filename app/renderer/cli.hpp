@@ -3,9 +3,29 @@
 #include <filesystem>
 #include <game.hpp>
 #include <iostream>
+#include <toml.hpp>
 
 namespace gfx_testing {
     class Cli {
+        static constexpr float DEFAULT_TARGET_FPS = 120.f;
+        static constexpr bool LOG_TOML = false;
+        using toml_doc = toml::basic_value<toml::type_config>;
+
+        static float findFloatLenient(toml_doc const &parsed, char const *name, float defaultValue) {
+            if (!parsed.contains(name)) {
+                return defaultValue;
+            }
+            auto const parsedVal = parsed.at(name);
+            switch (parsedVal.type()) {
+                case toml::value_t::floating:
+                    return static_cast<float>(parsedVal.as_floating());
+                case toml::value_t::integer:
+                    return static_cast<float>(parsedVal.as_integer());
+                default:
+                    FAIL("Unable to handle type for %s", name);
+            }
+        }
+
     public:
         Cli(int argc, char *argv[]) :
             mConfigFilePath("config.toml"),
@@ -18,9 +38,32 @@ namespace gfx_testing {
         }
 
         [[nodiscard]] game::GameSettings loadGameSettings() const {
-            std::cout << "Path is: " << std::filesystem::absolute(mConfigFilePath).string() << std::endl;
-            // TODO: load
-            return game::GameSettings{.mTargetFps = 120};
+            SDL_Log("Loading game settings at %s", std::filesystem::absolute(mConfigFilePath).c_str());
+
+            const auto maybeParsed = toml::try_parse(mConfigFilePath, toml::spec::v(1, 1, 0));
+
+            game::GameSettings gameSettings{
+                    .mTargetFps = DEFAULT_TARGET_FPS,
+            };
+
+            if (maybeParsed.is_ok()) {
+                auto const &parsed = maybeParsed.as_ok();
+                if constexpr (LOG_TOML) {
+                    std::stringstream ss;
+                    ss << parsed;
+                    SDL_Log("Loaded contents of %s:\n%s", mConfigFilePath.c_str(), ss.str().c_str());
+                }
+                gameSettings.mTargetFps = findFloatLenient(parsed, "target_fps", DEFAULT_TARGET_FPS);
+            } else {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to load settings from %s. Using defaults.",
+                            mConfigFilePath.c_str());
+            }
+            {
+                std::stringstream ss;
+                ss << gameSettings;
+                SDL_Log("Game settings:\n%s", ss.str().c_str());
+            }
+            return gameSettings;
         }
 
     private:
