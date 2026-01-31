@@ -6,7 +6,8 @@
 
 namespace gfx_testing::sdl {
 
-    SdlContext::SdlContext(const bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes) :
+    SdlContext::SdlContext(const bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes,
+                           std::vector<SDL_GPUSwapchainComposition> const &swapchainCompositions) :
         mWindow(nullptr), mDevice(nullptr) {
         CHECK(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) << "Failed to initialize SDL: " << SDL_GetError();
         SDL_Log("SDL initialized.");
@@ -24,7 +25,7 @@ namespace gfx_testing::sdl {
 
         CHECK(SDL_ClaimWindowForGPUDevice(mDevice, mWindow)) << "Failed to claim window: " << SDL_GetError();
 
-        updateSwapchainParameters(presentModes);
+        updateSwapchainParameters(presentModes, swapchainCompositions);
     }
 
     char const *getSwapchainCompositionName(SDL_GPUSwapchainComposition composition) {
@@ -53,15 +54,40 @@ namespace gfx_testing::sdl {
         FAIL("Unknown GPU present mode: {}", static_cast<uint32_t>(presentMode));
     }
 
-    void SdlContext::updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes) const {
+    void
+    SdlContext::updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes,
+                                          std::vector<SDL_GPUSwapchainComposition> const &swapchainCompositions) const {
         auto presentMode = SDL_GPU_PRESENTMODE_VSYNC;
-        for (auto const &modeToTry: presentModes) {
-            if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, modeToTry)) {
-                presentMode = modeToTry;
-                break;
+        {
+            for (auto const &candidate: presentModes) {
+                if (SDL_WindowSupportsGPUPresentMode(mDevice, mWindow, candidate)) {
+                    presentMode = candidate;
+                    break;
+                }
+            }
+            if (presentMode == SDL_GPU_PRESENTMODE_VSYNC &&
+                std::ranges::find(presentModes, SDL_GPU_PRESENTMODE_VSYNC) == presentModes.end()) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "No requested present modes are supported; defaulting to %s.",
+                            getPresentModeName(presentMode));
             }
         }
-        constexpr auto swapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
+        auto swapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
+        {
+            for (auto const &candidate: swapchainCompositions) {
+                if (SDL_WindowSupportsGPUSwapchainComposition(mDevice, mWindow, candidate)) {
+                    swapchainComposition = candidate;
+                    break;
+                }
+            }
+            if (swapchainComposition == SDL_GPU_SWAPCHAINCOMPOSITION_SDR &&
+                std::ranges::find(swapchainCompositions, SDL_GPU_SWAPCHAINCOMPOSITION_SDR) ==
+                        swapchainCompositions.end()) {
+                SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                            "No requested swapchain compositions are supported; defaulting to %s.",
+                            getSwapchainCompositionName(swapchainComposition));
+            }
+        }
+
         SDL_Log("Swapchain parameters: composition=%s, present mode=%s",
                 getSwapchainCompositionName(swapchainComposition), getPresentModeName(presentMode));
         SDL_SetGPUSwapchainParameters(mDevice, mWindow, swapchainComposition, presentMode);

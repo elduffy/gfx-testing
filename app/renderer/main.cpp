@@ -5,7 +5,8 @@
 #include <render/scene.hpp>
 #include <sdl.hpp>
 #include <util/debug.hpp>
-#include <util/util.hpp>
+
+#include "cli.hpp"
 
 void handleUpdate(gfx_testing::game::GameContext &gameContext, gfx_testing::render::Scene &scene,
                   gfx_testing::imgui::ImGuiContext &imGuiContext) {
@@ -20,16 +21,14 @@ void handleUpdate(gfx_testing::game::GameContext &gameContext, gfx_testing::rend
     imGuiContext.renderFrame(drawContext, scene);
 }
 
-int main() {
-    constexpr gfx_testing::game::GameSettings gameSettings{.mTargetFps = {120}};
-    std::vector<SDL_GPUPresentMode> presentModes;
-    if constexpr (gameSettings.mTargetFps.has_value()) {
-        presentModes.push_back(SDL_GPU_PRESENTMODE_MAILBOX);
-        presentModes.push_back(SDL_GPU_PRESENTMODE_IMMEDIATE);
+int main(int argc, char *argv[]) {
+    gfx_testing::game::GameSettings gameSettings;
+    {
+        gfx_testing::Cli cli(argc, argv);
+        gameSettings = cli.loadGameSettings();
     }
-    presentModes.push_back(SDL_GPU_PRESENTMODE_VSYNC);
-
-    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, presentModes};
+    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, gameSettings.getPresentModes(),
+                                                  gameSettings.getSwapchainCompositions()};
     const gfx_testing::io::ResourceLoader resourceLoader{sdlContext};
 
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader, gameSettings);

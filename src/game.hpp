@@ -1,10 +1,12 @@
 #pragma once
 
 #include <ecs/ecs.hpp>
+#include <ostream>
 #include <pipeline/pipelines.hpp>
 #include <render/samplers.hpp>
 #include <sdl.hpp>
 #include <util/fps_capper.hpp>
+#include <util/optional.hpp>
 #include <util/stopwatch.hpp>
 
 namespace gfx_testing::game {
@@ -12,6 +14,16 @@ namespace gfx_testing::game {
         // Optional FPS to target.
         // std::nullopt causes vsync to be used.
         std::optional<float> mTargetFps = std::nullopt;
+        bool mVsyncDisabled = false;
+        bool mHdrEnabled = false;
+
+        std::vector<SDL_GPUPresentMode> getPresentModes() const;
+        std::vector<SDL_GPUSwapchainComposition> getSwapchainCompositions() const;
+
+        friend std::ostream &operator<<(std::ostream &os, const GameSettings &settings) {
+            return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "none") << "\n"
+                      << "  mVsyncDisabled: " << util::toString(settings.mVsyncDisabled);
+        }
     };
 
     class GameContext {
@@ -62,6 +74,7 @@ namespace gfx_testing::game {
         pipeline::Pipelines mPipelines;
         render::Samplers mSamplers;
         util::Stopwatch mStopwatch{false};
+        GameSettings const &mGameSettings;
         util::FpsCapper mFpsCapper;
 
     private:

@@ -14,7 +14,8 @@ namespace gfx_testing::sdl {
 
         static constexpr util::Extent2D INITIAL_EXTENT = {1280, 720};
 
-        explicit SdlContext(bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes);
+        explicit SdlContext(bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes,
+                            std::vector<SDL_GPUSwapchainComposition> const &swapchainCompositions);
 
         ~SdlContext();
 
@@ -23,7 +24,8 @@ namespace gfx_testing::sdl {
         }
 
     private:
-        void updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes) const;
+        void updateSwapchainParameters(std::vector<SDL_GPUPresentMode> const &presentModes,
+                                       std::vector<SDL_GPUSwapchainComposition> const &swapchainCompositions) const;
 
     public:
         SDL_Window *mWindow;
