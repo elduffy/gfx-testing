@@ -37,6 +37,7 @@ namespace gfx_testing {
         static void applyConfigFile(toml_doc const &parsed, game::GameSettings &gameSettings) {
             gameSettings.mTargetFps = findOptionalFloatLenient(parsed, "target_fps", DEFAULT_TARGET_FPS);
             gameSettings.mVsyncDisabled = toml::find_or(parsed, "vsync_disabled", gameSettings.mVsyncDisabled);
+            gameSettings.mHdrEnabled = toml::find_or(parsed, "hdr_enabled", gameSettings.mHdrEnabled);
         }
 
     public:

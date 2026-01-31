@@ -27,7 +27,8 @@ int main(int argc, char *argv[]) {
         gfx_testing::Cli cli(argc, argv);
         gameSettings = cli.loadGameSettings();
     }
-    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, gameSettings.getPresentModes()};
+    const gfx_testing::sdl::SdlContext sdlContext{gfx_testing::util::DEBUG_MODE, gameSettings.getPresentModes(),
+                                                  gameSettings.getSwapchainCompositions()};
     const gfx_testing::io::ResourceLoader resourceLoader{sdlContext};
 
     gfx_testing::game::GameContext gameContext(sdlContext, resourceLoader, gameSettings);

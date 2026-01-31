@@ -15,8 +15,10 @@ namespace gfx_testing::game {
         // std::nullopt causes vsync to be used.
         std::optional<float> mTargetFps = std::nullopt;
         bool mVsyncDisabled = false;
+        bool mHdrEnabled = false;
 
         std::vector<SDL_GPUPresentMode> getPresentModes() const;
+        std::vector<SDL_GPUSwapchainComposition> getSwapchainCompositions() const;
 
         friend std::ostream &operator<<(std::ostream &os, const GameSettings &settings) {
             return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "none") << "\n"

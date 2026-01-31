@@ -15,6 +15,17 @@ namespace gfx_testing::game {
         return presentModes;
     }
 
+    std::vector<SDL_GPUSwapchainComposition> GameSettings::getSwapchainCompositions() const {
+        std::vector<SDL_GPUSwapchainComposition> swapchainCompositions;
+        swapchainCompositions.push_back(SDL_GPU_SWAPCHAINCOMPOSITION_SDR);
+        if (mHdrEnabled) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "HDR support is untested.");
+            swapchainCompositions.push_back(SDL_GPU_SWAPCHAINCOMPOSITION_HDR_EXTENDED_LINEAR);
+            swapchainCompositions.push_back(SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084);
+        }
+        return swapchainCompositions;
+    }
+
     GameContext::GameContext(sdl::SdlContext const &sdlContext, io::ResourceLoader const &resourceLoader,
                              GameSettings const &settings) :
         mSdlContext(sdlContext), mResourceLoader(resourceLoader), mPipelines(sdlContext, resourceLoader),
