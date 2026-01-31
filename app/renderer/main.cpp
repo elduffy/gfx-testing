@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::vector<SDL_GPUPresentMode> presentModes;
-    if (gameSettings.mTargetFps.has_value()) {
+    if (gameSettings.mTargetFps.has_value() || gameSettings.mVsyncDisabled) {
         presentModes.push_back(SDL_GPU_PRESENTMODE_MAILBOX);
         presentModes.push_back(SDL_GPU_PRESENTMODE_IMMEDIATE);
     }

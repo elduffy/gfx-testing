@@ -34,6 +34,11 @@ namespace gfx_testing {
             }
         }
 
+        static void applyConfigFile(toml_doc const &parsed, game::GameSettings &gameSettings) {
+            gameSettings.mTargetFps = findOptionalFloatLenient(parsed, "target_fps", DEFAULT_TARGET_FPS);
+            gameSettings.mVsyncDisabled = toml::find_or(parsed, "vsync_disabled", gameSettings.mVsyncDisabled);
+        }
+
     public:
         Cli(int argc, char *argv[]) :
             mConfigFilePath("config.toml"),
@@ -61,7 +66,7 @@ namespace gfx_testing {
                     ss << parsed;
                     SDL_Log("Loaded contents of %s:\n%s", mConfigFilePath.c_str(), ss.str().c_str());
                 }
-                gameSettings.mTargetFps = findOptionalFloatLenient(parsed, "target_fps", DEFAULT_TARGET_FPS);
+                applyConfigFile(parsed, gameSettings);
             } else {
                 SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to load settings from %s. Using defaults.",
                             mConfigFilePath.c_str());

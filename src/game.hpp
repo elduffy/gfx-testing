@@ -14,9 +14,11 @@ namespace gfx_testing::game {
         // Optional FPS to target.
         // std::nullopt causes vsync to be used.
         std::optional<float> mTargetFps = std::nullopt;
+        bool mVsyncDisabled = false;
 
         friend std::ostream &operator<<(std::ostream &os, const GameSettings &settings) {
-            return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "none");
+            return os << "  mTargetFps: " << util::toString(settings.mTargetFps, "none") << "\n"
+                      << "  mVsyncDisabled: " << util::toString(settings.mVsyncDisabled);
         }
     };
 
