@@ -78,14 +78,14 @@ namespace gfx_testing::imgui {
         }
 
         if (ImGui::CollapsingHeader("ECS")) {
-            auto const &ecs = scene.getGameContext().getEcs();
+            auto &ecs = scene.getGameContext().getEcs();
             if (ImGui::TreeNode("Root")) {
-                static constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH |
-                                                              ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg |
-                                                              ImGuiTableFlags_NoBordersInBody;
-                static ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_SpanAllColumns;
-                if (ImGui::BeginTable("ecs", 2, tableFlags)) {
-                    ImGui::TableSetupColumn("Entity ID", ImGuiTableColumnFlags_NoHide);
+                static constexpr ImGuiTableFlags tableFlags =
+                        ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable |
+                        ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_SizingStretchProp;
+                if (ImGui::BeginTable("ecs", 3, tableFlags)) {
+                    ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_NoHide);
+                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
                     ImGui::TableSetupColumn("RenderObject", ImGuiTableColumnFlags_NoHide);
                     ImGui::TableHeadersRow();
 
@@ -94,8 +94,10 @@ namespace gfx_testing::imgui {
                         ImGui::TableNextColumn();
                         ImGui::Text("%u", ecs::EntityId::getId(entity));
                         ImGui::TableNextColumn();
-                        auto const *renderObject = ecs.mRegistry.try_get<render::RenderObject>(entity);
-                        if (renderObject == nullptr) {
+                        ImGui::Text("%s", ecs.get(entity).getName());
+                        ImGui::TableNextColumn();
+                        if (auto const *renderObject = ecs.mRegistry.try_get<render::RenderObject>(entity);
+                            renderObject == nullptr) {
                             ImGui::TextDisabled("--");
                         } else {
                             ImGui::Value("Pipeline", getName(renderObject->getPipelineName()));

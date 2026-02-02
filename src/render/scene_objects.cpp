@@ -15,7 +15,7 @@ namespace gfx_testing::render {
     SceneObjects::SceneObjects(game::GameContext &gameContext) :
         mGameContext(gameContext),
         mPropObjects(gfx_testing::ecs::render::createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Gooch>(
-                gameContext.getEcs(), gameContext,
+                gameContext.getEcs(), "PropObjects", gameContext,
                 gameContext.mResourceLoader.loadGltfModel("basic-shapes.glb", UNTEXTURED_ATTRIB_TREATMENT),
                 pipeline::gfx::PipelineName::Gooch, translate(glm::mat4(1.0f), PROP_OBJECTS_POSITION))) {
         auto &ecs = gameContext.getEcs();
@@ -32,12 +32,13 @@ namespace gfx_testing::render {
         DebugAxes::create(ecs, gameContext);
         // Landscape
         ecs::render::createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Lambert>(
-                ecs, gameContext, gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
+                ecs, "Landscape", gameContext,
+                gameContext.mResourceLoader.loadGltfModel("cube.glb", UNTEXTURED_ATTRIB_TREATMENT),
                 pipeline::gfx::PipelineName::Lambert,
                 glm::scale(translate(glm::mat4(1.0f), LANDSCAPE_POSITION), LANDSCAPE_SCALE));
         // Textured object
         ecs::render::createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Textured>(
-                ecs, gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
+                ecs, "VikingRoom", gameContext, gameContext.mResourceLoader.loadGltfModel("viking-room.glb"),
                 pipeline::gfx::PipelineName::Textured,
                 glm::scale(translate(glm::mat4(1.0f), TEXTURE_OBJECT_POSITION), TEXTURE_OBJECT_SCALE));
     }

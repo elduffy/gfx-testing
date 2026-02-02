@@ -17,7 +17,7 @@ namespace gfx_testing::render {
 
     PointLight &PointLight::create(ecs::Ecs &ecs, game::GameContext &gameContext,
                                    shader::ShaderObject const &shaderObject, float pathRadius, float phase) {
-        auto entityId = ecs.create();
+        auto entityId = ecs.create("PointLight");
         return entityId.emplace<PointLight>(entityId, gameContext, shaderObject, pathRadius, phase);
     }
 

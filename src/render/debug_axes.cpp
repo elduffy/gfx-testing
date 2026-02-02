@@ -74,7 +74,7 @@ namespace gfx_testing::render {
     }
 
     DebugAxes &DebugAxes::create(ecs::Ecs &ecs, game::GameContext &gameContext) {
-        auto entityId = ecs.create();
+        auto entityId = ecs.create("DebugAxes");
         auto &debugAxes = entityId.emplace<DebugAxes>(entityId, gameContext);
         return debugAxes;
     }

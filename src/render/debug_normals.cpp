@@ -58,7 +58,7 @@ namespace gfx_testing::render {
     DebugNormals &DebugNormals::create(ecs::EntityId target, game::GameContext const &gameContext,
                                        Options const &options) {
         auto &ecs = target.mEcs;
-        auto entityId = ecs.create();
+        auto entityId = ecs.create("DebugNormals");
         auto &debugNormals = entityId.emplace<DebugNormals>(entityId, gameContext, target, options);
         entityId.setParent(target);
         return debugNormals;

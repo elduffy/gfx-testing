@@ -9,9 +9,15 @@ namespace gfx_testing::ecs {
 
     struct ParentEntity;
 
+    struct EntityName {
+        const char *mName;
+    };
+
     class Ecs {
     public:
         EntityId create();
+        EntityId create(char const *name);
+        EntityId get(entt::entity entity);
 
         void destroy(EntityId id);
 
@@ -43,6 +49,14 @@ namespace gfx_testing::ecs {
         template<typename T>
         T &get() const {
             return mEcs.mRegistry.get<T>(mEntity);
+        }
+
+        char const *getName() const {
+            auto const *entityName = mEcs.mRegistry.try_get<EntityName>(mEntity);
+            if (entityName == nullptr) {
+                return nullptr;
+            }
+            return entityName->mName;
         }
 
         template<typename T>

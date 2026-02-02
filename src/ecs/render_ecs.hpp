@@ -17,8 +17,8 @@ namespace gfx_testing::ecs::render {
     }
 
     template<pipeline::gfx::PipelineName pipelineName, typename... Args>
-    EntityId createAndEmplaceRenderObject(Ecs &ecs, Args &&...args) {
-        auto entityId = ecs.create();
+    EntityId createAndEmplaceRenderObject(Ecs &ecs, char const *name, Args &&...args) {
+        auto entityId = ecs.create(name);
         emplaceRenderObject<pipelineName>(entityId, std::forward<Args>(args)...);
         return entityId;
     }

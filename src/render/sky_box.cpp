@@ -59,7 +59,7 @@ namespace gfx_testing::render {
 
 
     SkyBox &SkyBox::create(ecs::Ecs &ecs, game::GameContext &gameContext, util::CubeMap cubeMap) {
-        auto entityId = ecs.create();
+        auto entityId = ecs.create("SkyBox");
         return entityId.emplace<SkyBox>(entityId, gameContext, std::move(cubeMap));
     }
 
