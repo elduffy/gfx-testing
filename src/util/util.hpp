@@ -85,4 +85,12 @@ namespace gfx_testing::util {
         }
         return ss.str();
     }
+
+    inline std::string toString(bool b) { return b ? "true" : "false"; }
+
+    inline std::string toString(glm::vec3 const &vec) {
+        std::stringstream ss;
+        ss << vec.x << ", " << vec.y << ", " << vec.z;
+        return ss.str();
+    }
 } // namespace gfx_testing::util

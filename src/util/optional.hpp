@@ -27,8 +27,6 @@ namespace gfx_testing::util {
         return defaultValue;
     }
 
-    inline std::string toString(bool b) { return b ? "true" : "false"; }
-
     template<typename T, typename F>
         requires std::invocable<F, T>
     void if_present(std::optional<T> const &opt, F &&f) {

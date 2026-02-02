@@ -22,12 +22,14 @@ namespace gfx_testing::ecs {
         Ecs &mEcs;
         entt::entity mEntity;
 
+        static uint32_t getId(entt::entity entity) {
+            static_assert(std::is_same_v<ENTT_ID_TYPE, uint32_t>);
+            return static_cast<uint32_t>(entity);
+        }
+
         void destroy() const { mEcs.destroy(*this); }
 
-        uint32_t getId() const {
-            static_assert(std::is_same_v<ENTT_ID_TYPE, uint32_t>);
-            return static_cast<uint32_t>(mEntity);
-        };
+        uint32_t getId() const { return getId(mEntity); };
 
         util::ref_opt<EntityId> getParent() const;
 

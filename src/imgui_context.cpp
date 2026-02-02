@@ -4,11 +4,17 @@
 #include <imgui_context.hpp>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
+#include <render/render_object.hpp>
 #include <sdl.hpp>
+
+namespace ImGui {
+    IMGUI_API void Value(const char *prefix, glm::vec3 const &v) { Text("%s: %f %f %f", prefix, v.x, v.y, v.z); }
+    IMGUI_API void Value(const char *prefix, char const *v) { Text("%s: %s", prefix, v); }
+} // namespace ImGui
 
 namespace gfx_testing::imgui {
     // Set true to show the demo menu to try out widgets, etc
-    static auto constexpr SHOW_DEMO = false;
+    static auto constexpr SHOW_DEMO = true;
 
     float *getVectorData(glm::vec3 &v) {
         static_assert(offsetof(glm::vec3, x) == 0);
@@ -70,6 +76,39 @@ namespace gfx_testing::imgui {
             }
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
+
+        if (ImGui::CollapsingHeader("ECS")) {
+            auto const &ecs = scene.getGameContext().getEcs();
+            if (ImGui::TreeNode("Root")) {
+                static constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH |
+                                                              ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg |
+                                                              ImGuiTableFlags_NoBordersInBody;
+                static ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_SpanAllColumns;
+                if (ImGui::BeginTable("ecs", 2, tableFlags)) {
+                    ImGui::TableSetupColumn("Entity ID", ImGuiTableColumnFlags_NoHide);
+                    ImGui::TableSetupColumn("RenderObject", ImGuiTableColumnFlags_NoHide);
+                    ImGui::TableHeadersRow();
+
+                    for (auto const entity: ecs.mRegistry.view<entt::entity>()) {
+                        ImGui::TableNextRow();
+                        ImGui::TableNextColumn();
+                        ImGui::Text("%u", ecs::EntityId::getId(entity));
+                        ImGui::TableNextColumn();
+                        auto const *renderObject = ecs.mRegistry.try_get<render::RenderObject>(entity);
+                        if (renderObject == nullptr) {
+                            ImGui::TextDisabled("--");
+                        } else {
+                            ImGui::Value("Pipeline", getName(renderObject->getPipelineName()));
+                            ImGui::Value("Position", renderObject->getPositionWs());
+                        }
+                    }
+
+                    ImGui::EndTable();
+                }
+                ImGui::TreePop();
+            }
+        }
+
         if (ImGui::CollapsingHeader("Camera")) {
             auto &camera = scene.getCamera();
             glm::vec3 cameraPos = camera.getPosition();
@@ -89,6 +128,7 @@ namespace gfx_testing::imgui {
             camera.setPosition(cameraPos);
             camera.setPivot(cameraPivot);
         }
+
         if (ImGui::CollapsingHeader("Debug")) {
             // Debug Normals
             {

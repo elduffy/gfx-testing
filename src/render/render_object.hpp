@@ -1,5 +1,6 @@
 #pragma once
 #include <game.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 #include <pipeline/gfx/pipeline_definition.hpp>
 #include <render/camera.hpp>
 
@@ -18,6 +19,8 @@ namespace gfx_testing::render {
         void render(SDL_GPURenderPass *) const;
 
         pipeline::gfx::PipelineName getPipelineName() const { return mPipelineName; }
+
+        glm::vec3 getPositionWs() const { return mTransform[3]; }
 
         shader::GpuShaderObject const &getGpuShaderObject() const { return mGpuShaderObject; }
 
