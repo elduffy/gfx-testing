@@ -7,14 +7,16 @@ namespace gfx_testing::render {
         return sdl::ScopedCommandBuffer(commandBuffer);
     }
 
-    SDL_GPUTexture *acquireSwapchainTexture(SDL_GPUCommandBuffer *commandBuffer, SDL_Window *window) {
+    SDL_GPUTexture *acquireSwapchainTexture(SDL_GPUCommandBuffer *commandBuffer, SDL_Window *window,
+                                            util::Extent2D &swapchainExtentOut) {
         SDL_GPUTexture *swapchainTexture = nullptr;
-        CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, window, &swapchainTexture, nullptr, nullptr))
+        CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, window, &swapchainTexture,
+                                                    &swapchainExtentOut.mWidth, &swapchainExtentOut.mHeight))
                 << "Failed to acquire swapchain texture: " << SDL_GetError();
         return swapchainTexture;
     }
 
     DrawContext::DrawContext(sdl::SdlContext const &sdlContext) :
-        mCommandBuffer(acquireCommandBuffer(sdlContext)),
-        mSwapchainTexture(acquireSwapchainTexture(*mCommandBuffer, sdlContext.mWindow)) {}
+        mCommandBuffer(acquireCommandBuffer(sdlContext)), mSwapchainExtent(0, 0),
+        mSwapchainTexture(acquireSwapchainTexture(*mCommandBuffer, sdlContext.mWindow, mSwapchainExtent)) {}
 } // namespace gfx_testing::render

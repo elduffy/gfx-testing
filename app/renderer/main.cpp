@@ -17,6 +17,7 @@ void handleUpdate(gfx_testing::game::GameContext &gameContext, gfx_testing::rend
         return;
     }
     gameContext.maybeLimitFps();
+    scene.onResize(drawContext.mSwapchainExtent);
     scene.draw(drawContext);
     imGuiContext.renderFrame(drawContext, scene);
 }

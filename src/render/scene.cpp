@@ -31,6 +31,9 @@ namespace gfx_testing::render {
         mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
 
     void Scene::onResize(const util::Extent2D extent) {
+        if (mViewportExtent == extent) {
+            return;
+        }
         mViewportExtent = extent;
         mProjection = getProjection(mViewportExtent);
         mDepthTexture = createDepthTexture(mGameContext.mSdlContext, extent);
@@ -43,6 +46,7 @@ namespace gfx_testing::render {
 
     void Scene::draw(DrawContext const &drawContext) const {
         CHECK_NE(drawContext.mSwapchainTexture, nullptr) << "Scene::draw called with null swapchain.";
+        CHECK_EQ(drawContext.mSwapchainExtent, mViewportExtent) << "Swapchain extent is different than viewport extent";
 
         SDL_GPUColorTargetInfo mainColorTarget{
                 .texture = drawContext.mSwapchainTexture,

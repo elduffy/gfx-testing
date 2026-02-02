@@ -10,6 +10,7 @@ namespace gfx_testing::render {
         bool hasSwapchain() const { return mSwapchainTexture != nullptr; }
 
         sdl::ScopedCommandBuffer mCommandBuffer;
+        util::Extent2D mSwapchainExtent;
         SDL_GPUTexture *mSwapchainTexture;
         std::optional<sdl::SdlGpuTexture> mMultisampleTextureOpt;
     };
