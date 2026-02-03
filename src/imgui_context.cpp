@@ -79,16 +79,20 @@ namespace gfx_testing::imgui {
 
         if (ImGui::CollapsingHeader("ECS")) {
             auto &ecs = scene.getGameContext().getEcs();
-            if (ImGui::TreeNode("Root")) {
+            if (ImGui::TreeNodeEx("Root", ImGuiTreeNodeFlags_DefaultOpen)) {
                 static constexpr ImGuiTableFlags tableFlags =
                         ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable |
                         ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_SizingStretchProp;
                 if (ImGui::BeginTable("ecs", 3, tableFlags)) {
-                    ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_NoHide);
-                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-                    ImGui::TableSetupColumn("RenderObject", ImGuiTableColumnFlags_NoHide);
+                    static constexpr ImGuiTableColumnFlags defaultColumnFlags = ImGuiTableColumnFlags_NoHide;
+                    ImGui::TableSetupColumn("ID", defaultColumnFlags);
+                    ImGui::TableSetupColumn("Name", defaultColumnFlags);
+                    ImGui::TableSetupColumn("RenderObject", defaultColumnFlags);
                     ImGui::TableHeadersRow();
 
+                    ecs.mRegistry.sort<entt::entity>([](entt::entity const &lhs, entt::entity const &rhs) {
+                        return ecs::EntityId::getId(lhs) < ecs::EntityId::getId(rhs);
+                    });
                     for (auto const entity: ecs.mRegistry.view<entt::entity>()) {
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
