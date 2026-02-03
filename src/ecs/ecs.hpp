@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ecs/entity.hpp>
 #include <entt/entt.hpp>
 #include <util/ref.hpp>
 #include <util/util.hpp>
@@ -7,16 +8,9 @@
 namespace gfx_testing::ecs {
     struct EntityId;
 
-    struct ParentEntity;
-
-    struct EntityName {
-        const char *mName;
-    };
-
     class Ecs {
     public:
-        EntityId create();
-        EntityId create(char const *name);
+        EntityId create(char const *name = nullptr);
         EntityId get(entt::entity entity);
 
         void destroy(EntityId id);
@@ -37,9 +31,11 @@ namespace gfx_testing::ecs {
 
         uint32_t getId() const { return getId(mEntity); };
 
-        util::ref_opt<EntityId> getParent() const;
+        std::optional<EntityId> getParent() const;
 
         void setParent(EntityId parent) const;
+
+        EntityBase const &getEntityBase() const;
 
         template<typename T, typename... Args>
         decltype(auto) emplace(Args &&...args) {
@@ -52,11 +48,8 @@ namespace gfx_testing::ecs {
         }
 
         char const *getName() const {
-            auto const *entityName = mEcs.mRegistry.try_get<EntityName>(mEntity);
-            if (entityName == nullptr) {
-                return nullptr;
-            }
-            return entityName->mName;
+            auto const &baseEntity = mEcs.mRegistry.get<EntityBase>(mEntity);
+            return baseEntity.getName();
         }
 
         template<typename T>
@@ -66,8 +59,4 @@ namespace gfx_testing::ecs {
         }
     };
     static_assert(sizeof(EntityId) <= 32);
-
-    struct ParentEntity {
-        EntityId mParent;
-    };
 } // namespace gfx_testing::ecs

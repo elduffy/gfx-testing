@@ -75,7 +75,7 @@ namespace gfx_testing::render {
     void DebugNormals::update() const {
         const auto targetId = mEntityId.getParent();
         CHECK(targetId.has_value()) << "DebugNormals::update: entity has no parent.";
-        const auto &targetObj = targetId->get().get<RenderObject>();
+        const auto &targetObj = targetId->get<RenderObject>();
 
         mEntityId.get<RenderObject>().mTransform = targetObj.mTransform;
     }

@@ -3,15 +3,13 @@
 #include <util/ref.hpp>
 
 namespace gfx_testing::ecs {
-    EntityId Ecs::create() { return create(nullptr); }
-
     EntityId Ecs::create(char const *name) {
         EntityId id{
                 .mEcs = *this,
                 .mEntity = mRegistry.create(),
         };
         SDL_Log("Created entity %u", id.getId());
-        id.emplace<EntityName>(name);
+        id.emplace<EntityBase>(name);
         return id;
     }
 
@@ -22,13 +20,16 @@ namespace gfx_testing::ecs {
         mRegistry.destroy(id.mEntity);
     }
 
-    util::ref_opt<EntityId> EntityId::getParent() const {
-        auto *parent = mEcs.mRegistry.try_get<ParentEntity>(mEntity);
-        if (parent == nullptr) {
-            return {};
-        }
-        return {parent->mParent};
+    std::optional<EntityId> EntityId::getParent() const {
+        auto const &base = getEntityBase();
+        return util::transform(base.getParent(), [this](entt::entity parent) { return EntityId{mEcs, parent}; });
     }
 
-    void EntityId::setParent(EntityId parent) const { mEcs.mRegistry.emplace<ParentEntity>(mEntity, parent); }
+    EntityBase &getEntityBaseInternal(EntityId entityId) {
+        return entityId.mEcs.mRegistry.get<EntityBase>(entityId.mEntity);
+    }
+
+    void EntityId::setParent(EntityId parent) const { getEntityBaseInternal(*this).setParent(parent.mEntity); }
+
+    EntityBase const &EntityId::getEntityBase() const { return getEntityBaseInternal(*this); }
 } // namespace gfx_testing::ecs
