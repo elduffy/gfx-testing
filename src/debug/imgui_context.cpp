@@ -10,7 +10,7 @@
 
 namespace gfx_testing::imgui {
     // Set true to show the demo menu to try out widgets, etc
-    static auto constexpr SHOW_DEMO = true;
+    static auto constexpr SHOW_DEMO = false;
 
     float *getVectorData(glm::vec3 &v) {
         static_assert(offsetof(glm::vec3, x) == 0);
