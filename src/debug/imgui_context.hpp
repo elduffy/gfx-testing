@@ -1,6 +1,6 @@
 #pragma once
 
-#include <debug/imgui_ecs_view.hpp>
+#include <debug/imgui_debug_view.hpp>
 #include <render/draw_context.hpp>
 #include <render/scene.hpp>
 #include <sdl.hpp>
@@ -28,6 +28,6 @@ namespace gfx_testing::imgui {
 
         bool mOpenWindow{false};
 
-        ImGuiEcsView mEcsView;
+        std::vector<std::unique_ptr<ImguiDebugView>> mDebugViews;
     };
 } // namespace gfx_testing::imgui

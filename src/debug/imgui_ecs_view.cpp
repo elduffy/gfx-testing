@@ -4,7 +4,8 @@
 #include <render/render_object.hpp>
 
 namespace gfx_testing::imgui {
-    void ImGuiEcsView::render(ecs::Ecs &ecs) {
+    void ImGuiEcsView::render(render::Scene &scene) {
+        auto &ecs = scene.getGameContext().getEcs();
         if (ImGui::TreeNodeEx("Root", ImGuiTreeNodeFlags_DefaultOpen)) {
             static constexpr ImGuiTableFlags tableFlags =
                     ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable |
@@ -42,7 +43,7 @@ namespace gfx_testing::imgui {
                             renderObject == nullptr) {
                             ImGui::TextDisabled("--");
                         } else {
-                            ImGui::Value("Pipeline", getName(renderObject->getPipelineName()));
+                            ImGui::Value("Pipeline", pipeline::gfx::getName(renderObject->getPipelineName()));
                             ImGui::Value("Position", renderObject->getPositionWs());
                         }
                         ImGui::TreePop();

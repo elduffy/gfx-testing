@@ -1,6 +1,7 @@
 #include <SDL3/SDL_log.h>
 #include <absl/log/check.h>
 #include <debug/imgui_context.hpp>
+#include <debug/imgui_ecs_view.hpp>
 #include <debug/imgui_utils.hpp>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -26,6 +27,8 @@ namespace gfx_testing::imgui {
         };
         CHECK(ImGui_ImplSDLGPU3_Init(&init_info)) << "Failed to initialize ImGui";
         SDL_Log("Setup ImGui");
+
+        mDebugViews.emplace_back(std::make_unique<ImGuiEcsView>());
     }
 
     ImGuiContext::~ImGuiContext() {
@@ -64,9 +67,10 @@ namespace gfx_testing::imgui {
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
 
-        if (ImGui::CollapsingHeader("ECS")) {
-            auto &ecs = scene.getGameContext().getEcs();
-            mEcsView.render(ecs);
+        for (auto const &view: mDebugViews) {
+            if (ImGui::CollapsingHeader(view->getName())) {
+                view->render(scene);
+            }
         }
 
         if (ImGui::CollapsingHeader("Camera")) {
