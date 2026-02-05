@@ -31,6 +31,7 @@ add_library(gfx_testing_lib
         src/game.cpp
         src/debug/imgui_context.cpp
         src/debug/imgui_ecs_view.cpp
+        src/debug/imgui_utils.cpp
         src/ecs/ecs.cpp
         src/io/input_manager.cpp
         src/io/gltf_loader.cpp

@@ -4,6 +4,11 @@
 #include <render/scene.hpp>
 
 namespace ImGui {
-    IMGUI_API inline void Value(const char *prefix, glm::vec3 const &v) { Text("%s: %f %f %f", prefix, v.x, v.y, v.z); }
-    IMGUI_API inline void Value(const char *prefix, char const *v) { Text("%s: %s", prefix, v); }
+    IMGUI_API void Value(const char *prefix, glm::vec3 const &v);
+    IMGUI_API void Value(const char *prefix, char const *v);
 } // namespace ImGui
+
+
+namespace gfx_testing::imgui {
+    float *getVectorData(glm::vec3 &v);
+} // namespace gfx_testing::imgui

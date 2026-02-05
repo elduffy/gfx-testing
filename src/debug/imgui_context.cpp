@@ -1,6 +1,7 @@
 #include <SDL3/SDL_log.h>
 #include <absl/log/check.h>
 #include <debug/imgui_context.hpp>
+#include <debug/imgui_utils.hpp>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -11,16 +12,6 @@
 namespace gfx_testing::imgui {
     // Set true to show the demo menu to try out widgets, etc
     static auto constexpr SHOW_DEMO = false;
-
-    float *getVectorData(glm::vec3 &v) {
-        static_assert(offsetof(glm::vec3, x) == 0);
-        static_assert(sizeof(v.x) == sizeof(float));
-        static_assert(offsetof(glm::vec3, y) == sizeof(float));
-        static_assert(sizeof(v.y) == sizeof(float));
-        static_assert(offsetof(glm::vec3, z) == offsetof(glm::vec3, y) + sizeof(float));
-        static_assert(sizeof(v.z) == sizeof(float));
-        return &v.x;
-    }
 
     ImGuiContext::ImGuiContext(sdl::SdlContext const &sdlContext) {
         IMGUI_CHECKVERSION();
