@@ -29,7 +29,7 @@ include(cmake/build-shaders.cmake)
 # gfx_testing_lib main library
 add_library(gfx_testing_lib
         src/game.cpp
-        src/imgui_context.cpp
+        src/debug/imgui_context.cpp
         src/ecs/ecs.cpp
         src/io/input_manager.cpp
         src/io/gltf_loader.cpp

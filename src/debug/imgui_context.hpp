@@ -2,8 +2,7 @@
 
 #include <render/draw_context.hpp>
 #include <render/scene.hpp>
-
-#include "sdl.hpp"
+#include <sdl.hpp>
 
 namespace gfx_testing::imgui {
     class ImGuiContext {
