@@ -30,8 +30,8 @@ include(cmake/build-shaders.cmake)
 add_library(gfx_testing_lib
         src/game.cpp
         src/debug/imgui_context.cpp
-        src/debug/imgui_ecs_view.cpp
         src/debug/imgui_utils.cpp
+        src/debug/views/imgui_ecs_view.cpp
         src/ecs/ecs.cpp
         src/io/input_manager.cpp
         src/io/gltf_loader.cpp
@@ -61,6 +61,8 @@ add_library(gfx_testing_lib
         src/util/stopwatch.cpp
         src/util/util.cpp
         src/ecs/entity.hpp
+        src/debug/views/imgui_perf_view.cpp
+        src/debug/views/imgui_perf_view.hpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui::imgui

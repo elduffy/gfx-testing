@@ -2,7 +2,6 @@
 #include <game.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <pipeline/gfx/pipeline_definition.hpp>
-#include <render/camera.hpp>
 
 namespace gfx_testing::render {
 

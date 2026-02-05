@@ -1,8 +1,9 @@
 #include <SDL3/SDL_log.h>
 #include <absl/log/check.h>
 #include <debug/imgui_context.hpp>
-#include <debug/imgui_ecs_view.hpp>
 #include <debug/imgui_utils.hpp>
+#include <debug/views/imgui_ecs_view.hpp>
+#include <debug/views/imgui_perf_view.hpp>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -28,6 +29,7 @@ namespace gfx_testing::imgui {
         CHECK(ImGui_ImplSDLGPU3_Init(&init_info)) << "Failed to initialize ImGui";
         SDL_Log("Setup ImGui");
 
+        mDebugViews.emplace_back(std::make_unique<ImGuiPerfView>());
         mDebugViews.emplace_back(std::make_unique<ImGuiEcsView>());
     }
 
@@ -53,19 +55,6 @@ namespace gfx_testing::imgui {
             ImGui::End();
             return;
         }
-        const ImGuiIO &io = ImGui::GetIO();
-        auto const &gameSettings = scene.getGameContext().mGameSettings;
-
-        if (ImGui::CollapsingHeader("Perf")) {
-            if (auto const &targetFps = gameSettings.mTargetFps; targetFps.has_value()) {
-                ImGui::Text("FPS target is %.1f", targetFps.value());
-            } else if (gameSettings.mVsyncDisabled) {
-                ImGui::Text("FPS is uncapped");
-            } else {
-                ImGui::Text("FPS is capped by vsync");
-            }
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        }
 
         for (auto const &view: mDebugViews) {
             if (ImGui::CollapsingHeader(view->getName())) {
@@ -73,6 +62,7 @@ namespace gfx_testing::imgui {
             }
         }
 
+        // TODO: move these to debug/views
         if (ImGui::CollapsingHeader("Camera")) {
             auto &camera = scene.getCamera();
             glm::vec3 cameraPos = camera.getPosition();

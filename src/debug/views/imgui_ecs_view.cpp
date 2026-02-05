@@ -1,5 +1,5 @@
-#include <debug/imgui_ecs_view.hpp>
 #include <debug/imgui_utils.hpp>
+#include <debug/views/imgui_ecs_view.hpp>
 #include <imgui.h>
 #include <render/render_object.hpp>
 
