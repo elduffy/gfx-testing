@@ -89,6 +89,8 @@ add_executable(tests
         tests/io/gltf_loader_tests.cpp
         tests/io/obj_loader_tests.cpp
         tests/shader/mesh_tests.cpp
+        tests/render/camera_tests.cpp
+        tests/util/coord_tests.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain gfx_testing_lib)
 target_include_directories(tests SYSTEM PRIVATE src/)

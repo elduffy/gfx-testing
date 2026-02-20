@@ -53,7 +53,7 @@ namespace gfx_testing::test {
         return VecWithinAbsMatcher(std::move(target), margin);
     }
 
-    auto WithinAbs(shader::VertexData const &target, float margin) {
+    inline auto WithinAbs(shader::VertexData const &target, float margin) {
         return VertexDataWithinAbsMatcher(target, margin);
     }
 } // namespace gfx_testing::test
