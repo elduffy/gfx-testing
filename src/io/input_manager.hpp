@@ -4,6 +4,8 @@
 #include <SDL3/SDL_events.h>
 #include <game.hpp>
 #include <render/scene.hpp>
+#include <glm/vec2.hpp>
+#include <unordered_map>
 
 namespace gfx_testing::io {
     class InputManager {
@@ -17,5 +19,11 @@ namespace gfx_testing::io {
         imgui::ImGuiContext &mImGuiContext;
 
         bool mShift{false};
+        std::unordered_map<SDL_FingerID, glm::vec2> mFingers;
+
+    private:
+        void doPivot(glm::vec2 normalizedDelta);
+        void doPan(glm::vec2 normalizedDelta);
+        void doZoom(float delta);
     };
 } // namespace gfx_testing::io
