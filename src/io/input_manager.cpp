@@ -15,7 +15,8 @@ namespace gfx_testing::io {
     void InputManager::doZoom(float delta) { mScene.getCamera().approach(delta); }
 
     void InputManager::handleEvent(SDL_Event const &event) {
-        if (mImGuiContext.processEvent(event)) {
+        if (mImGuiContext.processEvent(event) && event.type != SDL_EVENT_FINGER_UP &&
+            event.type != SDL_EVENT_FINGER_CANCELED) {
             return;
         }
         switch (event.type) {
@@ -65,11 +66,13 @@ namespace gfx_testing::io {
             }
             case SDL_EVENT_FINGER_DOWN: {
                 mFingers[event.tfinger.fingerID] = {event.tfinger.x, event.tfinger.y};
+                SDL_Log("Finger down %lu; finger count %lu", event.tfinger.fingerID, mFingers.size());
                 break;
             }
             case SDL_EVENT_FINGER_UP:
             case SDL_EVENT_FINGER_CANCELED: {
                 mFingers.erase(event.tfinger.fingerID);
+                SDL_Log("Finger up/cancel %lu; finger count %lu", event.tfinger.fingerID, mFingers.size());
                 break;
             }
             case SDL_EVENT_FINGER_MOTION: {
