@@ -6,6 +6,7 @@
 #include <lambert.frag.hpp>
 #include <optional>
 #include <skybox.frag.hpp>
+#include <string_view>
 #include <skybox.vert.hpp>
 #include <util/util.hpp>
 #include <vertex_color.frag.hpp>
@@ -159,4 +160,12 @@ namespace gfx_testing::pipeline::gfx {
     };
     static constexpr std::array ALL_PIPELINES{PIPELINE_SIMPLE_COLOR, PIPELINE_GOOCH,   PIPELINE_TEXTURED,
                                               PIPELINE_LINES,        PIPELINE_LAMBERT, PIPELINE_SKYBOX};
+    inline std::optional<PipelineName> parsePipelineName(std::string_view name) {
+        for (auto const &pipeline : ALL_PIPELINES) {
+            if (name == getName(pipeline.mName)) {
+                return pipeline.mName;
+            }
+        }
+        return std::nullopt;
+    }
 } // namespace gfx_testing::pipeline::gfx
