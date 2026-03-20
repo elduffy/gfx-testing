@@ -1,5 +1,3 @@
-#pragma once
-
 #include <debug/imgui_utils.hpp>
 #include <imgui.h>
 #include <render/scene.hpp>
