@@ -4,26 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 
-This is a CMake + vcpkg C++20 project. A `CMakeUserPresets.json` (not committed) must inherit the `vcpkg` preset from `CMakePresets.json` and set the `VCPKG_ROOT` environment variable.
+This is a CMake + Ninja + vcpkg C++20 project. A `CMakeUserPresets.json` (not committed) must inherit the `vcpkg` preset from `CMakePresets.json` and set the `VCPKG_ROOT` environment variable. CLion manages the build; these commands replicate its configuration.
 
 ```bash
 # Configure (only needed once or after CMakeLists.txt changes)
-cmake --preset default
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -B cmake-build-debug
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -B cmake-build-release
+cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -B cmake-build-relwithdebinfo
 
 # Build everything (renderer, shaders, tests)
-cmake --build build
+cmake --build cmake-build-debug
 
 # Build just the renderer
-cmake --build build --target renderer
+cmake --build cmake-build-debug --target renderer
 
 # Build and run tests (Catch2)
-cmake --build build --target tests && ./build/tests
+cmake --build cmake-build-debug --target tests && ./cmake-build-debug/tests
 
 # Run a single test by name
-./build/tests "test name substring"
+./cmake-build-debug/tests "test name substring"
 
 # Run the renderer
-./build/app/renderer/renderer
+./cmake-build-debug/app/renderer/renderer
 ```
 
 Shaders are compiled automatically as part of the build via the `build_shaders` target (HLSL → SPIR-V → JSON → C++ headers). External tools required: `shadercross`, `spirv-cross`, `spirv-opt`.
