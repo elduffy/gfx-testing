@@ -1,0 +1,43 @@
+{
+  "objects": [
+    {
+      "name": "PropObjects",
+      "type": "mesh",
+      "model": "basic-shapes.glb",
+      "pipeline": "Gooch",
+      "position": [0, 0, 0],
+      "untextured": true,
+      "behavior": "rotate_z",
+      "behaviorParams": { "radsPerSecond": 0.3927 }
+    },
+    {
+      "name": "PointLights",
+      "type": "point_lights",
+      "count": 3,
+      "model": "uv-sphere.obj",
+      "orbitRadius": 3.4641
+    },
+    {
+      "name": "Skybox",
+      "type": "skybox",
+      "cubemap": "desert-night"
+    },
+    {
+      "name": "Landscape",
+      "type": "mesh",
+      "model": "cube.glb",
+      "pipeline": "Lambert",
+      "position": [0, 0, -15],
+      "scale": [20, 20, 0.5],
+      "untextured": true
+    },
+    {
+      "name": "VikingRoom",
+      "type": "mesh",
+      "model": "viking-room.glb",
+      "pipeline": "Textured",
+      "position": [-5, -5, 0],
+      "scale": [2, 2, 2]
+    }
+  ]
+}

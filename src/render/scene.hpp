@@ -10,7 +10,7 @@
 namespace gfx_testing::render {
     class Scene {
     public:
-        explicit Scene(game::GameContext &gameContext);
+        explicit Scene(game::GameContext &gameContext, std::string const &sceneFilename = "default.json");
 
         void update();
 
