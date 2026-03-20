@@ -24,9 +24,9 @@ namespace gfx_testing::render {
         return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
     }
 
-    Scene::Scene(game::GameContext &gameContext) :
+    Scene::Scene(game::GameContext &gameContext, std::string const &sceneFilename) :
         mGameContext(gameContext), mViewportExtent(sdl::SdlContext::INITIAL_EXTENT), mCamera(INITIAL_CAMERA_POSITION),
-        mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext),
+        mProjection(getProjection(mViewportExtent)), mSceneObjects(gameContext, sceneFilename),
         mDepthTexture(createDepthTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)),
         mMultisampleTextureOpt(createMultisampleTexture(gameContext.mSdlContext, sdl::SdlContext::INITIAL_EXTENT)) {}
 

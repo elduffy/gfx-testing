@@ -2,20 +2,20 @@
 
 #include <ecs/ecs.hpp>
 #include <game.hpp>
+#include <io/scene_loader.hpp>
 #include <render/debug_normals.hpp>
 
 namespace gfx_testing::render {
-    static constexpr glm::vec3 INITIAL_LIGHT_POSITION(2, 2, 2);
-    static constexpr glm::vec3 PROP_OBJECTS_POSITION(0, 0, 0);
-    static constexpr glm::vec3 LANDSCAPE_POSITION(0, 0, -15);
-    static constexpr glm::vec3 LANDSCAPE_SCALE(20, 20, .5);
-    static constexpr glm::vec3 TEXTURE_OBJECT_POSITION(-5, -5, 0);
-    static constexpr glm::vec3 TEXTURE_OBJECT_SCALE(2);
+
+    struct RotateBehavior {
+        glm::vec3 mAxis;
+        float mRadsPerSecond;
+    };
 
     class SceneObjects {
 
     public:
-        explicit SceneObjects(game::GameContext &gameContext);
+        SceneObjects(game::GameContext &gameContext, std::string const &sceneFilename);
 
         void update() const;
 
@@ -25,6 +25,7 @@ namespace gfx_testing::render {
 
     private:
         game::GameContext &mGameContext;
+        io::SceneDefinition mSceneDefinition;
         ecs::EntityId mPropObjects;
         util::ref_opt<DebugNormals> mDebugNormals;
     };

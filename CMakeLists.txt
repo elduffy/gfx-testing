@@ -37,6 +37,7 @@ add_library(gfx_testing_lib
         src/io/gltf_loader.cpp
         src/io/obj_loader.cpp
         src/io/resource_loader.cpp
+        src/io/scene_loader.cpp
         src/io/texture_loader.cpp
         src/pipeline/compute/pipeline.cpp
         src/pipeline/gfx/pipeline.cpp
@@ -77,6 +78,7 @@ target_link_libraries(gfx_testing_lib PUBLIC
         glm::glm
         fastgltf::fastgltf
         EnTT::EnTT
+        nlohmann_json::nlohmann_json
 )
 add_dependencies(gfx_testing_lib build_shaders)
 target_include_directories(gfx_testing_lib SYSTEM PUBLIC src/)
