@@ -52,4 +52,7 @@ namespace gfx_testing::io {
     util::CubeMap ResourceLoader::loadCubeMap(std::string const &dirname) const {
         return io::loadCubeMap(mProjectRoot / "content/cubemaps/" / dirname);
     }
+    SceneDefinition ResourceLoader::loadSceneDefinition(std::string const &filename) const {
+        return io::loadSceneDefinition(mProjectRoot / "content/scenes" / filename);
+    }
 } // namespace gfx_testing::io

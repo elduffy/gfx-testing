@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <filesystem>
+#include <io/scene_loader.hpp>
 #include <sdl.hpp>
 #include <shader/object.hpp>
 #include <util/cube_map.hpp>
@@ -51,6 +52,8 @@ namespace gfx_testing::io {
         [[nodiscard]] sdl::SdlSurface loadSurface(std::string const &filename) const;
 
         [[nodiscard]] util::CubeMap loadCubeMap(std::string const &dirname) const;
+
+        [[nodiscard]] SceneDefinition loadSceneDefinition(std::string const &filename) const;
 
     private:
         sdl::SdlContext const &mSdlContext;
