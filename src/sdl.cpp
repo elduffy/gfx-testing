@@ -217,7 +217,7 @@ namespace gfx_testing::sdl {
     void SdlGpuTexture::upload(std::vector<SdlSurface> const &surfaces) {
         auto const extent = surfaces.front().getExtent();
         auto const bytesPerLayer = extent.mWidth * extent.mHeight * 4;
-        auto const numLayers = boost::safe_numerics::checked::cast<uint32_t>(surfaces.size());
+        auto const numLayers = util::narrow_u32(surfaces.size());
         for (auto const &surface: surfaces) {
             auto surfaceExtent = surface.getExtent();
             CHECK_EQ(surfaceExtent, extent)

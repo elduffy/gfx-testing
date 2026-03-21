@@ -3,7 +3,6 @@
 #include <SDL3/SDL.h>
 #include <absl/log/check.h>
 #include <array>
-#include <boost/safe_numerics/checked_default.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -11,6 +10,7 @@
 #include <ostream>
 #include <shader/util.hpp>
 #include <shader/vertex.hpp>
+#include <util/util.hpp>
 #include <sstream>
 #include <vector>
 
@@ -54,7 +54,7 @@ namespace gfx_testing::shader {
             CHECK_LE(lightPosWs.size(), MAX_NUM_LIGHTS) << "Too many lights";
             auto const worldToModelTransform = glm::inverse(modelMatrix);
             ObjectLighting lighting{
-                    .mNumLights = boost::safe_numerics::checked::cast<uint32_t>(lightPosWs.size()),
+                    .mNumLights = util::narrow_u32(lightPosWs.size()),
                     .mCameraPosMS = worldToModelTransform * glm::vec4(cameraPosWs, 1),
             };
             for (size_t i = 0; i < lightPosWs.size(); ++i) {

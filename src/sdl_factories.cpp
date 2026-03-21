@@ -15,8 +15,8 @@ namespace gfx_testing::sdl {
                 .type = type,
                 .format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
                 .usage = SDL_GPU_TEXTUREUSAGE_SAMPLER,
-                .width = boost::safe_numerics::checked::cast<uint32_t>(extent.mWidth),
-                .height = boost::safe_numerics::checked::cast<uint32_t>(extent.mHeight),
+                .width = util::narrow_u32(extent.mWidth),
+                .height = util::narrow_u32(extent.mHeight),
                 .layer_count_or_depth = layerCount,
                 .num_levels = 1,
         };

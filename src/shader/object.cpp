@@ -15,7 +15,13 @@ namespace gfx_testing::shader {
                             GpuShaderObject const &gpuShaderObject) {
         const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
                 context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                boost::safe_numerics::checked::add(meshData.getVertexBufferSize(), meshData.getIndexBufferSize()));
+                [&] {
+                    auto const v = meshData.getVertexBufferSize();
+                    auto const i = meshData.getIndexBufferSize();
+                    CHECK_LE(static_cast<uint64_t>(v) + i,
+                             std::numeric_limits<uint32_t>::max());
+                    return v + i;
+                }());
 
         // Set the vertex/index data
         {
@@ -118,7 +124,7 @@ namespace gfx_testing::shader {
     }
 
     sdl::SdlMappedTransferBuffer GpuShaderObject::downloadVertexData() const {
-        auto const dataSize = boost::safe_numerics::checked::cast<uint32_t>(mVertexCount * sizeof(VertexData));
+        auto const dataSize = util::narrow_u32(mVertexCount * sizeof(VertexData));
         auto const &sdlContext = mVertexBuffer.mContext;
         auto const transferBuffer =
                 sdl::SdlTransferBuffer::create(sdlContext, SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD, dataSize);

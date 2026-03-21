@@ -6,20 +6,20 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 
-#include "boost/algorithm/string/replace.hpp"
+#include <absl/strings/str_replace.h>
 #include "write.hpp"
 
 
 std::string getPackageName(std::string const &inputFile) {
     std::string result = std::filesystem::path(inputFile).filename().string();
-    boost::replace_last(result, ".json", "");
-    boost::algorithm::replace_all(result, ".", "_");
+    absl::StrReplaceAll({{".json", ""}}, &result);
+    absl::StrReplaceAll({{".", "_"}}, &result);
     return result;
 }
 
 std::string getSourceSpvFilename(std::string const &inputFile) {
     std::string result = std::filesystem::path(inputFile).filename().string();
-    boost::replace_last(result, ".json", ".spv");
+    absl::StrReplaceAll({{".json", ".spv"}}, &result);
     return result;
 }
 

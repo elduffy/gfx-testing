@@ -22,8 +22,8 @@ namespace gfx_testing::io {
         switch (event.type) {
             case SDL_EVENT_WINDOW_RESIZED: {
                 mScene.onResize({
-                        boost::safe_numerics::checked::cast<uint32_t>(event.window.data1),
-                        boost::safe_numerics::checked::cast<uint32_t>(event.window.data2),
+                        util::narrow_u32(event.window.data1),
+                        util::narrow_u32(event.window.data2),
                 });
                 break;
             }
