@@ -1,5 +1,4 @@
 #include <absl/log/check.h>
-#include <boost/algorithm/string/replace.hpp>
 #include <sdl.hpp>
 #include <stdexcept>
 #include <util/scoped_timer.hpp>
