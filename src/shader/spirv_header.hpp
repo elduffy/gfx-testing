@@ -2,7 +2,6 @@
 #include <SDL3/SDL_gpu.h>
 #include <algorithm>
 #include <array>
-#include <boost/safe_numerics/checked_integer.hpp>
 #include <util/util.hpp>
 #include <variant>
 #include <vector>
@@ -128,6 +127,6 @@ namespace gfx_testing::shader {
         for (auto const &b: bindables) {
             result = std::max(result, b.mBinding + 1);
         }
-        return boost::safe_numerics::checked::cast<uint32_t>(result);
+        return static_cast<uint32_t>(result);
     }
 } // namespace gfx_testing::shader

@@ -1,5 +1,4 @@
 #include <absl/log/check.h>
-#include <boost/safe_numerics/checked_default.hpp>
 #include <util/cube_map.hpp>
 
 namespace gfx_testing::util {

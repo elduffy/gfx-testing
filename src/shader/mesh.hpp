@@ -2,7 +2,6 @@
 #include <SDL3/SDL.h>
 #include <absl/log/check.h>
 #include <array>
-#include <boost/safe_numerics/checked_default.hpp>
 #include <glm/mat4x4.hpp>
 #include <gooch.frag.hpp>
 #include <ostream>
@@ -112,7 +111,7 @@ namespace gfx_testing::shader {
     }
 
     inline uint32_t getVertexBufferSize(size_t vertexCount) {
-        return boost::safe_numerics::checked::cast<uint32_t>(vertexCount * sizeof(VertexData));
+        return util::narrow_u32(vertexCount * sizeof(VertexData));
     }
 
     struct MeshData {
@@ -124,7 +123,7 @@ namespace gfx_testing::shader {
         [[nodiscard]] uint32_t getVertexBufferSize() const { return shader::getVertexBufferSize(mVertices.size()); }
 
         [[nodiscard]] uint32_t getIndexBufferSize() const {
-            return boost::safe_numerics::checked::cast<uint32_t>(mIndices.bufferSize());
+            return util::narrow_u32(mIndices.bufferSize());
         }
 
         [[nodiscard]] std::string toString() const {
