@@ -5,7 +5,6 @@
 #include <util/cube_map.hpp>
 
 #include "SDL3_image/SDL_image.h"
-#include "boost/algorithm/string/split.hpp"
 
 namespace gfx_testing::io {
     sdl::SdlSurface convertFormat(SDL_Surface *surface) {

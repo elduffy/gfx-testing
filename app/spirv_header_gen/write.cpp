@@ -1,11 +1,8 @@
 #include <absl/log/check.h>
-#include <boost/algorithm/string/replace.hpp>
+#include <absl/strings/str_replace.h>
 #include <format>
 #include <inja/inja.hpp>
 #include <write.hpp>
-
-#include "boost/algorithm/string/classification.hpp"
-#include "boost/algorithm/string/detail/trim.hpp"
 
 namespace spirv_header_gen {
     std::filesystem::path getProjectRoot() {
@@ -36,10 +33,9 @@ namespace spirv_header_gen {
     }
 
     std::string getTypeVariableNameImpl(std::string const &typeStr) {
-        auto const newStart =
-                boost::algorithm::detail::trim_begin(typeStr.begin(), typeStr.end(), boost::is_any_of("type."));
-        auto result = std::string{&*newStart};
-        boost::algorithm::replace_all(result, ".", "_");
+        auto const pos = typeStr.find_first_not_of("type.");
+        auto result = pos != std::string::npos ? typeStr.substr(pos) : std::string{};
+        absl::StrReplaceAll({{".", "_"}}, &result);
         return result;
     }
 

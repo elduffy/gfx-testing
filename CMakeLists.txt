@@ -6,9 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(SDL_STATIC ON)
 find_package(SDL3 CONFIG REQUIRED SDL3 SDL3-static)
 find_package(SDL3_image CONFIG REQUIRED)
-find_package(Boost CONFIG REQUIRED algorithm safe_numerics scope)
 find_package(glm CONFIG REQUIRED glm)
-find_package(absl CONFIG REQUIRED base absl_check log)
+find_package(absl CONFIG REQUIRED base absl_check log strings cleanup)
 find_package(Catch2 CONFIG REQUIRED Catch2WithMain)
 find_package(EnTT CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
@@ -72,9 +71,8 @@ target_link_libraries(gfx_testing_lib PUBLIC
         absl::base
         absl::absl_check
         absl::log
-        Boost::algorithm
-        Boost::safe_numerics
-        Boost::scope
+        absl::strings
+        absl::cleanup
         glm::glm
         fastgltf::fastgltf
         EnTT::EnTT

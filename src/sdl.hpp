@@ -1,9 +1,8 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <absl/cleanup/cleanup.h>
 #include <algorithm>
-#include <boost/safe_numerics/checked_default.hpp>
-#include <boost/scope/scope_exit.hpp>
 #include <util/util.hpp>
 #include <vector>
 
@@ -33,7 +32,7 @@ namespace gfx_testing::sdl {
     };
 
     [[nodiscard]] inline auto scopedSubmitCommandBuffer(SDL_GPUCommandBuffer *commandBuffer) {
-        boost::scope::scope_exit guard([commandBuffer] { SDL_SubmitGPUCommandBuffer(commandBuffer); });
+        absl::Cleanup guard = [commandBuffer] { SDL_SubmitGPUCommandBuffer(commandBuffer); };
         return std::move(guard);
     }
 
@@ -134,8 +133,8 @@ namespace gfx_testing::sdl {
         util::Extent2D getExtent() const {
             assert(mSurface);
             return {
-                    .mWidth = boost::safe_numerics::checked::cast<uint32_t>(mSurface->w),
-                    .mHeight = boost::safe_numerics::checked::cast<uint32_t>(mSurface->h),
+                    .mWidth = util::narrow_u32(mSurface->w),
+                    .mHeight = util::narrow_u32(mSurface->h),
             };
         }
 

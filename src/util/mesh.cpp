@@ -92,7 +92,7 @@ namespace gfx_testing::util {
         for (size_t i = 0; i < mVertexData.size(); ++i) {
             auto const &v = mVertexData[i];
             auto const outIndex = vertexToUniqueIndex.at(v);
-            builder.addIndex(boost::safe_numerics::checked::cast<uint32_t>(outIndex));
+            builder.addIndex(util::narrow_u32(outIndex));
         }
 
         if (attribTreatment.mNormal == NormalTreatment::AVERAGE) {

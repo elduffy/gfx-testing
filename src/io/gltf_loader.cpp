@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <boost/algorithm/string/classification.hpp>
 #include <fastgltf/core.hpp>
 #include <fastgltf/tools.hpp>
 #include <io/gltf_loader.hpp>
