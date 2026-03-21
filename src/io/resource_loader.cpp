@@ -1,4 +1,4 @@
-#include <boost/algorithm/string/replace.hpp>
+#include <absl/strings/str_replace.h>
 #include <io/gltf_loader.hpp>
 #include <io/obj_loader.hpp>
 #include <io/resource_loader.hpp>
@@ -30,7 +30,7 @@ namespace gfx_testing::io {
                 << "Only supporting SPIRV formats for now";
 
         std::string compiledFilename = shaderSourcePath.filename().string();
-        boost::replace_last(compiledFilename, ".hlsl", ".spv");
+        absl::StrReplaceAll({{".hlsl", ".spv"}}, &compiledFilename);
         const auto compiledFilePath = getShaderDir(mProjectRoot) / compiledFilename;
         return ShaderCode(compiledFilePath, type);
     }

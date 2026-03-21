@@ -2,7 +2,9 @@
 
 #include <SDL3/SDL_gpu.h>
 #include <absl/log/check.h>
+#include <concepts>
 #include <filesystem>
+#include <limits>
 #include <ostream>
 #include <source_location>
 
@@ -31,6 +33,16 @@ namespace {
 #define TODO(...) FAIL(__VA_ARGS__)
 
 namespace gfx_testing::util {
+    template <std::integral T>
+    inline uint32_t narrow_u32(T x) {
+        if constexpr (std::is_signed_v<T>) {
+            CHECK_GE(x, T{0});
+        }
+        CHECK_LE(static_cast<uintmax_t>(x),
+                 static_cast<uintmax_t>(std::numeric_limits<uint32_t>::max()));
+        return static_cast<uint32_t>(x);
+    }
+
     std::filesystem::path getProjectRoot();
 
     struct Extent2D {

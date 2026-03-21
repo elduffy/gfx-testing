@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/container_hash/hash.hpp>
+#include <cstddef>
 #include <cstring>
 #include <sdl.hpp>
 #include <unordered_map>
@@ -9,16 +9,19 @@ namespace gfx_testing::render {
 
     struct SamplerKeyOps {
         std::size_t operator()(const SDL_GPUSamplerCreateInfo &obj) const {
-            std::size_t hash = 0;
             constexpr std::hash<uint8_t> byteHash;
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.min_filter)));
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.mag_filter)));
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.mipmap_mode)));
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.address_mode_u)));
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.address_mode_v)));
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.address_mode_w)));
-            boost::hash_combine(hash, byteHash(static_cast<uint8_t>(obj.max_anisotropy)));
-            boost::hash_combine(hash, byteHash(obj.enable_anisotropy));
+            auto combine = [](std::size_t &h, std::size_t v) {
+                h ^= v + 0x9e3779b9u + (h << 6) + (h >> 2);
+            };
+            std::size_t hash = 0;
+            combine(hash, byteHash(static_cast<uint8_t>(obj.min_filter)));
+            combine(hash, byteHash(static_cast<uint8_t>(obj.mag_filter)));
+            combine(hash, byteHash(static_cast<uint8_t>(obj.mipmap_mode)));
+            combine(hash, byteHash(static_cast<uint8_t>(obj.address_mode_u)));
+            combine(hash, byteHash(static_cast<uint8_t>(obj.address_mode_v)));
+            combine(hash, byteHash(static_cast<uint8_t>(obj.address_mode_w)));
+            combine(hash, byteHash(static_cast<uint8_t>(obj.max_anisotropy)));
+            combine(hash, byteHash(obj.enable_anisotropy));
             return hash;
         }
 

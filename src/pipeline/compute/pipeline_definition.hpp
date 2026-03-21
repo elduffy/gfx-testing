@@ -49,7 +49,7 @@ namespace gfx_testing::pipeline::compute {
             }
             result = std::max(result, b.mBinding + 1);
         }
-        return boost::safe_numerics::checked::cast<uint32_t>(result);
+        return static_cast<uint32_t>(result);
     }
 
     static constexpr auto SHADER_DEBUG_NORMALS = ShaderDefinition{

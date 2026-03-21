@@ -1,6 +1,5 @@
 #include <absl/log/check.h>
 #include <array>
-#include <boost/scope/scope_exit.hpp>
 #include <cmath>
 #include <ecs/render_ecs.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
