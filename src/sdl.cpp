@@ -25,6 +25,21 @@ namespace gfx_testing::sdl {
         CHECK(SDL_ClaimWindowForGPUDevice(mDevice, mWindow)) << "Failed to claim window: " << SDL_GetError();
 
         updateSwapchainParameters(presentModes, swapchainCompositions);
+
+        mColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(mDevice, mWindow);
+    }
+
+    SdlContext::SdlContext(const bool gfxDebug, SDL_GPUTextureFormat colorTargetFormat) :
+        mWindow(nullptr), mDevice(nullptr), mColorTargetFormat(colorTargetFormat) {
+        SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "offscreen");
+        CHECK(SDL_Init(SDL_INIT_VIDEO)) << "Failed to initialize SDL: " << SDL_GetError();
+        SDL_Log("SDL initialized (headless mode).");
+
+        mDevice = LOG_DURATION(SDL_CreateGPUDevice,
+                               SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
+                               gfxDebug, nullptr);
+        CHECK_NE(mDevice, nullptr) << "SDL_CreateGPUDevice failed: " << SDL_GetError();
+        SDL_Log("GPU Device created (headless).");
     }
 
     char const *getSwapchainCompositionName(SDL_GPUSwapchainComposition composition) {
@@ -93,9 +108,11 @@ namespace gfx_testing::sdl {
     }
 
     SdlContext::~SdlContext() {
-        SDL_ReleaseWindowFromGPUDevice(mDevice, mWindow);
+        if (mWindow) {
+            SDL_ReleaseWindowFromGPUDevice(mDevice, mWindow);
+            SDL_DestroyWindow(mWindow);
+        }
         SDL_DestroyGPUDevice(mDevice);
-        SDL_DestroyWindow(mWindow);
         SDL_Quit();
     }
 } // namespace gfx_testing::sdl

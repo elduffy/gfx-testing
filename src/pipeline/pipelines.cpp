@@ -22,7 +22,7 @@ namespace gfx_testing::pipeline {
                                             gfx::PipelineDefinition const &pipelineDefinition) {
 
         SDL_GPUColorTargetDescription colorTargetDescription = {
-                .format = SDL_GetGPUSwapchainTextureFormat(context.mDevice, context.mWindow),
+                .format = context.mColorTargetFormat,
         };
         constexpr SDL_GPUVertexBufferDescription vertexBufferDescription = {
                 .slot = 0,
