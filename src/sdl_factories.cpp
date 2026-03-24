@@ -41,7 +41,7 @@ namespace gfx_testing::sdl {
         if constexpr (pipeline::MSAA_SAMPLE_COUNT == SDL_GPU_SAMPLECOUNT_1) {
             return std::nullopt;
         }
-        auto const format = SDL_GetGPUSwapchainTextureFormat(sdlContext.mDevice, sdlContext.mWindow);
+        auto const format = sdlContext.mColorTargetFormat;
         const SDL_GPUTextureCreateInfo createInfo = {
                 .type = SDL_GPU_TEXTURETYPE_2D,
                 .format = format,

@@ -16,6 +16,8 @@ namespace gfx_testing::game {
         std::optional<float> mTargetFps = std::nullopt;
         bool mVsyncDisabled = false;
         bool mHdrEnabled = false;
+        bool mHeadless = false;
+        uint32_t mFrameCount = 1;
 
         std::vector<SDL_GPUPresentMode> getPresentModes() const;
         std::vector<SDL_GPUSwapchainComposition> getSwapchainCompositions() const;
@@ -32,30 +34,35 @@ namespace gfx_testing::game {
                     GameSettings const &settings);
 
         template<typename EventFn, typename UpdateFn>
-        void runMainLoop(EventFn &eventFn, UpdateFn &updateFn) {
+        void runMainLoop(EventFn &eventFn, UpdateFn &updateFn, bool pollEvents = true,
+                         std::optional<uint32_t> frameCount = std::nullopt) {
             SDL_Event event;
+            uint32_t framesRendered = 0;
 
             mStopwatch.resume();
-            while (true) {
+            while (!frameCount.has_value() || framesRendered < frameCount.value()) {
                 mLastFrame.update(mStopwatch);
 
-                while (SDL_PollEvent(&event)) {
-                    eventFn(event);
-                    switch (event.type) {
-                        case SDL_EVENT_QUIT: {
-                            SDL_Log("Quitting.");
-                            return;
-                        }
-                        case SDL_EVENT_WINDOW_RESIZED: {
-                            break;
-                        }
-                        default: {
-                            // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
-                            break;
+                if (pollEvents) {
+                    while (SDL_PollEvent(&event)) {
+                        eventFn(event);
+                        switch (event.type) {
+                            case SDL_EVENT_QUIT: {
+                                SDL_Log("Quitting.");
+                                return;
+                            }
+                            case SDL_EVENT_WINDOW_RESIZED: {
+                                break;
+                            }
+                            default: {
+                                // SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unhandled event type: 0x%x", event.type);
+                                break;
+                            }
                         }
                     }
                 }
                 updateFn();
+                ++framesRendered;
             }
         }
 

@@ -15,7 +15,7 @@ namespace gfx_testing::io {
     void InputManager::doZoom(float delta) { mScene.getCamera().approach(delta); }
 
     void InputManager::handleEvent(SDL_Event const &event) {
-        if (mImGuiContext.processEvent(event) && event.type != SDL_EVENT_FINGER_UP &&
+        if (mImGuiContext && mImGuiContext->processEvent(event) && event.type != SDL_EVENT_FINGER_UP &&
             event.type != SDL_EVENT_FINGER_CANCELED) {
             return;
         }
@@ -38,7 +38,9 @@ namespace gfx_testing::io {
                     mGameContext.mStopwatch.toggle();
                 }
                 if (!event.key.down && !event.key.repeat && event.key.key == SDLK_D) {
-                    mImGuiContext.toggleOpen();
+                    if (mImGuiContext) {
+                        mImGuiContext->toggleOpen();
+                    }
                 }
                 if (!event.key.down && !event.key.repeat && event.key.key == SDLK_LSHIFT) {
                     mShift = false;

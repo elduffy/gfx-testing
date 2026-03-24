@@ -16,7 +16,11 @@ namespace gfx_testing::sdl {
         explicit SdlContext(bool gfxDebug, std::vector<SDL_GPUPresentMode> const &presentModes,
                             std::vector<SDL_GPUSwapchainComposition> const &swapchainCompositions);
 
+        explicit SdlContext(bool gfxDebug, SDL_GPUTextureFormat colorTargetFormat);
+
         ~SdlContext();
+
+        [[nodiscard]] bool isHeadless() const { return mWindow == nullptr; }
 
         friend bool operator==(const SdlContext &lhs, const SdlContext &rhs) {
             return lhs.mWindow == rhs.mWindow && lhs.mDevice == rhs.mDevice;
@@ -29,6 +33,7 @@ namespace gfx_testing::sdl {
     public:
         SDL_Window *mWindow;
         SDL_GPUDevice *mDevice;
+        SDL_GPUTextureFormat mColorTargetFormat;
     };
 
     [[nodiscard]] inline auto scopedSubmitCommandBuffer(SDL_GPUCommandBuffer *commandBuffer) {
