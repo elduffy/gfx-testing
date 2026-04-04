@@ -1,3 +1,4 @@
+#include <color_target.hpp>
 #include <render/draw_context.hpp>
 
 namespace gfx_testing::render {
@@ -7,16 +8,7 @@ namespace gfx_testing::render {
         return sdl::ScopedCommandBuffer(commandBuffer);
     }
 
-    SDL_GPUTexture *acquireSwapchainTexture(SDL_GPUCommandBuffer *commandBuffer, SDL_Window *window,
-                                            util::Extent2D &swapchainExtentOut) {
-        SDL_GPUTexture *swapchainTexture = nullptr;
-        CHECK(SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, window, &swapchainTexture,
-                                                    &swapchainExtentOut.mWidth, &swapchainExtentOut.mHeight))
-                << "Failed to acquire swapchain texture: " << SDL_GetError();
-        return swapchainTexture;
-    }
-
-    DrawContext::DrawContext(sdl::SdlContext const &sdlContext) :
-        mCommandBuffer(acquireCommandBuffer(sdlContext)), mSwapchainExtent(0, 0),
-        mSwapchainTexture(acquireSwapchainTexture(*mCommandBuffer, sdlContext.mWindow, mSwapchainExtent)) {}
+    DrawContext::DrawContext(sdl::SdlContext const &sdlContext, sdl::ColorTargetSource const &colorTargetSource) :
+        mCommandBuffer(acquireCommandBuffer(sdlContext)), mExtent(0, 0),
+        mColorTarget(colorTargetSource.acquireColorTarget(*mCommandBuffer, mExtent)) {}
 } // namespace gfx_testing::render

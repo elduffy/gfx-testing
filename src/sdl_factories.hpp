@@ -3,8 +3,13 @@
 #include <sdl.hpp>
 
 namespace gfx_testing::sdl {
+    constexpr auto DEFAULT_TEXTURE_FORMAT = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+    //
+    // SdlGpuTexture createColorTarget(SdlContext const &sdlContext, util::Extent2D extent, SDL_GPUTextureType type,
+    //                                 uint32_t layerCount);
+
     SdlGpuTexture createGpuTexture(SdlContext const &sdlContext, util::Extent2D extent, SDL_GPUTextureType type,
-                                   uint32_t layerCount);
+                                   SDL_GPUTextureFormat format, SDL_GPUTextureUsageFlags usage, uint32_t layerCount);
 
     SdlGpuTexture createDepthTexture(SdlContext const &sdlContext, util::Extent2D const &extent);
 

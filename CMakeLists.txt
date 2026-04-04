@@ -60,9 +60,8 @@ add_library(gfx_testing_lib
         src/util/scoped_timer.cpp
         src/util/stopwatch.cpp
         src/util/util.cpp
-        src/ecs/entity.hpp
         src/debug/views/imgui_perf_view.cpp
-        src/debug/views/imgui_perf_view.hpp
+        src/color_target.cpp
 )
 target_link_libraries(gfx_testing_lib PUBLIC
         imgui::imgui

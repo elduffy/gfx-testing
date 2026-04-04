@@ -3,10 +3,8 @@
 #include <cmath>
 #include <ecs/render_ecs.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <pipeline/pipelines.hpp>
 #include <render/point_light.hpp>
-#include <render/samplers.hpp>
 #include <render/scene.hpp>
 #include <sdl_factories.hpp>
 #include <tiny_obj_loader.h>
@@ -44,11 +42,11 @@ namespace gfx_testing::render {
     void Scene::update() { mSceneObjects.update(); }
 
     void Scene::draw(DrawContext const &drawContext) const {
-        CHECK_NE(drawContext.mSwapchainTexture, nullptr) << "Scene::draw called with null swapchain.";
-        CHECK_EQ(drawContext.mSwapchainExtent, mViewportExtent) << "Swapchain extent is different than viewport extent";
+        CHECK_NE(drawContext.mColorTarget, nullptr) << "Scene::draw called with null swapchain.";
+        CHECK_EQ(drawContext.mExtent, mViewportExtent) << "Swapchain extent is different than viewport extent";
 
         SDL_GPUColorTargetInfo mainColorTarget{
-                .texture = drawContext.mSwapchainTexture,
+                .texture = drawContext.mColorTarget,
                 .clear_color = {0, 0, 0, 1},
                 .load_op = SDL_GPU_LOADOP_CLEAR,
                 .store_op = SDL_GPU_STOREOP_STORE,
@@ -57,7 +55,7 @@ namespace gfx_testing::render {
         if (mMultisampleTextureOpt.has_value()) {
             mainColorTarget.texture = *mMultisampleTextureOpt.value();
             mainColorTarget.store_op = SDL_GPU_STOREOP_RESOLVE;
-            mainColorTarget.resolve_texture = drawContext.mSwapchainTexture;
+            mainColorTarget.resolve_texture = drawContext.mColorTarget;
         }
 
         const SDL_GPUDepthStencilTargetInfo depthStencilTargetInfo{

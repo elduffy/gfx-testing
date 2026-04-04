@@ -13,13 +13,11 @@ namespace gfx_testing::shader {
 
     void transferBufferData(sdl::SdlContext const &context, MeshData const &meshData,
                             GpuShaderObject const &gpuShaderObject) {
-        const sdl::SdlTransferBuffer transferBuffer = sdl::SdlTransferBuffer::create(
-                context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
-                [&] {
+        const sdl::SdlTransferBuffer transferBuffer =
+                sdl::SdlTransferBuffer::create(context, SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, [&] {
                     auto const v = meshData.getVertexBufferSize();
                     auto const i = meshData.getIndexBufferSize();
-                    CHECK_LE(static_cast<uint64_t>(v) + i,
-                             std::numeric_limits<uint32_t>::max());
+                    CHECK_LE(static_cast<uint64_t>(v) + i, std::numeric_limits<uint32_t>::max());
                     return v + i;
                 }());
 
@@ -81,7 +79,8 @@ namespace gfx_testing::shader {
         for (auto const &image: imageData) {
             CHECK(!image.mSurfaces.empty()) << "No surfaces for image data";
             textures.emplace_back(sdl::createGpuTexture(sdlContext, image.mSurfaces.front().getExtent(),
-                                                        image.mTextureType, image.mSurfaces.size()));
+                                                        image.mTextureType, sdl::DEFAULT_TEXTURE_FORMAT,
+                                                        SDL_GPU_TEXTUREUSAGE_SAMPLER, image.mSurfaces.size()));
         }
         return textures;
     }

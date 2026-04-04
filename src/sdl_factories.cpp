@@ -10,11 +10,11 @@ namespace gfx_testing::sdl {
     }
 
     SdlGpuTexture createGpuTexture(SdlContext const &sdlContext, util::Extent2D extent, SDL_GPUTextureType type,
-                                   uint32_t layerCount) {
+                                   SDL_GPUTextureFormat format, SDL_GPUTextureUsageFlags usage, uint32_t layerCount) {
         const SDL_GPUTextureCreateInfo createInfo = {
                 .type = type,
-                .format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
-                .usage = SDL_GPU_TEXTUREUSAGE_SAMPLER,
+                .format = format,
+                .usage = usage,
                 .width = util::narrow_u32(extent.mWidth),
                 .height = util::narrow_u32(extent.mHeight),
                 .layer_count_or_depth = layerCount,
@@ -41,7 +41,7 @@ namespace gfx_testing::sdl {
         if constexpr (pipeline::MSAA_SAMPLE_COUNT == SDL_GPU_SAMPLECOUNT_1) {
             return std::nullopt;
         }
-        auto const format = SDL_GetGPUSwapchainTextureFormat(sdlContext.mDevice, sdlContext.mWindow);
+        auto const format = sdlContext.mColorTargetFormat;
         const SDL_GPUTextureCreateInfo createInfo = {
                 .type = SDL_GPU_TEXTURETYPE_2D,
                 .format = format,

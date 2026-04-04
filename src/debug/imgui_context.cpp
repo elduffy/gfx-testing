@@ -15,7 +15,7 @@ namespace gfx_testing::imgui {
     // Set true to show the demo menu to try out widgets, etc
     static auto constexpr SHOW_DEMO = false;
 
-    ImGuiContext::ImGuiContext(sdl::SdlContext const &sdlContext) {
+    ImGuiContext::ImGuiContext(sdl::SdlContext const &sdlContext) : mSdlContext(sdlContext) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
@@ -24,7 +24,7 @@ namespace gfx_testing::imgui {
         ImGui_ImplSDL3_InitForSDLGPU(sdlContext.mWindow);
         ImGui_ImplSDLGPU3_InitInfo init_info{
                 .Device = sdlContext.mDevice,
-                .ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(sdlContext.mDevice, sdlContext.mWindow),
+                .ColorTargetFormat = sdlContext.mColorTargetFormat,
         };
         CHECK(ImGui_ImplSDLGPU3_Init(&init_info)) << "Failed to initialize ImGui";
         SDL_Log("Setup ImGui");
@@ -43,6 +43,7 @@ namespace gfx_testing::imgui {
         if (!mOpenWindow) {
             return false;
         }
+        CHECK(!mSdlContext.isHeadless());
         ImGui_ImplSDL3_ProcessEvent(&sdlEvent);
         const ImGuiIO &io = ImGui::GetIO();
         return io.WantCaptureMouse || io.WantCaptureKeyboard;
@@ -99,6 +100,7 @@ namespace gfx_testing::imgui {
         if (!mOpenWindow) {
             return;
         }
+        CHECK(!mSdlContext.isHeadless());
         ImGui_ImplSDLGPU3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
@@ -112,7 +114,7 @@ namespace gfx_testing::imgui {
         Imgui_ImplSDLGPU3_PrepareDrawData(drawData, *drawContext.mCommandBuffer);
 
         const SDL_GPUColorTargetInfo colorTargetInfo{
-                .texture = drawContext.mSwapchainTexture,
+                .texture = drawContext.mColorTarget,
                 .clear_color = {0, 0, 0, 1},
                 .load_op = SDL_GPU_LOADOP_LOAD,
                 .store_op = SDL_GPU_STOREOP_STORE,
