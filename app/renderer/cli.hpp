@@ -43,7 +43,9 @@ namespace gfx_testing {
     public:
         Cli(int argc, char *argv[]) :
             mConfigFilePath("config.toml"),
-            mGroup(clipp::option("-c", "--config") & clipp::value("config toml file", mConfigFilePath)) {
+            mGroup((clipp::option("-c", "--config") & clipp::value("config toml file", mConfigFilePath)),
+                   clipp::option("--headless").set(mHeadless),
+                   clipp::option("--frames") & clipp::value("frame count", mFrameCount)) {
 
             if (!clipp::parse(argc, argv, mGroup)) {
                 std::cout << clipp::make_man_page(mGroup, std::filesystem::path{argv[0]}.filename().string());
@@ -72,6 +74,8 @@ namespace gfx_testing {
                 SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to load settings from %s. Using defaults.",
                             mConfigFilePath.c_str());
             }
+            gameSettings.mHeadless = mHeadless;
+            gameSettings.mFrameCount = mFrameCount;
             {
                 std::stringstream ss;
                 ss << gameSettings;
@@ -82,6 +86,8 @@ namespace gfx_testing {
 
     private:
         std::string mConfigFilePath;
+        bool mHeadless = false;
+        uint32_t mFrameCount = 1;
         clipp::group mGroup;
     };
 } // namespace gfx_testing

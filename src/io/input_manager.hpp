@@ -1,10 +1,10 @@
 #pragma once
 
-#include <debug/imgui_context.hpp>
 #include <SDL3/SDL_events.h>
+#include <debug/imgui_context.hpp>
 #include <game.hpp>
-#include <render/scene.hpp>
 #include <glm/vec2.hpp>
+#include <render/scene.hpp>
 #include <unordered_map>
 
 namespace gfx_testing::io {

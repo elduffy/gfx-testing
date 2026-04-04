@@ -14,7 +14,7 @@ namespace gfx_testing::imgui {
 
         explicit ImGuiContext(sdl::SdlContext const &sdlContext);
 
-        void toggleOpen() { mOpenWindow = !mOpenWindow; }
+        void toggleOpen() { mOpenWindow = !mSdlContext.isHeadless() && !mOpenWindow; }
 
         /**
          * @return true if the event was captured by imgui
@@ -26,8 +26,8 @@ namespace gfx_testing::imgui {
     private:
         void showDebugWindow(render::Scene &scene);
 
+        sdl::SdlContext const &mSdlContext;
         bool mOpenWindow{false};
-
         std::vector<std::unique_ptr<ImguiDebugView>> mDebugViews;
     };
 } // namespace gfx_testing::imgui
