@@ -1,6 +1,7 @@
 #pragma once
-#include <sdl.hpp>
 #include <vector>
+
+#include <sdl.hpp>
 
 namespace gfx_testing::pipeline {
 

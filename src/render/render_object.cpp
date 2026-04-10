@@ -1,7 +1,8 @@
-#include <game.hpp>
-#include <render/render_object.hpp>
 #include <utility>
 #include <vector>
+
+#include <game.hpp>
+#include <render/render_object.hpp>
 
 namespace gfx_testing::render {
     RenderObject::RenderObject(game::GameContext &gameContext, shader::ShaderObject const &shaderObject,

@@ -1,6 +1,7 @@
 #pragma once
-#include <entt/entity/entity.hpp>
 #include <optional>
+
+#include <entt/entity/entity.hpp>
 
 namespace gfx_testing::ecs {
     class EntityBase {

@@ -1,6 +1,7 @@
+#include <algorithm>
+
 #include <SDL3/SDL_gpu.h>
 #include <absl/log/check.h>
-#include <algorithm>
 #include <pipeline/gfx/pipeline.hpp>
 #include <pipeline/gfx/pipeline_definition.hpp>
 #include <pipeline/util.hpp>

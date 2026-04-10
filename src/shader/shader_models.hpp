@@ -1,18 +1,19 @@
 #pragma once
 
+#include <array>
+#include <ostream>
+#include <sstream>
+#include <vector>
+
 #include <SDL3/SDL.h>
 #include <absl/log/check.h>
-#include <array>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <gooch.frag.hpp>
-#include <ostream>
 #include <shader/util.hpp>
 #include <shader/vertex.hpp>
 #include <util/util.hpp>
-#include <sstream>
-#include <vector>
 
 
 namespace gfx_testing::shader {

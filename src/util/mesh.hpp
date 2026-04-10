@@ -1,9 +1,10 @@
 #pragma once
 #include <array>
+#include <vector>
+
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <shader/shader_models.hpp>
-#include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <shader/mesh.hpp>

@@ -31,20 +31,20 @@ namespace gfx_testing::ecs::render {
                 return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::SimpleColor>(
                         ecs, name, std::forward<Args>(args)...);
             case pipeline::gfx::PipelineName::Gooch:
-                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Gooch>(
-                        ecs, name, std::forward<Args>(args)...);
+                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Gooch>(ecs, name,
+                                                                                        std::forward<Args>(args)...);
             case pipeline::gfx::PipelineName::Textured:
-                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Textured>(
-                        ecs, name, std::forward<Args>(args)...);
+                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Textured>(ecs, name,
+                                                                                           std::forward<Args>(args)...);
             case pipeline::gfx::PipelineName::Lines:
-                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Lines>(
-                        ecs, name, std::forward<Args>(args)...);
+                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Lines>(ecs, name,
+                                                                                        std::forward<Args>(args)...);
             case pipeline::gfx::PipelineName::Lambert:
-                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Lambert>(
-                        ecs, name, std::forward<Args>(args)...);
+                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Lambert>(ecs, name,
+                                                                                          std::forward<Args>(args)...);
             case pipeline::gfx::PipelineName::Skybox:
-                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Skybox>(
-                        ecs, name, std::forward<Args>(args)...);
+                return createAndEmplaceRenderObject<pipeline::gfx::PipelineName::Skybox>(ecs, name,
+                                                                                         std::forward<Args>(args)...);
         }
         FAIL("Unknown pipeline name '{}'", static_cast<uint32_t>(pipelineName));
     }

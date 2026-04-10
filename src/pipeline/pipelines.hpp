@@ -1,7 +1,8 @@
 #pragma once
 
-#include <io/resource_loader.hpp>
 #include <map>
+
+#include <io/resource_loader.hpp>
 #include <pipeline/compute/pipeline.hpp>
 #include <pipeline/gfx/pipeline.hpp>
 #include <sdl.hpp>

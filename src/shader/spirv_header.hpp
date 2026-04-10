@@ -1,10 +1,11 @@
 #pragma once
-#include <SDL3/SDL_gpu.h>
 #include <algorithm>
 #include <array>
-#include <util/util.hpp>
 #include <variant>
 #include <vector>
+
+#include <SDL3/SDL_gpu.h>
+#include <util/util.hpp>
 
 namespace gfx_testing::shader {
 
