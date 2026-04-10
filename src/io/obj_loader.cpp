@@ -1,9 +1,10 @@
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <SDL3/SDL_log.h>
 #include <filesystem>
 #include <format>
-#include <io/obj_loader.hpp>
 #include <iostream>
+
+#include <SDL3/SDL_log.h>
+#include <io/obj_loader.hpp>
 #include <shader/shader_models.hpp>
 #include <tiny_obj_loader.h>
 

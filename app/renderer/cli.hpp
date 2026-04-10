@@ -1,8 +1,9 @@
 #pragma once
-#include <clipp.h>
 #include <filesystem>
-#include <game.hpp>
 #include <iostream>
+
+#include <clipp.h>
+#include <game.hpp>
 #include <toml.hpp>
 
 namespace gfx_testing {

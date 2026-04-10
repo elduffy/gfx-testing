@@ -1,8 +1,9 @@
 #pragma once
 
+#include <chrono>
+
 #include <SDL3/SDL_log.h>
 #include <absl/cleanup/cleanup.h>
-#include <chrono>
 
 namespace gfx_testing::util {
     class ScopedTimer {

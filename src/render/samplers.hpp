@@ -2,17 +2,16 @@
 
 #include <cstddef>
 #include <cstring>
-#include <sdl.hpp>
 #include <unordered_map>
+
+#include <sdl.hpp>
 
 namespace gfx_testing::render {
 
     struct SamplerKeyOps {
         std::size_t operator()(const SDL_GPUSamplerCreateInfo &obj) const {
             constexpr std::hash<uint8_t> byteHash;
-            auto combine = [](std::size_t &h, std::size_t v) {
-                h ^= v + 0x9e3779b9u + (h << 6) + (h >> 2);
-            };
+            auto combine = [](std::size_t &h, std::size_t v) { h ^= v + 0x9e3779b9u + (h << 6) + (h >> 2); };
             std::size_t hash = 0;
             combine(hash, byteHash(static_cast<uint8_t>(obj.min_filter)));
             combine(hash, byteHash(static_cast<uint8_t>(obj.mag_filter)));

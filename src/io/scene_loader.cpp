@@ -1,4 +1,5 @@
 #include <fstream>
+
 #include <io/scene_loader.hpp>
 #include <nlohmann/json.hpp>
 #include <util/util.hpp>
@@ -19,7 +20,7 @@ namespace gfx_testing::io {
         auto const json = nlohmann::json::parse(file);
         SceneDefinition scene;
 
-        for (auto const &obj : json.at("objects")) {
+        for (auto const &obj: json.at("objects")) {
             auto const type = obj.at("type").get<std::string>();
 
             if (type == "mesh") {

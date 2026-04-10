@@ -1,10 +1,11 @@
 #pragma once
 
 #include <filesystem>
-#include <glm/vec3.hpp>
 #include <string>
 #include <variant>
 #include <vector>
+
+#include <glm/vec3.hpp>
 
 namespace gfx_testing::io {
 

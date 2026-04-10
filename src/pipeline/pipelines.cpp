@@ -1,5 +1,6 @@
-#include <absl/log/check.h>
 #include <array>
+
+#include <absl/log/check.h>
 #include <pipeline/pipelines.hpp>
 #include <shader/shader_models.hpp>
 

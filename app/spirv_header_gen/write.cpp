@@ -1,6 +1,7 @@
+#include <format>
+
 #include <absl/log/check.h>
 #include <absl/strings/str_replace.h>
-#include <format>
 #include <inja/inja.hpp>
 #include <write.hpp>
 

@@ -1,7 +1,8 @@
-#include <absl/log/check.h>
 #include <format>
-#include <io/texture_loader.hpp>
 #include <map>
+
+#include <absl/log/check.h>
+#include <io/texture_loader.hpp>
 #include <util/cube_map.hpp>
 
 #include "SDL3_image/SDL_image.h"

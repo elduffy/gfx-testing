@@ -1,7 +1,8 @@
 #pragma once
 
-#include <SDL3/SDL.h>
 #include <filesystem>
+
+#include <SDL3/SDL.h>
 #include <io/scene_loader.hpp>
 #include <sdl.hpp>
 #include <shader/object.hpp>

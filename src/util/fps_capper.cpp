@@ -1,5 +1,6 @@
-#include <SDL3/SDL_log.h>
 #include <thread>
+
+#include <SDL3/SDL_log.h>
 #include <util/fps_capper.hpp>
 
 namespace gfx_testing::util {

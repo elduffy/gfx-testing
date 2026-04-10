@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 #include <optional>
+
 #include <util/util.hpp>
 
 namespace gfx_testing::util {

@@ -32,14 +32,13 @@ namespace gfx_testing::render {
     }
 
     static ecs::EntityId findFirstBehaviorMesh(io::SceneDefinition const &sceneDef, game::GameContext &gameContext) {
-        for (auto const &objDef : sceneDef.mObjects) {
+        for (auto const &objDef: sceneDef.mObjects) {
             if (auto const *mesh = std::get_if<io::MeshObjectDef>(&objDef)) {
                 if (!mesh->mBehavior.empty()) {
                     auto entityId = createMeshObject(gameContext, *mesh);
                     if (mesh->mBehavior == "rotate_z") {
-                        entityId.emplace<RotateBehavior>(
-                                RotateBehavior{.mAxis = glm::vec3(0, 0, 1),
-                                               .mRadsPerSecond = mesh->mBehaviorRadsPerSecond});
+                        entityId.emplace<RotateBehavior>(RotateBehavior{
+                                .mAxis = glm::vec3(0, 0, 1), .mRadsPerSecond = mesh->mBehaviorRadsPerSecond});
                     }
                     return entityId;
                 }
@@ -55,7 +54,7 @@ namespace gfx_testing::render {
 
         auto &ecs = gameContext.getEcs();
 
-        for (auto const &objDef : mSceneDefinition.mObjects) {
+        for (auto const &objDef: mSceneDefinition.mObjects) {
             if (auto const *mesh = std::get_if<io::MeshObjectDef>(&objDef)) {
                 // Skip the first behavior mesh — already created above
                 if (!mesh->mBehavior.empty() && mesh->mName == mPropObjects.getName()) {
@@ -63,9 +62,8 @@ namespace gfx_testing::render {
                 }
                 auto entityId = createMeshObject(gameContext, *mesh);
                 if (!mesh->mBehavior.empty() && mesh->mBehavior == "rotate_z") {
-                    entityId.emplace<RotateBehavior>(
-                            RotateBehavior{.mAxis = glm::vec3(0, 0, 1),
-                                           .mRadsPerSecond = mesh->mBehaviorRadsPerSecond});
+                    entityId.emplace<RotateBehavior>(RotateBehavior{.mAxis = glm::vec3(0, 0, 1),
+                                                                    .mRadsPerSecond = mesh->mBehaviorRadsPerSecond});
                 }
             } else if (auto const *skybox = std::get_if<io::SkyboxDef>(&objDef)) {
                 SkyBox::create(ecs, gameContext, gameContext.mResourceLoader.loadCubeMap(skybox->mCubemap));

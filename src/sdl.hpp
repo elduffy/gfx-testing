@@ -1,10 +1,11 @@
 #pragma once
 
+#include <algorithm>
+#include <vector>
+
 #include <SDL3/SDL.h>
 #include <absl/cleanup/cleanup.h>
-#include <algorithm>
 #include <util/util.hpp>
-#include <vector>
 
 namespace gfx_testing::sdl {
     class SdlContext {

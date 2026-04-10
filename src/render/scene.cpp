@@ -1,6 +1,7 @@
-#include <absl/log/check.h>
 #include <array>
 #include <cmath>
+
+#include <absl/log/check.h>
 #include <ecs/render_ecs.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <pipeline/pipelines.hpp>

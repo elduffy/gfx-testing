@@ -1,7 +1,8 @@
 #pragma once
 
-#include <ecs/ecs.hpp>
 #include <ostream>
+
+#include <ecs/ecs.hpp>
 #include <pipeline/pipelines.hpp>
 #include <render/samplers.hpp>
 #include <sdl.hpp>
